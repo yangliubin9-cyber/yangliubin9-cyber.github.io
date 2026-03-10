@@ -1,0 +1,32 @@
+---
+import PageIntro from '../../components/PageIntro.astro';
+import StudioEditor from '../../components/StudioEditor.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES, SITE, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const copy = getDictionary(locale);
+const paths = getLanguagePaths('studio');
+---
+
+<BaseLayout
+  locale={locale}
+  currentNav="blog"
+  pagePath={getLocalizedPath(locale, 'studio')}
+  paths={paths}
+  title={`${copy.nav.studio} | ${copy.branding.title}`}
+  description={copy.studio.description}
+>
+  <PageIntro eyebrow={copy.studio.eyebrow} title={copy.studio.title} description={copy.studio.description}>
+    <div class="page-intro__actions">
+      <a class="button button--ghost" href={SITE.repositoryUrl} target="_blank" rel="noreferrer">Repository</a>
+      <a class="text-link" href={SITE.commentsRepositoryUrl} target="_blank" rel="noreferrer">Comments Repo</a>
+    </div>
+  </PageIntro>
+
+  <StudioEditor locale={locale} />
+</BaseLayout>

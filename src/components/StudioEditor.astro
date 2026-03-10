@@ -1,0 +1,380 @@
+﻿---
+import { getDictionary, type Locale } from '../lib/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props as Props;
+const copy = getDictionary(locale);
+const messages = {
+  saveLabel: locale === 'zh' ? '草稿已保存' : 'Draft saved',
+  clearedLabel: locale === 'zh' ? '草稿已清空' : 'Draft cleared',
+  copiedLabel: locale === 'zh' ? '已复制到剪贴板' : 'Copied to clipboard',
+  copyFailedLabel: locale === 'zh' ? '复制失败，请手动复制' : 'Copy failed. Please copy manually.',
+  downloadLabel: locale === 'zh' ? '文件已生成' : 'File prepared',
+  defaultHeading: locale === 'zh' ? '从这里开始写作' : 'Start writing here',
+  defaultParagraph:
+    locale === 'zh'
+      ? '这是一个可视化编辑区域，你可以先把内容结构整理清楚，再导出成 Markdown 或 MDX。'
+      : 'This is a visual editing surface. Shape the structure first, then export it as Markdown or MDX.',
+  defaultNote: locale === 'zh' ? '这里适合放提示、结论或补充说明。' : 'Use this block for notes, takeaways, or context.',
+  defaultCode: '// code',
+  untitled: locale === 'zh' ? '未命名文章' : 'Untitled post',
+  uncategorized: locale === 'zh' ? '未分类' : 'Uncategorized',
+  defaultTag: 'Draft',
+  defaultEyebrow: 'Draft'
+};
+const serializedMessages = JSON.stringify(messages);
+const defaultMarkup = `<h2>${messages.defaultHeading}</h2><p>${messages.defaultParagraph}</p>`;
+---
+
+<section
+  class="studio-shell section"
+  data-studio-root
+  data-default-locale={locale}
+  data-messages={serializedMessages}
+  data-default-markup={defaultMarkup}
+>
+  <div class="surface studio-meta">
+    <div class="studio-meta__grid">
+      <label>
+        <span>{copy.studio.meta.locale}</span>
+        <select data-field="locale">
+          <option value="zh">简中</option>
+          <option value="en">EN</option>
+        </select>
+      </label>
+
+      <label>
+        <span>{copy.studio.meta.pathSlug}</span>
+        <input data-field="pathSlug" placeholder="my-post-slug" />
+      </label>
+
+      <label>
+        <span>{copy.studio.meta.translationKey}</span>
+        <input data-field="translationKey" placeholder="my-post-slug" />
+      </label>
+
+      <label>
+        <span>{copy.studio.meta.category}</span>
+        <input data-field="category" placeholder={locale === 'zh' ? '工程实践 / 设计' : 'Engineering / Design'} />
+      </label>
+
+      <label>
+        <span>{copy.studio.meta.title}</span>
+        <input data-field="title" placeholder={locale === 'zh' ? '输入文章标题' : 'Enter article title'} />
+      </label>
+
+      <label>
+        <span>{copy.studio.meta.excerpt}</span>
+        <input data-field="excerpt" placeholder={locale === 'zh' ? '输入文章摘要' : 'Enter excerpt'} />
+      </label>
+
+      <label>
+        <span>{copy.studio.meta.tags}</span>
+        <input data-field="tags" placeholder="AI, Workflow, Blog" />
+      </label>
+
+      <label>
+        <span>{copy.studio.meta.heroEyebrow}</span>
+        <input data-field="heroEyebrow" placeholder="Workflow" />
+      </label>
+
+      <label>
+        <span>{copy.studio.meta.accent}</span>
+        <select data-field="accent">
+          <option value="yellow">yellow</option>
+          <option value="cyan">cyan</option>
+          <option value="violet">violet</option>
+        </select>
+      </label>
+
+      <label class="studio-meta__checkbox">
+        <input data-field="featured" type="checkbox" />
+        <span>{copy.studio.meta.featured}</span>
+      </label>
+    </div>
+
+    <div class="studio-meta__notes">
+      <p>{copy.studio.notes.autosave}</p>
+      <p>{copy.studio.notes.translation}</p>
+    </div>
+  </div>
+
+  <div class="surface studio-editor">
+    <div class="studio-toolbar">
+      <button type="button" data-command="h2">{copy.studio.toolbar.h2}</button>
+      <button type="button" data-command="h3">{copy.studio.toolbar.h3}</button>
+      <button type="button" data-command="paragraph">{copy.studio.toolbar.paragraph}</button>
+      <button type="button" data-command="bold">{copy.studio.toolbar.bold}</button>
+      <button type="button" data-command="list">{copy.studio.toolbar.list}</button>
+      <button type="button" data-command="quote">{copy.studio.toolbar.quote}</button>
+      <button type="button" data-command="code">{copy.studio.toolbar.code}</button>
+      <button type="button" data-command="note">{copy.studio.toolbar.note}</button>
+    </div>
+
+    <div class="studio-tabs">
+      <button type="button" class="is-active" data-tab-target="editor">{copy.studio.tabs.editor}</button>
+      <button type="button" data-tab-target="output">{copy.studio.tabs.output}</button>
+    </div>
+
+    <div class="studio-panel is-active" data-tab-panel="editor">
+      <article class="studio-surface" contenteditable="true" spellcheck="true" data-editor-surface>
+        <h2>{messages.defaultHeading}</h2>
+        <p>{messages.defaultParagraph}</p>
+      </article>
+    </div>
+
+    <div class="studio-panel" data-tab-panel="output">
+      <textarea class="studio-output" data-output readonly></textarea>
+    </div>
+
+    <div class="studio-actions">
+      <button type="button" data-action="save">{copy.studio.actions.save}</button>
+      <button type="button" data-action="copy">{copy.studio.actions.copy}</button>
+      <button type="button" data-action="download">{copy.studio.actions.download}</button>
+      <button type="button" data-action="clear">{copy.studio.actions.clear}</button>
+      <span class="studio-actions__status" data-status-node>{copy.studio.notes.autosave}</span>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (() => {
+    const root = document.querySelector('[data-studio-root]');
+    if (!root) return;
+
+    const storageKey = 'ylb-studio-draft-v1';
+    const texts = JSON.parse(root.dataset.messages || '{}');
+    const defaultLocale = root.dataset.defaultLocale || 'zh';
+    const defaultMarkup = root.dataset.defaultMarkup || '<h2>Start writing here</h2><p></p>';
+    const surface = root.querySelector('[data-editor-surface]');
+    const output = root.querySelector('[data-output]');
+    const statusNode = root.querySelector('[data-status-node]');
+    const tabButtons = [...root.querySelectorAll('[data-tab-target]')];
+    const panels = [...root.querySelectorAll('[data-tab-panel]')];
+    const fieldElements = [...root.querySelectorAll('[data-field]')];
+    const fields = Object.fromEntries(fieldElements.map((element) => [element.dataset.field, element]));
+
+    const setStatus = (value) => {
+      if (statusNode) statusNode.textContent = value;
+    };
+
+    const isCheckbox = (element) => element instanceof HTMLInputElement && element.type === 'checkbox';
+
+    const getFieldValue = (element) => (isCheckbox(element) ? element.checked : element.value);
+
+    const setFieldValue = (element, value) => {
+      if (isCheckbox(element)) {
+        element.checked = Boolean(value);
+        return;
+      }
+      element.value = typeof value === 'string' ? value : '';
+    };
+
+    const inlineToMarkdown = (node) => {
+      if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+      if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+      const element = node;
+      const tag = element.tagName.toLowerCase();
+      const content = [...element.childNodes].map(inlineToMarkdown).join('');
+
+      if (tag === 'strong' || tag === 'b') return `**${content}**`;
+      if (tag === 'em' || tag === 'i') return `*${content}*`;
+      if (tag === 'code' && element.parentElement?.tagName.toLowerCase() !== 'pre') return `\`${content}\``;
+      if (tag === 'br') return '\n';
+      return content;
+    };
+
+    const blockToMarkdown = (element) => {
+      const tag = element.tagName.toLowerCase();
+      const text = [...element.childNodes].map(inlineToMarkdown).join('').trim();
+
+      if (tag === 'h2') return `## ${text}`;
+      if (tag === 'h3') return `### ${text}`;
+      if (tag === 'p') return text;
+      if (tag === 'blockquote') return text.split(/\n+/).map((line) => `> ${line.trim()}`).join('\n');
+      if (tag === 'ul') return [...element.querySelectorAll(':scope > li')].map((item) => `- ${(item.textContent || '').trim()}`).join('\n');
+      if (tag === 'ol') return [...element.querySelectorAll(':scope > li')].map((item, index) => `${index + 1}. ${(item.textContent || '').trim()}`).join('\n');
+      if (tag === 'pre') return ['```ts', element.textContent?.trim() || '', '```'].join('\n');
+      if (tag === 'aside' && element.classList.contains('mdx-note')) return ['<aside className="mdx-note">', text, '</aside>'].join('\n');
+      if (tag === 'hr') return '---';
+      return text;
+    };
+
+    const serialize = () => {
+      const localeValue = fields.locale?.value || 'zh';
+      const tags = String(fields.tags?.value || '')
+        .split(/[,，]/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+      const blocks = [...surface.children].map((element) => blockToMarkdown(element)).filter(Boolean);
+      const pathSlug = String(fields.pathSlug?.value || 'draft-post').trim() || 'draft-post';
+      const translationKey = String(fields.translationKey?.value || pathSlug).trim() || pathSlug;
+      const title = String(fields.title?.value || texts.untitled).trim() || texts.untitled;
+      const excerpt = String(fields.excerpt?.value || '').trim();
+      const category = String(fields.category?.value || texts.uncategorized).trim() || texts.uncategorized;
+      const accent = String(fields.accent?.value || 'yellow').trim() || 'yellow';
+      const heroEyebrow = String(fields.heroEyebrow?.value || texts.defaultEyebrow).trim() || texts.defaultEyebrow;
+      const featured = fields.featured?.checked ? 'true' : 'false';
+      const frontmatter = [
+        '---',
+        `pathSlug: ${pathSlug}`,
+        `locale: ${localeValue}`,
+        `translationKey: ${translationKey}`,
+        `title: ${title}`,
+        `excerpt: ${excerpt}`,
+        `category: ${category}`,
+        `publishedAt: ${new Date().toISOString().slice(0, 10)}`,
+        `featured: ${featured}`,
+        'tags:',
+        ...(tags.length ? tags.map((tag) => `  - ${tag}`) : [`  - ${texts.defaultTag}`]),
+        `accent: ${accent}`,
+        `heroEyebrow: ${heroEyebrow}`,
+        '---'
+      ].join('\n');
+
+      const body = blocks.join('\n\n').trim();
+      const full = [frontmatter, body].filter(Boolean).join('\n\n') + '\n';
+      output.value = full;
+      return full;
+    };
+
+    const saveDraft = () => {
+      const payload = {
+        html: surface.innerHTML,
+        fields: Object.fromEntries(Object.entries(fields).map(([key, element]) => [key, getFieldValue(element)]))
+      };
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+      setStatus(texts.saveLabel);
+    };
+
+    const restoreDraft = () => {
+      const raw = localStorage.getItem(storageKey);
+      fields.locale.value = defaultLocale;
+      fields.accent.value = 'yellow';
+
+      if (!raw) {
+        surface.innerHTML = defaultMarkup;
+        serialize();
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(raw);
+        surface.innerHTML = payload.html || defaultMarkup;
+        Object.entries(payload.fields || {}).forEach(([key, value]) => {
+          const element = fields[key];
+          if (!element) return;
+          setFieldValue(element, value);
+        });
+      } catch {
+        surface.innerHTML = defaultMarkup;
+        fields.locale.value = defaultLocale;
+        fields.accent.value = 'yellow';
+      }
+
+      serialize();
+    };
+
+    const update = () => {
+      serialize();
+      saveDraft();
+    };
+
+    const focusSurface = () => {
+      surface.focus();
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount > 0) return;
+      const range = document.createRange();
+      range.selectNodeContents(surface);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    };
+
+    root.querySelectorAll('[data-command]').forEach((button) => {
+      button.addEventListener('click', () => {
+        focusSurface();
+        const command = button.dataset.command;
+
+        if (command === 'h2') document.execCommand('formatBlock', false, 'h2');
+        if (command === 'h3') document.execCommand('formatBlock', false, 'h3');
+        if (command === 'paragraph') document.execCommand('formatBlock', false, 'p');
+        if (command === 'bold') document.execCommand('bold');
+        if (command === 'list') document.execCommand('insertUnorderedList');
+        if (command === 'quote') document.execCommand('formatBlock', false, 'blockquote');
+        if (command === 'code') document.execCommand('insertHTML', false, `<pre><code>${texts.defaultCode}</code></pre>`);
+        if (command === 'note') document.execCommand('insertHTML', false, `<aside class="mdx-note">${texts.defaultNote}</aside>`);
+        update();
+      });
+    });
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = button.dataset.tabTarget;
+        tabButtons.forEach((item) => item.classList.toggle('is-active', item === button));
+        panels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.tabPanel === target));
+        if (target === 'output') serialize();
+      });
+    });
+
+    fieldElements.forEach((element) => {
+      element.addEventListener(isCheckbox(element) ? 'change' : 'input', update);
+    });
+    surface.addEventListener('input', update);
+
+    root.querySelector('[data-action="save"]').addEventListener('click', () => {
+      serialize();
+      saveDraft();
+    });
+
+    root.querySelector('[data-action="copy"]').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(serialize());
+        setStatus(texts.copiedLabel);
+      } catch {
+        setStatus(texts.copyFailedLabel);
+      }
+    });
+
+    root.querySelector('[data-action="download"]').addEventListener('click', () => {
+      const content = serialize();
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      const fileName = String(fields.pathSlug?.value || 'draft-post').trim() || 'draft-post';
+      anchor.href = url;
+      anchor.download = `${fileName}.mdx`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setStatus(texts.downloadLabel);
+    });
+
+    root.querySelector('[data-action="clear"]').addEventListener('click', () => {
+      localStorage.removeItem(storageKey);
+      surface.innerHTML = defaultMarkup;
+      Object.entries(fields).forEach(([key, element]) => {
+        if (key === 'locale') {
+          setFieldValue(element, defaultLocale);
+          return;
+        }
+        if (key === 'accent') {
+          setFieldValue(element, 'yellow');
+          return;
+        }
+        if (isCheckbox(element)) {
+          element.checked = false;
+          return;
+        }
+        element.value = '';
+      });
+      serialize();
+      setStatus(texts.clearedLabel);
+    });
+
+    restoreDraft();
+  })();
+</script>

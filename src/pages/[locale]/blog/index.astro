@@ -2,8 +2,8 @@
 import PageIntro from '../../../components/PageIntro.astro';
 import PostCard from '../../../components/PostCard.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getCategories, getPosts, getTags } from '../../../lib/posts';
-import { LOCALES, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../../lib/site';
+import { getAllPosts, getCategories, getTags } from '../../../lib/posts';
+import { LOCALES, SITE, getBlogPath, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../../lib/site';
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({
@@ -14,15 +14,14 @@ export function getStaticPaths() {
 
 const { locale } = Astro.props as { locale: Locale };
 const copy = getDictionary(locale);
-const posts = await getPosts(locale);
+const posts = await getAllPosts();
 const categories = getCategories(posts);
 const tags = getTags(posts);
 const paths = getLanguagePaths('blog');
+const resultLabel = copy.blog.resultLabel;
 const filterScript = `(() => {
   const root = document.querySelector('[data-blog-filters]');
-  if (!root) {
-    return;
-  }
+  if (!root) return;
 
   const cards = [...root.querySelectorAll('[data-post-card]')];
   const searchInput = root.querySelector('[data-search-input]');
@@ -55,25 +54,18 @@ const filterScript = `(() => {
       const matchesTag = state.tag === 'all' || (card.dataset.tags || '').split('|').includes(state.tag);
       const show = matchesQuery && matchesCategory && matchesTag;
       card.hidden = !show;
-      if (show) {
-        visible += 1;
-      }
+      if (show) visible += 1;
     });
 
-    if (count) {
-      count.textContent = visible + ' ' + ${JSON.stringify(copy.blog.resultLabel)};
-    }
-
-    if (empty) {
-      empty.hidden = visible !== 0;
-    }
+    if (count) count.textContent = visible + ' ' + ${JSON.stringify(resultLabel)};
+    if (empty) empty.hidden = visible !== 0;
 
     const nextParams = new URLSearchParams();
     if (state.query) nextParams.set('q', state.query);
     if (state.category !== 'all') nextParams.set('category', state.category);
     if (state.tag !== 'all') nextParams.set('tag', state.tag);
-    const nextParamsValue = nextParams.toString();
-    history.replaceState({}, '', nextParamsValue ? window.location.pathname + '?' + nextParamsValue : window.location.pathname);
+    const nextValue = nextParams.toString();
+    history.replaceState({}, '', nextValue ? window.location.pathname + '?' + nextValue : window.location.pathname);
     syncButtons(categoryButtons, state.category, 'categoryFilter');
     syncButtons(tagButtons, state.tag, 'tagFilter');
   };
@@ -107,12 +99,17 @@ const filterScript = `(() => {
 <BaseLayout
   locale={locale}
   currentNav="blog"
-  pagePath={getLocalizedPath(locale, 'blog')}
+  pagePath={getBlogPath(locale)}
   paths={paths}
   title={`${copy.nav.blog} | ${copy.branding.title}`}
   description={copy.blog.description}
 >
-  <PageIntro eyebrow={copy.blog.eyebrow} title={copy.blog.title} description={copy.blog.description} />
+  <PageIntro eyebrow={copy.blog.eyebrow} title={copy.blog.title} description={copy.blog.description}>
+    <div class="page-intro__actions">
+      <a class="button button--ghost" href={getLocalizedPath(locale, 'studio')}>{copy.blog.studioAction}</a>
+      <a class="text-link" href={SITE.commentsRepositoryUrl} target="_blank" rel="noreferrer">{copy.blog.commentsAction}</a>
+    </div>
+  </PageIntro>
 
   <section class="blog-filters section" data-blog-filters>
     <div class="surface filter-panel">
@@ -148,7 +145,7 @@ const filterScript = `(() => {
       {posts.map((post) => (
         <div
           data-post-card
-          data-search-text={`${post.data.title} ${post.data.excerpt} ${post.data.category} ${post.data.tags.join(' ')}`.toLowerCase()}
+          data-search-text={`${post.data.locale} ${post.data.title} ${post.data.excerpt} ${post.data.category} ${post.data.tags.join(' ')}`.toLowerCase()}
           data-category={post.data.category}
           data-tags={post.data.tags.join('|')}
         >

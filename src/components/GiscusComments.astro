@@ -71,7 +71,7 @@ const giscusScript = `(() => {
   ) : (
     <div class="comments-panel__placeholder">
       <p>{copy.post.commentsHint}</p>
-      <a class="text-link" href="https://giscus.app" target="_blank" rel="noreferrer">giscus.app</a>
+      <a class="text-link" href={SITE.commentsRepositoryUrl} target="_blank" rel="noreferrer">{SITE.giscus.repo}</a>
     </div>
   )}
 </section>

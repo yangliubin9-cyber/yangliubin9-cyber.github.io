@@ -35,6 +35,7 @@ const brandPath = getLocalizedPath(locale);
     <div class="site-header__identity">
       <span>{PROFILE.name[locale]}</span>
     </div>
+    <a class="site-header__utility" href={getLocalizedPath(locale, 'studio')}>{copy.nav.studio}</a>
     <LocaleSwitch locale={locale} paths={paths} />
     <ThemeToggle locale={locale} />
   </div>

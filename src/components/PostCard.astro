@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { formatDate } from '../lib/posts';
-import { getDictionary, getLocalizedPath, type Locale } from '../lib/site';
+import { getDictionary, getPostPath, type Locale } from '../lib/site';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -10,12 +10,16 @@ interface Props {
 
 const { post, locale } = Astro.props as Props;
 const copy = getDictionary(locale);
-const href = getLocalizedPath(locale, `blog/${post.data.pathSlug}`);
+const href = getPostPath(post.data.locale, post.data.pathSlug);
+const localeBadge = copy.localeLabel[post.data.locale];
 ---
 
 <article class="post-card" data-accent={post.data.accent}>
   <div class="post-card__topline">
-    <span class="pill">{post.data.category}</span>
+    <div class="post-card__badges">
+      <span class="pill">{post.data.category}</span>
+      <span class="tag tag--locale">{localeBadge}</span>
+    </div>
     <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale)}</time>
   </div>
 

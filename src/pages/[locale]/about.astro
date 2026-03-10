@@ -24,7 +24,7 @@ const paths = getLanguagePaths('about');
 
   <section class="section section--two-columns">
     <article class="surface profile-panel">
-      <img class="profile-card__avatar profile-card__avatar--large" src={PROFILE.avatar} alt={PROFILE.name[locale]} loading="lazy" />
+      <img class="profile-card__avatar profile-card__avatar--large" src={PROFILE.avatar} alt={PROFILE.name[locale]} loading="lazy" onerror={`this.onerror=null;this.src='${PROFILE.avatarFallback}'`} />
       <h2>{PROFILE.name[locale]}</h2>
       <p>{PROFILE.tagline[locale]}</p>
     </article>

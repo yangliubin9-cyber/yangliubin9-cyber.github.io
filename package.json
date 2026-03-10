@@ -4,10 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "sync:assets": "node scripts/sync-assets.mjs",
+    "predev": "npm run sync:assets",
     "dev": "astro dev --host",
+    "prestart": "npm run sync:assets",
     "start": "astro dev --host",
+    "prebuild": "npm run sync:assets",
     "build": "astro check && astro build",
-    "preview": "astro preview --host"
+    "preview": "astro preview --host",
+    "translate:post": "node scripts/translate-post.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.0",

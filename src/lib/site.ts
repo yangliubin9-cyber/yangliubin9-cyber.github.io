@@ -1,19 +1,26 @@
-export const SITE = {
+﻿export const SITE = {
   origin: 'https://yangliubin9-cyber.github.io',
   repositoryUrl: 'https://github.com/yangliubin9-cyber/yangliubin9-cyber.github.io',
+  commentsRepositoryUrl: 'https://github.com/yangliubin9-cyber/Blogs-Comment',
   profileUrl: 'https://github.com/yangliubin9-cyber',
   email: 'yangliubin9-cyber@users.noreply.github.com',
   defaultOgImage: '/og-card.svg',
   giscus: {
-    repo: 'yangliubin9-cyber/yangliubin9-cyber.github.io',
-    repoId: '',
-    category: 'General',
-    categoryId: '',
+    repo: import.meta.env.PUBLIC_GISCUS_REPO ?? 'yangliubin9-cyber/Blogs-Comment',
+    repoId: import.meta.env.PUBLIC_GISCUS_REPO_ID ?? '',
+    category: import.meta.env.PUBLIC_GISCUS_CATEGORY ?? 'General',
+    categoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID ?? '',
+    availableCategories: ['General', 'Ideas', 'Q&A', 'Showcase'],
     mapping: 'pathname',
     strict: '0',
     reactionsEnabled: '1',
     emitMetadata: '0',
     inputPosition: 'top'
+  },
+  ai: {
+    envFile: '.env.local',
+    scriptPath: 'scripts/translate-post.mjs',
+    defaultStyle: 'anthropic'
   }
 } as const;
 
@@ -25,7 +32,8 @@ export type NavKey = 'home' | 'blog' | 'about' | 'projects' | 'uses' | 'contact'
 export const NAV_ITEMS: NavKey[] = ['home', 'blog', 'about', 'projects', 'uses', 'contact'];
 
 export const PROFILE = {
-  avatar: '/avatar-sponge.svg',
+  avatar: '/Avatar.jpg',
+  avatarFallback: '/avatar-sponge.svg',
   name: {
     zh: '杨刘彬 (Bin)',
     en: 'Yang Liubin (Bin)'
@@ -49,47 +57,50 @@ const dictionaries = {
       projects: '项目',
       uses: '装备',
       contact: '联系',
-      theme: '切换明暗主题',
+      studio: '工作台',
+      theme: '切换亮暗主题',
       language: '切换语言'
     },
     home: {
-      eyebrow: 'YANG LIUBIN · JOURNAL',
+      eyebrow: 'YANG LIUBIN / JOURNAL',
       heroTitle: '让技术写作像产品一样被认真设计。',
       heroDescription:
-        '这是一个双语个人博客系统，记录工程、设计、云计算、生活观察与长期主义。界面借鉴 Apple 的克制与 Linear 的秩序感，让内容成为真正的主角。',
+        '这里记录工程、设计、云计算运维与生活观察。视觉上借鉴 Apple 的克制和 Linear 的秩序感，让内容、结构与个人气质自然融合。',
       primary: '进入博客',
       secondary: '了解我',
       introTitle: '你好，我是杨刘彬 (Bin)',
       introBody:
-        '我在全栈开发、设计表达与云计算运维之间穿梭，喜欢把复杂系统整理成清晰、耐看的体验。',
+        '我在全栈开发、设计表达与云计算运维之间穿梭，喜欢把复杂系统整理成清晰、耐看、可持续演进的体验。',
       latestTitle: '最新文章',
-      latestDescription: '从工程实践到生活思考，每一篇文章都服务于“更高信噪比”的阅读体验。',
+      latestDescription: '从工程实践到生活思考，每一篇文章都服务于更高信噪比的阅读体验。',
       spotlightTitle: '这不是模板博客，而是一个持续成长的个人操作系统。',
       spotlightItems: [
-        '首页聚焦最新文章、头像与一句话简介，让访客在第一屏就认识你。',
-        '博客列表支持本地静态搜索、分类和标签筛选，保持完全免费。',
-        'About / Projects / Uses / Contact 让它更像一张可持续更新的个人名片。'
+        '首页聚焦最新文章、头像和一句话简介，让访客在第一屏就快速认识你。',
+        '博客列表支持跨中英文统一搜索、分类和标签筛选，保持完全免费的静态方案。',
+        'About / Projects / Uses / Contact 让它更像一张可以持续更新的个人名片。'
       ]
     },
     blog: {
       eyebrow: 'INDEX / SEARCH',
       title: '博客',
-      description: '支持分类、标签和本地静态搜索，帮助读者快速定位文章。',
-      searchPlaceholder: '搜索标题、摘要、标签或分类',
+      description: '跨中英文统一搜索，支持分类、标签与本地静态搜索。',
+      searchPlaceholder: '搜索标题、摘要、标签、分类或语言',
       searchLabel: '搜索',
       categoryLabel: '分类',
       tagLabel: '标签',
       allCategories: '全部分类',
       allTags: '全部标签',
-      resultLabel: '篇文章',
+      resultLabel: '篇结果',
       emptyTitle: '没有匹配的文章',
-      emptyBody: '可以尝试清空搜索词，或切换分类 / 标签。'
+      emptyBody: '可以尝试清空搜索词，或切换分类 / 标签。',
+      studioAction: '打开可视化工作台',
+      commentsAction: '评论仓库'
     },
     about: {
       eyebrow: 'ABOUT / PROFILE',
       title: '关于我',
       description:
-        '我希望把开发、设计和运维之间的经验，转化成更容易被理解和使用的数字产品。',
+        '我希望把开发、设计和运维之间的经验，转化成更容易被理解、使用和信任的数字产品。',
       sections: {
         background: '背景',
         skills: '技能',
@@ -99,7 +110,7 @@ const dictionaries = {
       background: [
         '全栈开发者，同时对界面设计和内容表达有很强兴趣。',
         '长期关注云计算、自动化运维、工程效率与产品体验。',
-        '相信“讲清楚复杂系统”本身，就是一种重要能力。'
+        '我相信“讲清楚复杂系统”本身，就是一种重要能力。'
       ],
       skills: ['TypeScript / JavaScript', 'Astro / React / Node.js', 'Cloud Ops / Automation', 'Design systems', 'Technical writing'],
       interests: ['开发者工具', '个人知识系统', '静态网站', '可读性驱动的 UI 设计']
@@ -107,17 +118,17 @@ const dictionaries = {
     projects: {
       eyebrow: 'PROJECTS / WORK',
       title: '项目',
-      description: '这里展示能代表你工程能力、设计判断和系统化思维的作品。',
+      description: '这里展示能体现你的工程能力、设计判断和系统化思维的作品。',
       items: [
         {
           name: 'Yang’s Log',
           type: 'Personal Platform',
-          description: '这个博客系统本身就是一个项目：双语、主题切换、静态搜索、评论系统与 GitHub Pages 自动部署。'
+          description: '这个博客系统本身就是一个项目：双语路由、主题切换、跨语言搜索、评论系统与 GitHub Pages 自动部署。'
         },
         {
           name: 'Cloud Automation Toolkit',
           type: 'Ops / Internal Tools',
-          description: '适合替换成你日常在云环境、运维自动化或脚本平台上的真实项目。'
+          description: '适合替换成你在云环境、运维自动化或脚本平台上的真实项目。'
         },
         {
           name: 'Design + Code Experiments',
@@ -129,11 +140,11 @@ const dictionaries = {
     uses: {
       eyebrow: 'USES / STACK',
       title: '装备',
-      description: '开发者通常也喜欢看“你平时用什么工作”，这页会自然拉近距离。',
+      description: '开发者也会关心你平时用什么工作，这一页天然能拉近距离。',
       groups: [
         {
           name: '软件',
-          items: ['VS Code / Cursor 类编辑器', 'GitHub', 'Raycast / PowerToys', 'Chrome / Arc 类浏览器']
+          items: ['VS Code / Cursor 类编辑器', 'GitHub', 'PowerToys', 'Chrome / Arc 类浏览器']
         },
         {
           name: '开发',
@@ -148,12 +159,53 @@ const dictionaries = {
     contact: {
       eyebrow: 'CONTACT / LINKS',
       title: '联系',
-      description: '这是一个静态站点，所以我选择完全免费的联系方式：GitHub、邮箱和 Discussions。',
+      description: '这个站点坚持免费基础设施，所以联系层也保持轻量：GitHub、邮箱和 Discussions。',
       items: [
         { label: 'GitHub', value: 'github.com/yangliubin9-cyber', href: 'https://github.com/yangliubin9-cyber' },
         { label: 'Email', value: 'yangliubin9-cyber@users.noreply.github.com', href: 'mailto:yangliubin9-cyber@users.noreply.github.com' },
-        { label: 'Discussions', value: '在文章页评论区交流', href: 'https://github.com/yangliubin9-cyber/yangliubin9-cyber.github.io/discussions' }
+        { label: 'Discussions', value: 'github.com/yangliubin9-cyber/Blogs-Comment/discussions', href: 'https://github.com/yangliubin9-cyber/Blogs-Comment/discussions' }
       ]
+    },
+    studio: {
+      eyebrow: 'STUDIO / EDITOR',
+      title: '可视化写作工作台',
+      description: '这里提供富文本编辑、实时生成 Markdown / MDX、草稿本地保存以及导出能力，适合像 Notion 一样边写边看。',
+      meta: {
+        locale: '语言',
+        pathSlug: '文章路径',
+        translationKey: '双语关联键',
+        title: '标题',
+        excerpt: '摘要',
+        category: '分类',
+        tags: '标签',
+        accent: '强调色',
+        heroEyebrow: '眉标',
+        featured: '首页精选'
+      },
+      actions: {
+        copy: '复制 MDX',
+        download: '下载文件',
+        clear: '清空草稿',
+        save: '保存草稿'
+      },
+      tabs: {
+        editor: '可视化编辑',
+        output: 'MDX 输出'
+      },
+      notes: {
+        autosave: '草稿会自动保存到浏览器本地。',
+        translation: '想生成英文版本时，可结合 scripts/translate-post.mjs 和 .env.local 里的模型配置。'
+      },
+      toolbar: {
+        h2: '二级标题',
+        h3: '三级标题',
+        paragraph: '正文',
+        list: '列表',
+        quote: '引用',
+        code: '代码块',
+        note: '提示块',
+        bold: '加粗'
+      }
     },
     post: {
       backToBlog: '返回博客',
@@ -162,9 +214,15 @@ const dictionaries = {
       category: '分类',
       tags: '标签',
       contents: '目录',
+      noContents: '当前文章没有自动生成目录。',
       related: '继续阅读',
       comments: '评论',
-      commentsHint: '启用 GitHub Discussions 并填写 giscus 配置后，这里会自动出现评论区。'
+      commentsHint: '启用 Blogs-Comment 仓库的 GitHub Discussions 并补全 giscus 配置后，这里会自动出现评论区。',
+      legacyRedirect: '旧链接正在跳转到新的文章地址。'
+    },
+    localeLabel: {
+      zh: '简中',
+      en: 'EN'
     },
     footer: {
       title: '杨刘彬·言',
@@ -184,14 +242,15 @@ const dictionaries = {
       projects: 'Projects',
       uses: 'Uses',
       contact: 'Contact',
+      studio: 'Studio',
       theme: 'Toggle light and dark theme',
       language: 'Switch language'
     },
     home: {
-      eyebrow: 'YANG LIUBIN · JOURNAL',
+      eyebrow: 'YANG LIUBIN / JOURNAL',
       heroTitle: 'A personal blog designed with the same care as a product.',
       heroDescription:
-        'This bilingual site covers engineering, design, cloud operations, and everyday thinking. The interface borrows restraint from Apple and structure from Linear so the writing stays in focus.',
+        'This site covers engineering, design, cloud operations, and everyday thinking. The interface borrows restraint from Apple and structure from Linear so the writing stays in focus.',
       primary: 'Open the blog',
       secondary: 'Meet the author',
       introTitle: 'Hi, I’m Yang Liubin (Bin)',
@@ -202,23 +261,25 @@ const dictionaries = {
       spotlightTitle: 'This is not a generic template blog. It is a growing personal operating system.',
       spotlightItems: [
         'The home page introduces you instantly with your avatar, short bio, and latest writing.',
-        'The blog index offers free local search plus category and tag filtering.',
+        'The blog index offers cross-language search plus category and tag filtering.',
         'About / Projects / Uses / Contact turn the site into a complete public profile.'
       ]
     },
     blog: {
       eyebrow: 'INDEX / SEARCH',
       title: 'Blog',
-      description: 'Browse posts with category filters, tag filters, and static local search.',
-      searchPlaceholder: 'Search title, excerpt, tags, or category',
+      description: 'Search across Chinese and English posts with category, tag, and static local search.',
+      searchPlaceholder: 'Search title, excerpt, tags, category, or language',
       searchLabel: 'Search',
       categoryLabel: 'Category',
       tagLabel: 'Tag',
       allCategories: 'All categories',
       allTags: 'All tags',
-      resultLabel: 'posts',
+      resultLabel: 'results',
       emptyTitle: 'No matching posts',
-      emptyBody: 'Try clearing the query or switching the selected category or tag.'
+      emptyBody: 'Try clearing the query or switching the selected category or tag.',
+      studioAction: 'Open visual studio',
+      commentsAction: 'Comments repo'
     },
     about: {
       eyebrow: 'ABOUT / PROFILE',
@@ -247,12 +308,12 @@ const dictionaries = {
         {
           name: 'Yang’s Log',
           type: 'Personal Platform',
-          description: 'The blog itself is a project: bilingual routing, theme switching, static search, comments, and automated GitHub Pages deployment.'
+          description: 'The blog itself is a project: bilingual routes, theme switching, cross-language search, comments, and automated GitHub Pages deployment.'
         },
         {
           name: 'Cloud Automation Toolkit',
           type: 'Ops / Internal Tools',
-          description: 'A great placeholder for your real cloud, scripting, automation, or operational tooling work.'
+          description: 'A good placeholder for your real cloud, scripting, automation, or operational tooling work.'
         },
         {
           name: 'Design + Code Experiments',
@@ -268,7 +329,7 @@ const dictionaries = {
       groups: [
         {
           name: 'Software',
-          items: ['VS Code / Cursor style editor', 'GitHub', 'Raycast / PowerToys', 'Chrome / Arc style browser']
+          items: ['VS Code / Cursor style editor', 'GitHub', 'PowerToys', 'Chrome / Arc style browser']
         },
         {
           name: 'Development',
@@ -283,12 +344,53 @@ const dictionaries = {
     contact: {
       eyebrow: 'CONTACT / LINKS',
       title: 'Contact',
-      description: 'This is a static site, so I keep contact completely free: GitHub, email, and Discussions.',
+      description: 'The stack stays free, so the contact layer stays light too: GitHub, email, and Discussions.',
       items: [
         { label: 'GitHub', value: 'github.com/yangliubin9-cyber', href: 'https://github.com/yangliubin9-cyber' },
         { label: 'Email', value: 'yangliubin9-cyber@users.noreply.github.com', href: 'mailto:yangliubin9-cyber@users.noreply.github.com' },
-        { label: 'Discussions', value: 'Talk in the post comments area', href: 'https://github.com/yangliubin9-cyber/yangliubin9-cyber.github.io/discussions' }
+        { label: 'Discussions', value: 'github.com/yangliubin9-cyber/Blogs-Comment/discussions', href: 'https://github.com/yangliubin9-cyber/Blogs-Comment/discussions' }
       ]
+    },
+    studio: {
+      eyebrow: 'STUDIO / EDITOR',
+      title: 'Visual writing studio',
+      description: 'A local visual editor with rich text editing, real-time Markdown / MDX output, draft autosave, and export tools.',
+      meta: {
+        locale: 'Locale',
+        pathSlug: 'Path slug',
+        translationKey: 'Translation key',
+        title: 'Title',
+        excerpt: 'Excerpt',
+        category: 'Category',
+        tags: 'Tags',
+        accent: 'Accent',
+        heroEyebrow: 'Eyebrow',
+        featured: 'Featured'
+      },
+      actions: {
+        copy: 'Copy MDX',
+        download: 'Download file',
+        clear: 'Clear draft',
+        save: 'Save draft'
+      },
+      tabs: {
+        editor: 'Visual editor',
+        output: 'MDX output'
+      },
+      notes: {
+        autosave: 'Drafts are stored in browser localStorage automatically.',
+        translation: 'For English generation later, pair this with scripts/translate-post.mjs and the model settings in .env.local.'
+      },
+      toolbar: {
+        h2: 'Heading 2',
+        h3: 'Heading 3',
+        paragraph: 'Paragraph',
+        list: 'List',
+        quote: 'Quote',
+        code: 'Code block',
+        note: 'Note block',
+        bold: 'Bold'
+      }
     },
     post: {
       backToBlog: 'Back to blog',
@@ -297,9 +399,15 @@ const dictionaries = {
       category: 'Category',
       tags: 'Tags',
       contents: 'Contents',
+      noContents: 'This post has no generated table of contents.',
       related: 'Continue reading',
       comments: 'Comments',
-      commentsHint: 'Enable GitHub Discussions and fill in the giscus configuration to activate comments here.'
+      commentsHint: 'Enable GitHub Discussions on the Blogs-Comment repository and fill in the giscus config to activate comments here.',
+      legacyRedirect: 'Redirecting from the legacy article URL.'
+    },
+    localeLabel: {
+      zh: 'ZH',
+      en: 'EN'
     },
     footer: {
       title: 'Yang’s Log',
@@ -324,9 +432,18 @@ export function getLocalizedPath(locale: Locale, path = ''): string {
   return normalized ? `/${locale}/${normalized}/` : `/${locale}/`;
 }
 
+export function getBlogPath(locale: Locale): string {
+  return getLocalizedPath(locale, 'blog');
+}
+
+export function getPostPath(locale: Locale, slug: string): string {
+  return getLocalizedPath(locale, slug);
+}
+
 export function getLanguagePaths(path = ''): Record<Locale, string> {
   return {
     zh: getLocalizedPath('zh', path),
     en: getLocalizedPath('en', path)
   };
 }
+

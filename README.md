@@ -1,17 +1,20 @@
-# Yang’s Log / 杨刘彬·言
+﻿# Yang’s Log / 杨刘彬·言
 
-A bilingual personal blog built with Astro for GitHub Pages.
+A bilingual personal blog and portfolio built with Astro for GitHub Pages.
 
-## Included features
+## Features
 
 - `https://yangliubin9-cyber.github.io/zh` and `https://yangliubin9-cyber.github.io/en`
-- Home, Blog, About, Projects, Uses, and Contact pages
+- Home, Blog, About, Projects, Uses, Contact, and Studio pages
 - Light and dark theme switching with local persistence
-- Markdown and MDX article support
-- Blog category filters, tag filters, and local static search
-- GitHub Pages deployment via GitHub Actions
-- SEO essentials: sitemap, Open Graph metadata, and localized page titles
-- giscus comment area scaffold for GitHub Discussions
+- Markdown and MDX post support
+- Root-level post routes: `/zh/<slug>` and `/en/<slug>`
+- Cross-language local search, category filters, and tag filters
+- GitHub Discussions comments scaffold via giscus
+- GitHub Actions deployment for GitHub Pages
+- SEO essentials: sitemap, Open Graph metadata, and localized titles
+- Local visual writing studio that exports Markdown / MDX drafts
+- OpenAI-compatible translation script for Chinese-to-English post generation
 
 ## Content model
 
@@ -19,6 +22,7 @@ Posts live in `src/content/posts/{zh,en}` and use Astro content collections.
 
 Frontmatter fields:
 
+- `pathSlug`
 - `locale`
 - `translationKey`
 - `title`
@@ -31,14 +35,50 @@ Frontmatter fields:
 - `accent`
 - `heroEyebrow` (optional)
 
+## Avatar
+
+Place your avatar at the project root as one of these filenames:
+
+- `Avatar.jpg`
+- `Avatar.jpeg`
+- `Avatar.png`
+- `Avatar.webp`
+
+The `sync:assets` script will copy it to `public/Avatar.jpg` automatically before `dev` and `build`.
+If no avatar file is found, the site falls back to `public/avatar-sponge.svg`.
+
 ## Comments setup
 
-To enable giscus comments, fill these values in `src/lib/site.ts` after enabling GitHub Discussions:
+The site is already pointed at the dedicated comments repository:
 
-- `SITE.giscus.repoId`
-- `SITE.giscus.categoryId`
+- `yangliubin9-cyber/Blogs-Comment`
 
-You can generate them at [giscus.app](https://giscus.app).
+To enable giscus comments, do this:
+
+1. Enable GitHub Discussions on the `Blogs-Comment` repository.
+2. Create the categories you want to use, such as `General`, `Ideas`, `Q&A`, and `Showcase`.
+3. Generate the giscus config values at [giscus.app](https://giscus.app).
+4. Fill in `SITE.giscus.repoId` and `SITE.giscus.categoryId` in `src/lib/site.ts`.
+
+## AI translation
+
+The local translation script is at `scripts/translate-post.mjs`.
+It reads `.env.local` or `.env` and supports OpenAI-compatible and Anthropic-compatible APIs.
+
+Example:
+
+```bash
+npm run translate:post -- --source=src/content/posts/zh/ai-translation-workflows.mdx --write=true
+```
+
+Environment template:
+
+```bash
+AI_TRANSLATION_API_STYLE=anthropic
+AI_TRANSLATION_BASE_URL=https://open.bigmodel.cn/api/anthropic
+AI_TRANSLATION_API_KEY=your_api_key_here
+AI_TRANSLATION_MODEL=glm-5
+```
 
 ## Local development
 
@@ -49,11 +89,6 @@ npm run dev
 
 ## Deployment
 
-1. Push to the `main` branch of `yangliubin9-cyber.github.io`
-2. In GitHub `Settings > Pages`, choose `GitHub Actions`
-3. The workflow in `.github/workflows/deploy.yml` will build and publish automatically
-
-## Notes
-
-- The current avatar is an original sponge-inspired SVG so the public repo stays free and safe to publish.
-- Replace `public/avatar-sponge.svg` later if you want to swap in your own authorized image.
+1. Push to the `main` branch of `yangliubin9-cyber.github.io`.
+2. In GitHub `Settings > Pages`, choose `GitHub Actions`.
+3. The workflow in `.github/workflows/deploy.yml` will build and publish automatically.

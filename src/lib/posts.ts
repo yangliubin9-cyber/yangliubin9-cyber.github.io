@@ -8,6 +8,11 @@ export async function getPosts(locale: Locale) {
   return sortPosts(posts);
 }
 
+export async function getAllPosts() {
+  const posts = await getCollection('posts');
+  return sortPosts(posts);
+}
+
 export function sortPosts(posts: PostEntry[]) {
   return [...posts].sort(
     (left, right) => right.data.publishedAt.getTime() - left.data.publishedAt.getTime()
@@ -27,9 +32,9 @@ export function findTranslation(posts: PostEntry[], translationKey: string, loca
 }
 
 export function getCategories(posts: PostEntry[]) {
-  return [...new Set(posts.map((post) => post.data.category))];
+  return [...new Set(posts.map((post) => post.data.category))].sort();
 }
 
 export function getTags(posts: PostEntry[]) {
-  return [...new Set(posts.flatMap((post) => post.data.tags))];
+  return [...new Set(posts.flatMap((post) => post.data.tags))].sort();
 }

@@ -2,7 +2,7 @@
 import PostCard from '../../components/PostCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPosts } from '../../lib/posts';
-import { LOCALES, PROFILE, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+import { LOCALES, PROFILE, getBlogPath, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({
@@ -31,15 +31,16 @@ const paths = getLanguagePaths();
       <p class="eyebrow">{copy.home.eyebrow}</p>
       <h1>{copy.branding.title}</h1>
       <p class="hero__subtitle">{copy.branding.subtitle}</p>
+      <p class="hero__headline">{copy.home.heroTitle}</p>
       <p class="page-intro__description">{copy.home.heroDescription}</p>
       <div class="hero__actions">
-        <a class="button" href={getLocalizedPath(locale, 'blog')}>{copy.home.primary}</a>
+        <a class="button" href={getBlogPath(locale)}>{copy.home.primary}</a>
         <a class="button button--ghost" href={getLocalizedPath(locale, 'about')}>{copy.home.secondary}</a>
       </div>
     </div>
 
     <aside class="profile-card surface">
-      <img class="profile-card__avatar" src={PROFILE.avatar} alt={PROFILE.name[locale]} loading="lazy" />
+      <img class="profile-card__avatar" src={PROFILE.avatar} alt={PROFILE.name[locale]} loading="lazy" onerror={`this.onerror=null;this.src='${PROFILE.avatarFallback}'`} />
       <div class="profile-card__content">
         <p class="eyebrow">{copy.home.introTitle}</p>
         <h2>{PROFILE.name[locale]}</h2>
@@ -56,7 +57,7 @@ const paths = getLanguagePaths();
         <h2>{copy.home.latestTitle}</h2>
         <p>{copy.home.latestDescription}</p>
       </div>
-      <a class="text-link" href={getLocalizedPath(locale, 'blog')}>{copy.nav.blog}</a>
+      <a class="text-link" href={getBlogPath(locale)}>{copy.nav.blog}</a>
     </div>
 
     <div class="posts-grid">
