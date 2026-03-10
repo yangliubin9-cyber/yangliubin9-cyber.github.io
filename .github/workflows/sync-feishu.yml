@@ -37,6 +37,7 @@ jobs:
           FEISHU_OPEN_BASE_URL: ${{ secrets.FEISHU_OPEN_BASE_URL }}
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_USER_REFRESH_TOKEN: ${{ secrets.FEISHU_USER_REFRESH_TOKEN }}
 
       - name: Verify build
         env:

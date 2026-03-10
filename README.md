@@ -207,3 +207,17 @@ npm run dev
 1. Push to the `main` branch of `yangliubin9-cyber.github.io`.
 2. In GitHub `Settings > Pages`, choose `GitHub Actions`.
 3. The workflow in `.github/workflows/deploy.yml` will build and publish automatically.
+## Feishu user auth
+
+For personal Feishu folders, use user identity instead of app identity.
+
+1. Keep `FEISHU_AUTH_REDIRECT_URI=http://127.0.0.1:4390/feishu/callback` in your local `.env.local`
+2. Make sure the same redirect URI is configured in Feishu app security settings
+3. Run:
+
+```bash
+npm run auth:feishu
+```
+
+The script prints an authorization URL, waits for the callback locally, and stores `FEISHU_USER_REFRESH_TOKEN` in `.env.local`.
+Then add the same `FEISHU_USER_REFRESH_TOKEN` value to GitHub Actions Secrets so nightly sync can read your personal Feishu folder.

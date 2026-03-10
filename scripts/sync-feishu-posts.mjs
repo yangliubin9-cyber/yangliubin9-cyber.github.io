@@ -2,6 +2,8 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { fetchFeishuJson, getDocumentInfo, getFeishuAccessToken, loadEnvFile, trimTrailingSlash } from './feishu-oauth.mjs';
+
 const rootDir = process.cwd();
 const postsRoot = path.join(rootDir, 'src', 'content', 'posts');
 
@@ -18,13 +20,21 @@ if (configuredSources.length === 0) {
 
 const appId = process.env.FEISHU_APP_ID ?? '';
 const appSecret = process.env.FEISHU_APP_SECRET ?? '';
-const baseUrl = (process.env.FEISHU_OPEN_BASE_URL || 'https://open.feishu.cn').replace(/\/$/, '');
+const userRefreshToken = process.env.FEISHU_USER_REFRESH_TOKEN ?? '';
+const baseUrl = trimTrailingSlash(process.env.FEISHU_OPEN_BASE_URL || 'https://open.feishu.cn');
 
 if (!appId || !appSecret) {
   throw new Error('Missing FEISHU_APP_ID or FEISHU_APP_SECRET. Add them to .env.local or GitHub Actions secrets.');
 }
 
-const accessToken = await getTenantAccessToken({ appId, appSecret, baseUrl });
+const { accessToken, authMode } = await getFeishuAccessToken({
+  baseUrl,
+  appId,
+  appSecret,
+  userRefreshToken
+});
+console.log(`Using Feishu ${authMode} token mode.`);
+
 const existingIndex = await buildExistingPostIndex(postsRoot);
 const discoveredSources = await expandSources({
   sources: configuredSources,
@@ -355,47 +365,6 @@ async function loadSyncConfig() {
   return module.default ?? { sources: [] };
 }
 
-async function loadEnvFile(filePath) {
-  try {
-    const content = await readFile(filePath, 'utf8');
-    for (const line of content.split(/\r?\n/)) {
-      if (!line || line.trim().startsWith('#') || !line.includes('=')) continue;
-      const index = line.indexOf('=');
-      const key = line.slice(0, index).trim();
-      const value = line.slice(index + 1).trim().replace(/^['"]|['"]$/g, '');
-      if (!(key in process.env)) process.env[key] = value;
-    }
-  } catch {
-    // optional file
-  }
-}
-
-async function getTenantAccessToken({ appId, appSecret, baseUrl }) {
-  const response = await fetch(`${baseUrl}/open-apis/auth/v3/tenant_access_token/internal`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json; charset=utf-8'
-    },
-    body: JSON.stringify({
-      app_id: appId,
-      app_secret: appSecret
-    })
-  });
-
-  const data = await response.json();
-
-  if (!response.ok || data.code !== 0 || !data.tenant_access_token) {
-    throw new Error(`Unable to get Feishu tenant access token: ${response.status} ${JSON.stringify(data)}`);
-  }
-
-  return data.tenant_access_token;
-}
-
-async function getDocumentInfo({ baseUrl, accessToken, documentToken }) {
-  const data = await fetchFeishuJson(`${baseUrl}/open-apis/docx/v1/documents/${documentToken}`, accessToken);
-  return data.document ?? {};
-}
-
 async function getDocumentRawContent({ baseUrl, accessToken, documentToken }) {
   const data = await fetchFeishuJson(`${baseUrl}/open-apis/docx/v1/documents/${documentToken}/raw_content`, accessToken);
   const content = data.content ?? '';
@@ -403,23 +372,6 @@ async function getDocumentRawContent({ baseUrl, accessToken, documentToken }) {
     throw new Error(`Feishu returned empty raw content for document ${documentToken}`);
   }
   return content;
-}
-
-async function fetchFeishuJson(url, accessToken) {
-  const response = await fetch(url, {
-    headers: {
-      authorization: `Bearer ${accessToken}`,
-      'content-type': 'application/json; charset=utf-8'
-    }
-  });
-
-  const payload = await response.json();
-
-  if (!response.ok || payload.code !== 0) {
-    throw new Error(`Feishu request failed for ${url}: ${response.status} ${JSON.stringify(payload)}`);
-  }
-
-  return payload.data ?? {};
 }
 
 async function readExistingPost(filePath) {
