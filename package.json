@@ -1,0 +1,23 @@
+{
+  "name": "yangliubin9-cyber.github.io",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host",
+    "start": "astro dev --host",
+    "build": "astro check && astro build",
+    "preview": "astro preview --host"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/sitemap": "^3.0.0",
+    "@fontsource-variable/manrope": "^5.1.0",
+    "@fontsource/ibm-plex-mono": "^5.1.0",
+    "astro": "^5.0.0",
+    "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6"
+  }
+}

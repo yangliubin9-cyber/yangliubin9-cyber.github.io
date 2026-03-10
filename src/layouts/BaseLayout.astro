@@ -1,0 +1,108 @@
+---
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { SITE, getDictionary, type Locale } from '../lib/site';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+  pagePath: string;
+  paths: Record<Locale, string>;
+  showHeader?: boolean;
+  showFooter?: boolean;
+}
+
+const {
+  locale,
+  title = `${SITE.name} | ${getDictionary(locale).meta.tag}`,
+  description = getDictionary(locale).meta.description,
+  pagePath,
+  paths,
+  showHeader = true,
+  showFooter = true
+} = Astro.props as Props;
+
+const canonical = new URL(pagePath, SITE.origin).toString();
+const pageTitle = title.includes(SITE.name) ? title : `${title} | ${SITE.name}`;
+const themeBootstrap = `(() => {
+  const key = 'ylb-theme';
+  try {
+    const saved = localStorage.getItem(key);
+    const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const theme = saved || system;
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  } catch {
+    document.documentElement.dataset.theme = 'dark';
+    document.documentElement.style.colorScheme = 'dark';
+  }
+})();`;
+const localePersistence = `(() => {
+  const key = 'ylb-locale';
+  try {
+    localStorage.setItem(key, '${locale}');
+  } catch {}
+
+  const bind = () => {
+    document.querySelectorAll('[data-locale-choice]').forEach((link) => {
+      if (link.dataset.bound === 'true') {
+        return;
+      }
+
+      link.dataset.bound = 'true';
+      link.addEventListener('click', () => {
+        try {
+          localStorage.setItem(key, link.dataset.localeChoice || '${locale}');
+        } catch {}
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
+})();`;
+---
+
+<html lang={locale} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0d1017" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>{pageTitle}</title>
+    <script is:inline set:html={themeBootstrap}></script>
+    <slot name="head" />
+  </head>
+  <body>
+    <div class="site-backdrop" aria-hidden="true">
+      <div class="site-backdrop__aurora"></div>
+      <div class="site-backdrop__grid"></div>
+      <div class="site-backdrop__glow site-backdrop__glow--one"></div>
+      <div class="site-backdrop__glow site-backdrop__glow--two"></div>
+    </div>
+
+    <div class="page-shell">
+      {showHeader && <SiteHeader locale={locale} paths={paths} />}
+      <main class="page-main">
+        <slot />
+      </main>
+      {showFooter && <SiteFooter locale={locale} />}
+    </div>
+
+    <script is:inline set:html={localePersistence}></script>
+  </body>
+</html>

@@ -1,0 +1,120 @@
+---
+import { getCollection } from 'astro:content';
+import PostCard from '../../components/PostCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { sortPosts } from '../../lib/posts';
+import { LOCALES, getDictionary, getHomePath, type Locale } from '../../lib/site';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({
+    params: { locale },
+    props: { locale }
+  }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const copy = getDictionary(locale);
+const posts = sortPosts((await getCollection('posts')).filter((post) => post.data.locale === locale));
+const featuredPosts = posts.filter((post) => post.data.featured).slice(0, 3);
+const paths = {
+  zh: getHomePath('zh'),
+  en: getHomePath('en')
+};
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${copy.meta.title} | ${copy.meta.tag}`}
+  description={copy.meta.description}
+  pagePath={getHomePath(locale)}
+  paths={paths}
+>
+  <section class="hero panel">
+    <div class="hero__copy">
+      <p class="eyebrow">{copy.hero.eyebrow}</p>
+      <h1>{copy.hero.title}</h1>
+      <p class="hero__description">{copy.hero.description}</p>
+      <div class="hero__actions">
+        <a class="button" href="#essays">{copy.hero.primary}</a>
+        <a class="button button--ghost" href="#manifesto">{copy.hero.secondary}</a>
+      </div>
+    </div>
+
+    <div class="hero__rail">
+      <div class="surface hero__card hero__card--intro">
+        <span class="pill">Astro / GitHub Pages</span>
+        <p>
+          {locale === 'zh'
+            ? '界面被有意控制在克制范围内：更少的组件噪音，更强的内容聚焦。'
+            : 'The interface is intentionally restrained: less component noise, more focus on the writing.'}
+        </p>
+      </div>
+
+      <div class="hero__stats">
+        {copy.stats.map((item) => (
+          <div class="surface stat-card">
+            <strong>{item.value}</strong>
+            <span>{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="essays">
+    <div class="section-heading">
+      <p class="eyebrow">{copy.essays.eyebrow}</p>
+      <h2>{copy.essays.title}</h2>
+      <p>{copy.essays.description}</p>
+    </div>
+
+    <div class="posts-grid">
+      {featuredPosts.map((post) => <PostCard post={post} locale={locale} />)}
+    </div>
+  </section>
+
+  <section class="section" id="manifesto">
+    <div class="section-heading">
+      <p class="eyebrow">{copy.principles.eyebrow}</p>
+      <h2>{copy.principles.title}</h2>
+    </div>
+
+    <div class="principles-grid">
+      {copy.principles.items.map((item) => (
+        <article class="surface principle-card">
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+        </article>
+      ))}
+    </div>
+
+    <div class="manifesto surface">
+      <div class="manifesto__copy">
+        <p class="eyebrow">{copy.manifesto.eyebrow}</p>
+        <h3>{copy.manifesto.title}</h3>
+        <p>{copy.manifesto.description}</p>
+      </div>
+      <div class="manifesto__list">
+        {copy.manifesto.items.map((item) => (
+          <p>{item}</p>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="system">
+    <div class="section-heading">
+      <p class="eyebrow">{copy.system.eyebrow}</p>
+      <h2>{copy.system.title}</h2>
+    </div>
+
+    <div class="system-grid">
+      {copy.system.items.map((item, index) => (
+        <article class="surface system-card">
+          <span>{`0${index + 1}`}</span>
+          <p>{item}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

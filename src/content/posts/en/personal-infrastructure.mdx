@@ -1,0 +1,57 @@
+---
+slug: personal-infrastructure
+locale: en
+translationKey: personal-infrastructure
+title: Building personal infrastructure that lasts
+excerpt: A blog becomes a long-term asset only when writing, publishing, and maintenance all feel light enough to repeat.
+publishedAt: 2026-03-08
+readingTime: 7 min
+featured: true
+tags:
+  - Engineering
+  - Workflow
+  - Writing
+accent: violet
+heroEyebrow: System Note
+---
+
+## Starting is easy. Sustaining is the real challenge.
+
+Most personal blogs do not fail because the author has nothing to say. They fail because the maintenance burden becomes too heavy. Every update means fixing styles, checking deploys, touching copy, and making sure nothing subtle broke.
+
+That is why I keep returning to a simple rule: the architecture of a personal site has to be light enough that it never becomes a reason to stop publishing.
+
+## Why I prefer a static-first model
+
+A static site is not a weak site. It is a site that places complexity more intentionally.
+
+- No extra computation is needed at request time.
+- Content lives in files, which is easier to version and maintain.
+- Deployment stays simple and the cost stays near zero.
+
+For a personal blog, that tradeoff is almost ideal. You are maintaining a versioned knowledge repository, not a fragile online application that always wants more infrastructure.
+
+## Theme and language switching are infrastructure too
+
+People often treat language switching and theme switching as optional extras. I think they should feel like core capabilities.
+
+For me, that means three things:
+
+1. The same spatial system survives every switch.
+2. The site does not depend on paid services or gated platforms.
+3. Adding a new essay still feels like a stable file-based workflow.
+
+## A setup worth maintaining over time
+
+The stack I like right now is very simple:
+
+```ts
+const stack = {
+  framework: 'Astro',
+  content: 'MDX',
+  deploy: 'GitHub Pages',
+  automation: 'GitHub Actions'
+};
+```
+
+The strength of this setup is not that it is flashy. It is that it disappears into the background once it is working. For a personal project, that kind of smoothness matters a lot.

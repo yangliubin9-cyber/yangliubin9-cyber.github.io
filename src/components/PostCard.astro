@@ -1,0 +1,37 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../lib/posts';
+import { getDictionary, getPostPath, type Locale } from '../lib/site';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  locale: Locale;
+}
+
+const { post, locale } = Astro.props as Props;
+const copy = getDictionary(locale);
+const href = getPostPath(locale, post.slug);
+---
+
+<article class="post-card" data-accent={post.data.accent}>
+  <div class="post-card__meta">
+    <span>{post.data.heroEyebrow ?? 'Essay'}</span>
+    <span>{post.data.readingTime}</span>
+  </div>
+
+  <div class="post-card__body">
+    <h3>{post.data.title}</h3>
+    <p>{post.data.excerpt}</p>
+  </div>
+
+  <div class="post-card__footer">
+    <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale)}</time>
+    <div class="post-card__tags">
+      {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+    </div>
+  </div>
+
+  <a class="post-card__link" href={href}>
+    {copy.essays.more}
+  </a>
+</article>

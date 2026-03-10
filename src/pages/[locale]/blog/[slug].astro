@@ -1,0 +1,100 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import PostCard from '../../../components/PostCard.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { findTranslation, formatDate, sortPosts } from '../../../lib/posts';
+import { getDictionary, getHomePath, getOtherLocale, getPostPath, type Locale } from '../../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+
+  return posts.map((post) => ({
+    params: {
+      locale: post.data.locale,
+      slug: post.slug
+    },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props as { post: CollectionEntry<'posts'> };
+const locale = post.data.locale as Locale;
+const copy = getDictionary(locale);
+const allPosts = await getCollection('posts');
+const otherLocale = getOtherLocale(locale);
+const translation = findTranslation(allPosts, post.data.translationKey, otherLocale);
+const relatedPosts = sortPosts(
+  allPosts.filter((entry) => entry.data.locale === locale && entry.id !== post.id)
+).slice(0, 2);
+const { Content, headings } = await render(post);
+const paths = {
+  zh: locale === 'zh' ? getPostPath('zh', post.slug) : getHomePath('zh'),
+  en: locale === 'en' ? getPostPath('en', post.slug) : getHomePath('en')
+};
+
+if (translation) {
+  paths[translation.data.locale] = getPostPath(translation.data.locale, translation.slug);
+}
+---
+
+<BaseLayout
+  locale={locale}
+  title={post.data.title}
+  description={post.data.excerpt}
+  pagePath={getPostPath(locale, post.slug)}
+  paths={paths}
+>
+  <article class="article-layout">
+    <section class="article-hero panel">
+      <a class="text-link" href={getHomePath(locale)}>{copy.article.back}</a>
+      <p class="eyebrow">{post.data.heroEyebrow ?? 'Essay'}</p>
+      <h1>{post.data.title}</h1>
+      <p class="article-hero__excerpt">{post.data.excerpt}</p>
+
+      <div class="article-meta">
+        <span>{copy.article.published}: {formatDate(post.data.publishedAt, locale)}</span>
+        {post.data.updatedAt && <span>{copy.article.updated}: {formatDate(post.data.updatedAt, locale)}</span>}
+        <span>{post.data.readingTime}</span>
+      </div>
+
+      <div class="tag-row">
+        {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+      </div>
+    </section>
+
+    <div class="article-grid">
+      <div class="surface article-body">
+        <Content />
+      </div>
+
+      <aside class="surface toc">
+        <p class="toc__title">{copy.article.contents}</p>
+        {headings.length > 0 ? (
+          <nav class="toc__nav">
+            {headings.map((heading) => (
+              <a href={`#${heading.slug}`} class={`toc__level toc__level--${heading.depth}`}>
+                {heading.text}
+              </a>
+            ))}
+          </nav>
+        ) : (
+          <p class="toc__empty">
+            {locale === 'zh' ? '这篇文章没有分节目录。' : 'This essay does not have a generated table of contents.'}
+          </p>
+        )}
+      </aside>
+    </div>
+  </article>
+
+  {relatedPosts.length > 0 && (
+    <section class="section section--compact">
+      <div class="section-heading">
+        <p class="eyebrow">{copy.essays.eyebrow}</p>
+        <h2>{copy.article.related}</h2>
+      </div>
+      <div class="posts-grid">
+        {relatedPosts.map((entry) => <PostCard post={entry} locale={locale} />)}
+      </div>
+    </section>
+  )}
+</BaseLayout>

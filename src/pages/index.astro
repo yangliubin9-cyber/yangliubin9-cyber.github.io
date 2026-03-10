@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getHomePath } from '../lib/site';
+
+const paths = {
+  zh: getHomePath('zh'),
+  en: getHomePath('en')
+};
+
+const redirectScript = `(() => {
+  const key = 'ylb-locale';
+  try {
+    const saved = localStorage.getItem(key);
+    const browser = navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+    const target = saved === 'zh' || saved === 'en' ? saved : browser;
+    window.location.replace(target === 'en' ? '${paths.en}' : '${paths.zh}');
+  } catch {
+    window.location.replace('${paths.zh}');
+  }
+})();`;
+---
+
+<BaseLayout
+  locale="zh"
+  title="Yang Liubin"
+  description="A bilingual personal blog built with Astro and GitHub Pages."
+  pagePath="/"
+  paths={paths}
+  showHeader={false}
+  showFooter={false}
+>
+  <script slot="head" is:inline set:html={redirectScript}></script>
+
+  <section class="chooser panel">
+    <p class="eyebrow">YANG LIUBIN</p>
+    <h1>Choose your reading mode.</h1>
+    <p class="chooser__description">
+      The homepage will open in your preferred language automatically. You can still enter manually below.
+    </p>
+    <div class="chooser__actions">
+      <a class="button" href={paths.zh} data-locale-choice="zh">简体中文</a>
+      <a class="button button--ghost" href={paths.en} data-locale-choice="en">English</a>
+    </div>
+  </section>
+</BaseLayout>

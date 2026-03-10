@@ -1,0 +1,28 @@
+---
+import { getDictionary, type Locale } from '../lib/site';
+
+interface Props {
+  locale: Locale;
+  paths: Record<Locale, string>;
+}
+
+const { locale, paths } = Astro.props as Props;
+const copy = getDictionary(locale);
+---
+
+<div class="locale-switch" aria-label={copy.nav.language}>
+  <a
+    class:list={[ 'locale-switch__item', locale === 'zh' && 'is-active' ]}
+    href={paths.zh}
+    data-locale-choice="zh"
+  >
+    简中
+  </a>
+  <a
+    class:list={[ 'locale-switch__item', locale === 'en' && 'is-active' ]}
+    href={paths.en}
+    data-locale-choice="en"
+  >
+    EN
+  </a>
+</div>

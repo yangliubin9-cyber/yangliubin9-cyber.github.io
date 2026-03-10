@@ -1,0 +1,35 @@
+---
+import LocaleSwitch from './LocaleSwitch.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { getDictionary, getHomePath, type Locale } from '../lib/site';
+
+interface Props {
+  locale: Locale;
+  paths: Record<Locale, string>;
+}
+
+const { locale, paths } = Astro.props as Props;
+const copy = getDictionary(locale);
+const homePath = getHomePath(locale);
+---
+
+<header class="site-header">
+  <a class="brand" href={homePath}>
+    <span class="brand__mark">YL</span>
+    <span class="brand__text">
+      <strong>Yang Liubin</strong>
+      <small>{copy.meta.tag}</small>
+    </span>
+  </a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href={`${homePath}#essays`}>{copy.nav.essays}</a>
+    <a href={`${homePath}#manifesto`}>{copy.nav.manifesto}</a>
+    <a href={`${homePath}#system`}>{copy.nav.system}</a>
+  </nav>
+
+  <div class="site-header__actions">
+    <LocaleSwitch locale={locale} paths={paths} />
+    <ThemeToggle locale={locale} />
+  </div>
+</header>
