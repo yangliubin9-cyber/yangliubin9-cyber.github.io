@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "sync:assets": "node scripts/sync-assets.mjs",
+    "sync:feishu": "node scripts/sync-feishu-posts.mjs",
     "predev": "npm run sync:assets",
     "dev": "astro dev --host",
     "prestart": "npm run sync:assets",

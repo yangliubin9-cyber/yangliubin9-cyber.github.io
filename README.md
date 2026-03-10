@@ -1,4 +1,4 @@
-﻿# Yang’s Log / 杨刘彬·言
+# Yang’s Log / 杨刘彬·言
 
 A bilingual personal blog and portfolio built with Astro for GitHub Pages.
 
@@ -16,6 +16,7 @@ A bilingual personal blog and portfolio built with Astro for GitHub Pages.
 - Local visual writing studio that exports Markdown / MDX drafts
 - Decap CMS admin entry for free local visual editing
 - OpenAI-compatible translation script for Chinese-to-English post generation
+- Nightly Feishu Docs sync into blog content files
 
 ## Content model
 
@@ -34,7 +35,9 @@ Frontmatter fields:
 - `featured`
 - `tags`
 - `accent`
-- `heroEyebrow` (optional)
+- heroEyebrow (optional)
+- sourcePlatform (optional)
+- sourceUrl (optional)
 
 ## Avatar
 
@@ -97,6 +100,49 @@ Then open:
 
 This lets you visually edit post frontmatter and Markdown content for free. For advanced MDX components, continue using the built-in Studio or your code editor.
 
+
+## Feishu sync
+
+If you prefer writing in Feishu and publishing through GitHub Pages, this repo can pull your Feishu Docs into `src/content/posts` automatically.
+
+### What it does
+
+- Treats Feishu Docs as the writing source
+- Generates or updates local blog post files every night
+- Commits synced content back to `main`
+- Lets the normal Pages deploy workflow publish the new version
+
+### Schedule
+
+- GitHub Actions runs the Feishu sync workflow at `02:00` every day in `Asia/Shanghai`
+- Because GitHub cron uses UTC, the workflow uses `0 18 * * *`
+
+### Configuration
+
+1. Add your sources in `feishu-sync.config.mjs`
+2. Add these GitHub Actions secrets to `yangliubin9-cyber.github.io`
+
+```bash
+FEISHU_OPEN_BASE_URL=https://open.feishu.cn
+FEISHU_APP_ID=your_feishu_app_id
+FEISHU_APP_SECRET=your_feishu_app_secret
+```
+
+3. Trigger the workflow manually once from GitHub Actions, or wait for the nightly run
+
+The current syncer is designed for Feishu `docx` document URLs first. If your source is a wiki page instead of a `docx` link, keep the same config structure and add `documentToken` manually for now.
+
+### Local test
+
+```bash
+npm run sync:feishu
+```
+
+After sync finishes, run:
+
+```bash
+npm run build
+```
 ## AI translation
 
 The local translation script is at `scripts/translate-post.mjs`.

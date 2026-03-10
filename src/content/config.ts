@@ -14,7 +14,9 @@ const posts = defineCollection({
     featured: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
     accent: z.enum(['yellow', 'cyan', 'violet']).default('yellow'),
-    heroEyebrow: z.string().optional()
+    heroEyebrow: z.string().optional(),
+    sourcePlatform: z.enum(['feishu']).optional(),
+    sourceUrl: z.string().url().optional()
   })
 });
 
