@@ -16,7 +16,8 @@ const posts = defineCollection({
     accent: z.enum(['yellow', 'cyan', 'violet']).default('yellow'),
     heroEyebrow: z.string().optional(),
     sourcePlatform: z.enum(['feishu']).optional(),
-    sourceUrl: z.string().url().optional()
+    sourceUrl: z.string().url().optional(),
+    sourceDocToken: z.string().optional()
   })
 });
 

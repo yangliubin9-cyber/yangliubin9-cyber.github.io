@@ -35,9 +35,10 @@ Frontmatter fields:
 - `featured`
 - `tags`
 - `accent`
-- heroEyebrow (optional)
-- sourcePlatform (optional)
+- `heroEyebrow` (optional)
+- `sourcePlatform` (optional)
 - sourceUrl (optional)
+- sourceDocToken (optional)
 
 ## Avatar
 
@@ -108,9 +109,16 @@ If you prefer writing in Feishu and publishing through GitHub Pages, this repo c
 ### What it does
 
 - Treats Feishu Docs as the writing source
+- Supports both single `docx` documents and whole `drive/folder/...` folders
 - Generates or updates local blog post files every night
 - Commits synced content back to `main`
 - Lets the normal Pages deploy workflow publish the new version
+
+### Current folder source
+
+The repo is currently pointed at:
+
+- `https://my.feishu.cn/drive/folder/IfgPfdnzdlNvAQdXwgncHtVRnP0`
 
 ### Schedule
 
@@ -119,8 +127,7 @@ If you prefer writing in Feishu and publishing through GitHub Pages, this repo c
 
 ### Configuration
 
-1. Add your sources in `feishu-sync.config.mjs`
-2. Add these GitHub Actions secrets to `yangliubin9-cyber.github.io`
+1. Add these GitHub Actions secrets to `yangliubin9-cyber.github.io`
 
 ```bash
 FEISHU_OPEN_BASE_URL=https://open.feishu.cn
@@ -128,21 +135,46 @@ FEISHU_APP_ID=your_feishu_app_id
 FEISHU_APP_SECRET=your_feishu_app_secret
 ```
 
-3. Trigger the workflow manually once from GitHub Actions, or wait for the nightly run
+2. Adjust `feishu-sync.config.mjs` when you want to change folder URL, locale, tags, or recursion behavior
 
-The current syncer is designed for Feishu `docx` document URLs first. If your source is a wiki page instead of a `docx` link, keep the same config structure and add `documentToken` manually for now.
+Folder example:
+
+```js
+{
+  enabled: true,
+  kind: 'folder',
+  url: 'https://my.feishu.cn/drive/folder/IfgPfdnzdlNvAQdXwgncHtVRnP0',
+  locale: 'zh',
+  recursive: true,
+  slugStrategy: 'title'
+}
+```
+
+Single document example:
+
+```js
+{
+  enabled: true,
+  kind: 'document',
+  url: 'https://your-team.feishu.cn/docx/XXXXXXXXXXXX',
+  locale: 'zh',
+  pathSlug: 'my-feishu-post'
+}
+```
 
 ### Local test
 
 ```bash
 npm run sync:feishu
-```
-
-After sync finishes, run:
-
-```bash
 npm run build
 ```
+
+### Notes
+
+- The current folder sync only pulls `docx` documents from the folder tree
+- Existing synced posts keep stable slugs by tracking the Feishu document token
+- Removing a document from Feishu does not auto-delete the local blog file yet
+
 ## AI translation
 
 The local translation script is at `scripts/translate-post.mjs`.

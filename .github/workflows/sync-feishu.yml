@@ -26,7 +26,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Skip when Feishu credentials are missing
+        if: ${{ secrets.FEISHU_APP_ID == '' || secrets.FEISHU_APP_SECRET == '' }}
+        run: echo "Skipping Feishu sync because FEISHU_APP_ID / FEISHU_APP_SECRET are not configured yet."
+
       - name: Sync Feishu posts
+        if: ${{ secrets.FEISHU_APP_ID != '' && secrets.FEISHU_APP_SECRET != '' }}
         run: npm run sync:feishu
         env:
           FEISHU_OPEN_BASE_URL: ${{ secrets.FEISHU_OPEN_BASE_URL }}
