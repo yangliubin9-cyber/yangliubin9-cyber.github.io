@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   build:
+    environment: github-pages
     runs-on: ubuntu-latest
     env:
       PUBLIC_GISCUS_REPO: ${{ vars.PUBLIC_GISCUS_REPO || secrets.PUBLIC_GISCUS_REPO }}
@@ -66,3 +67,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
