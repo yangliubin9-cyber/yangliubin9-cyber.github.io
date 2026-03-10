@@ -14,17 +14,17 @@ const introText = enabled
     : 'Comments are powered by GitHub Discussions. Sign in with GitHub to join the conversation.'
   : copy.post.commentsHint;
 const serializedConfig = JSON.stringify({
-  src: 'https://giscus.app/client.js',
-  repo: SITE.giscus.repo,
-  repoId: SITE.giscus.repoId,
-  category: SITE.giscus.category,
-  categoryId: SITE.giscus.categoryId,
-  mapping: SITE.giscus.mapping,
-  strict: SITE.giscus.strict,
-  reactionsEnabled: SITE.giscus.reactionsEnabled,
-  emitMetadata: SITE.giscus.emitMetadata,
-  inputPosition: SITE.giscus.inputPosition,
-  lang: copy.giscusLang,
+  'data-repo': SITE.giscus.repo,
+  'data-repo-id': SITE.giscus.repoId,
+  'data-category': SITE.giscus.category,
+  'data-category-id': SITE.giscus.categoryId,
+  'data-mapping': SITE.giscus.mapping,
+  'data-strict': SITE.giscus.strict,
+  'data-reactions-enabled': SITE.giscus.reactionsEnabled,
+  'data-emit-metadata': SITE.giscus.emitMetadata,
+  'data-input-position': SITE.giscus.inputPosition,
+  'data-theme': 'dark',
+  'data-lang': copy.giscusLang,
   crossorigin: 'anonymous'
 });
 const giscusScript = `(() => {
@@ -34,12 +34,11 @@ const giscusScript = `(() => {
   }
 
   const options = ${serializedConfig};
-  options.theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+  options['data-theme'] = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
 
   const script = document.createElement('script');
-  script.src = options.src;
+  script.src = 'https://giscus.app/client.js';
   script.async = true;
-  delete options.src;
 
   Object.entries(options).forEach(([key, value]) => {
     script.setAttribute(key, String(value));
