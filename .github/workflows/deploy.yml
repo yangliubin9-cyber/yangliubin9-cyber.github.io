@@ -17,13 +17,7 @@ concurrency:
 
 jobs:
   build:
-    environment: github-pages
     runs-on: ubuntu-latest
-    env:
-      PUBLIC_GISCUS_REPO: ${{ vars.PUBLIC_GISCUS_REPO || secrets.PUBLIC_GISCUS_REPO }}
-      PUBLIC_GISCUS_REPO_ID: ${{ vars.PUBLIC_GISCUS_REPO_ID || secrets.PUBLIC_GISCUS_REPO_ID }}
-      PUBLIC_GISCUS_CATEGORY: ${{ vars.PUBLIC_GISCUS_CATEGORY || secrets.PUBLIC_GISCUS_CATEGORY }}
-      PUBLIC_GISCUS_CATEGORY_ID: ${{ vars.PUBLIC_GISCUS_CATEGORY_ID || secrets.PUBLIC_GISCUS_CATEGORY_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,16 +34,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify giscus variables
-        run: |
-          echo "PUBLIC_GISCUS_REPO=${PUBLIC_GISCUS_REPO}"
-          echo "PUBLIC_GISCUS_CATEGORY=${PUBLIC_GISCUS_CATEGORY}"
-          test -n "${PUBLIC_GISCUS_REPO}" || (echo "Missing PUBLIC_GISCUS_REPO" && exit 1)
-          test -n "${PUBLIC_GISCUS_REPO_ID}" || (echo "Missing PUBLIC_GISCUS_REPO_ID" && exit 1)
-          test -n "${PUBLIC_GISCUS_CATEGORY}" || (echo "Missing PUBLIC_GISCUS_CATEGORY" && exit 1)
-          test -n "${PUBLIC_GISCUS_CATEGORY_ID}" || (echo "Missing PUBLIC_GISCUS_CATEGORY_ID" && exit 1)
-
       - name: Build site
+        env:
+          PUBLIC_GISCUS_REPO: ${{ vars.PUBLIC_GISCUS_REPO || secrets.PUBLIC_GISCUS_REPO }}
+          PUBLIC_GISCUS_REPO_ID: ${{ vars.PUBLIC_GISCUS_REPO_ID || secrets.PUBLIC_GISCUS_REPO_ID }}
+          PUBLIC_GISCUS_CATEGORY: ${{ vars.PUBLIC_GISCUS_CATEGORY || secrets.PUBLIC_GISCUS_CATEGORY }}
+          PUBLIC_GISCUS_CATEGORY_ID: ${{ vars.PUBLIC_GISCUS_CATEGORY_ID || secrets.PUBLIC_GISCUS_CATEGORY_ID }}
         run: npm run build
 
       - name: Upload Pages artifact
@@ -67,4 +57,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
