@@ -3,7 +3,7 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import GiscusComments from '../../components/GiscusComments.astro';
 import PostCard from '../../components/PostCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { findTranslation, formatDate, sortPosts } from '../../lib/posts';
+import { findTranslation, formatDate, getAdjacentPosts, sortPosts } from '../../lib/posts';
 import { getBlogPath, getDictionary, getPostPath, type Locale } from '../../lib/site';
 
 export async function getStaticPaths() {
@@ -26,6 +26,9 @@ const translation = findTranslation(allPosts, post.data.translationKey, otherLoc
 const relatedPosts = sortPosts(
   allPosts.filter((entry) => entry.data.locale === locale && entry.id !== post.id)
 ).slice(0, 2);
+const adjacentPosts = getAdjacentPosts(allPosts, post);
+const previousLabel = locale === 'zh' ? '上一篇' : 'Previous';
+const nextLabel = locale === 'zh' ? '下一篇' : 'Next';
 const { Content, headings } = await render(post);
 const paths = {
   zh: locale === 'zh' ? getPostPath('zh', post.data.pathSlug) : getBlogPath('zh'),
@@ -84,6 +87,30 @@ if (translation) {
       </aside>
     </div>
   </article>
+
+  {(adjacentPosts.previous || adjacentPosts.next) && (
+    <section class="surface post-pagination">
+      {adjacentPosts.previous ? (
+        <a class="post-pagination__link" href={getPostPath(locale, adjacentPosts.previous.data.pathSlug)}>
+          <span class="eyebrow">{previousLabel}</span>
+          <strong>{adjacentPosts.previous.data.title}</strong>
+          <span>{adjacentPosts.previous.data.excerpt}</span>
+        </a>
+      ) : (
+        <div class="post-pagination__spacer"></div>
+      )}
+
+      {adjacentPosts.next ? (
+        <a class="post-pagination__link post-pagination__link--next" href={getPostPath(locale, adjacentPosts.next.data.pathSlug)}>
+          <span class="eyebrow">{nextLabel}</span>
+          <strong>{adjacentPosts.next.data.title}</strong>
+          <span>{adjacentPosts.next.data.excerpt}</span>
+        </a>
+      ) : (
+        <div class="post-pagination__spacer"></div>
+      )}
+    </section>
+  )}
 
   <GiscusComments locale={locale} />
 

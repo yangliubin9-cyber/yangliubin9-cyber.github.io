@@ -1,4 +1,4 @@
----
+﻿---
 import LocaleSwitch from './LocaleSwitch.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { NAV_ITEMS, PROFILE, getDictionary, getLocalizedPath, type Locale, type NavKey } from '../lib/site';
@@ -12,6 +12,7 @@ interface Props {
 const { locale, currentNav, paths } = Astro.props as Props;
 const copy = getDictionary(locale);
 const brandPath = getLocalizedPath(locale);
+const searchLabel = locale === 'zh' ? '搜索' : 'Search';
 ---
 
 <header class="site-header">
@@ -35,7 +36,12 @@ const brandPath = getLocalizedPath(locale);
     <div class="site-header__identity">
       <span>{PROFILE.name[locale]}</span>
     </div>
-    <a class="site-header__utility" href={getLocalizedPath(locale, 'studio')}>{copy.nav.studio}</a>
+
+    <div class="site-header__links">
+      <a class="site-header__utility" href={getLocalizedPath(locale, 'search')}>{searchLabel}</a>
+      <a class="site-header__utility" href={getLocalizedPath(locale, 'studio')}>{copy.nav.studio}</a>
+    </div>
+
     <LocaleSwitch locale={locale} paths={paths} />
     <ThemeToggle locale={locale} />
   </div>

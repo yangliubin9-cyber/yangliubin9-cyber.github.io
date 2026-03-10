@@ -1,4 +1,4 @@
----
+﻿---
 import PageIntro from '../../components/PageIntro.astro';
 import StudioEditor from '../../components/StudioEditor.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -11,6 +11,7 @@ export function getStaticPaths() {
 const { locale } = Astro.props as { locale: Locale };
 const copy = getDictionary(locale);
 const paths = getLanguagePaths('studio');
+const adminLabel = locale === 'zh' ? 'Decap CMS' : 'Decap CMS';
 ---
 
 <BaseLayout
@@ -24,6 +25,7 @@ const paths = getLanguagePaths('studio');
   <PageIntro eyebrow={copy.studio.eyebrow} title={copy.studio.title} description={copy.studio.description}>
     <div class="page-intro__actions">
       <a class="button button--ghost" href={SITE.repositoryUrl} target="_blank" rel="noreferrer">Repository</a>
+      <a class="text-link" href="/admin/" target="_blank" rel="noreferrer">{adminLabel}</a>
       <a class="text-link" href={SITE.commentsRepositoryUrl} target="_blank" rel="noreferrer">Comments Repo</a>
     </div>
   </PageIntro>

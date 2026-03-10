@@ -1,0 +1,171 @@
+﻿---
+import PageIntro from '../../components/PageIntro.astro';
+import PostCard from '../../components/PostCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllPosts } from '../../lib/posts';
+import { LOCALES, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({
+    params: { locale },
+    props: { locale }
+  }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const posts = await getAllPosts();
+const paths = getLanguagePaths('search');
+const copy = locale === 'zh'
+  ? {
+      eyebrow: 'SEARCH / INDEX',
+      title: '搜索',
+      description: '跨中英文搜索所有文章，适合快速找到某个主题、标签或标题片段。',
+      placeholder: '搜索标题、摘要、标签、分类或语言',
+      resultLabel: '篇结果',
+      emptyTitle: '没有找到匹配内容',
+      emptyBody: '换一个关键词试试，或者回到博客列表浏览最新文章。',
+      allLocales: '全部语言',
+      zh: '简中',
+      en: 'EN',
+      openBlog: '返回博客',
+      openStudio: '打开工作台',
+      openAdmin: '打开 CMS'
+    }
+  : {
+      eyebrow: 'SEARCH / INDEX',
+      title: 'Search',
+      description: 'Search across Chinese and English posts by title, excerpt, tags, category, or language.',
+      placeholder: 'Search title, excerpt, tags, category, or language',
+      resultLabel: 'results',
+      emptyTitle: 'No matching posts',
+      emptyBody: 'Try another keyword or head back to the blog index.',
+      allLocales: 'All languages',
+      zh: 'ZH',
+      en: 'EN',
+      openBlog: 'Back to blog',
+      openStudio: 'Open studio',
+      openAdmin: 'Open CMS'
+    };
+
+const filterScript = `(() => {
+  const root = document.querySelector('[data-search-page]');
+  if (!root) return;
+
+  const cards = [...root.querySelectorAll('[data-search-card]')];
+  const searchInput = root.querySelector('[data-search-input]');
+  const localeButtons = [...root.querySelectorAll('[data-locale-filter]')];
+  const count = root.querySelector('[data-results-count]');
+  const empty = root.querySelector('[data-empty-state]');
+  const params = new URLSearchParams(window.location.search);
+  const state = {
+    query: params.get('q') || '',
+    locale: params.get('locale') || 'all'
+  };
+
+  const syncButtons = () => {
+    localeButtons.forEach((button) => {
+      const active = button.dataset.localeFilter === state.locale;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  };
+
+  const apply = () => {
+    const query = state.query.trim().toLowerCase();
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const matchesQuery = !query || (card.dataset.searchText || '').includes(query);
+      const matchesLocale = state.locale === 'all' || card.dataset.locale === state.locale;
+      const show = matchesQuery && matchesLocale;
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+
+    if (count) count.textContent = visible + ' ' + ${JSON.stringify(copy.resultLabel)};
+    if (empty) empty.hidden = visible !== 0;
+
+    const nextParams = new URLSearchParams();
+    if (state.query) nextParams.set('q', state.query);
+    if (state.locale !== 'all') nextParams.set('locale', state.locale);
+    const nextValue = nextParams.toString();
+    history.replaceState({}, '', nextValue ? window.location.pathname + '?' + nextValue : window.location.pathname);
+    syncButtons();
+  };
+
+  if (searchInput) {
+    searchInput.value = state.query;
+    searchInput.addEventListener('input', (event) => {
+      state.query = event.target.value;
+      apply();
+    });
+  }
+
+  localeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      state.locale = button.dataset.localeFilter || 'all';
+      apply();
+    });
+  });
+
+  apply();
+})();`;
+---
+
+<BaseLayout
+  locale={locale}
+  currentNav="blog"
+  pagePath={getLocalizedPath(locale, 'search')}
+  paths={paths}
+  title={`${copy.title} | Yang’s Log`}
+  description={copy.description}
+>
+  <PageIntro eyebrow={copy.eyebrow} title={copy.title} description={copy.description}>
+    <div class="page-intro__actions">
+      <a class="button button--ghost" href={getLocalizedPath(locale, 'blog')}>{copy.openBlog}</a>
+      <a class="text-link" href={getLocalizedPath(locale, 'studio')}>{copy.openStudio}</a>
+      <a class="text-link" href="/admin/" target="_blank" rel="noreferrer">{copy.openAdmin}</a>
+    </div>
+  </PageIntro>
+
+  <section class="section search-layout" data-search-page>
+    <div class="surface filter-panel">
+      <label class="filter-panel__search">
+        <span>{copy.title}</span>
+        <input type="search" placeholder={copy.placeholder} data-search-input />
+      </label>
+
+      <div class="filter-group">
+        <span>{locale === 'zh' ? '语言' : 'Language'}</span>
+        <div class="chip-group">
+          <button type="button" class="filter-chip is-active" data-locale-filter="all">{copy.allLocales}</button>
+          <button type="button" class="filter-chip" data-locale-filter="zh">{copy.zh}</button>
+          <button type="button" class="filter-chip" data-locale-filter="en">{copy.en}</button>
+        </div>
+      </div>
+
+      <p class="filter-panel__count" data-results-count>{`${posts.length} ${copy.resultLabel}`}</p>
+    </div>
+
+    <div class="posts-grid posts-grid--catalog search-results">
+      {posts.map((post) => (
+        <div
+          data-search-card
+          data-locale={post.data.locale}
+          data-search-text={`${post.data.locale} ${post.data.title} ${post.data.excerpt} ${post.data.category} ${post.data.tags.join(' ')}`.toLowerCase()}
+        >
+          <PostCard post={post} locale={locale} />
+        </div>
+      ))}
+    </div>
+
+    <div class="surface empty-state" data-empty-state hidden>
+      <h2>{copy.emptyTitle}</h2>
+      <p>{copy.emptyBody}</p>
+    </div>
+  </section>
+
+  <script is:inline set:html={filterScript}></script>
+</BaseLayout>
+
+

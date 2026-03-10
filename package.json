@@ -12,6 +12,7 @@
     "prebuild": "npm run sync:assets",
     "build": "astro check && astro build",
     "preview": "astro preview --host",
+    "cms:proxy": "npx decap-server",
     "translate:post": "node scripts/translate-post.mjs"
   },
   "dependencies": {

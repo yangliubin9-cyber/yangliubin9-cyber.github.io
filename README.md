@@ -5,15 +5,16 @@ A bilingual personal blog and portfolio built with Astro for GitHub Pages.
 ## Features
 
 - `https://yangliubin9-cyber.github.io/zh` and `https://yangliubin9-cyber.github.io/en`
-- Home, Blog, About, Projects, Uses, Contact, and Studio pages
+- Home, Blog, Search, About, Projects, Uses, Contact, and Studio pages
 - Light and dark theme switching with local persistence
 - Markdown and MDX post support
 - Root-level post routes: `/zh/<slug>` and `/en/<slug>`
-- Cross-language local search, category filters, and tag filters
-- GitHub Discussions comments scaffold via giscus
+- Cross-language local search on the blog index and a dedicated search page
+- Table of contents, adjacent post navigation, related posts, and giscus comments
 - GitHub Actions deployment for GitHub Pages
 - SEO essentials: sitemap, Open Graph metadata, and localized titles
 - Local visual writing studio that exports Markdown / MDX drafts
+- Decap CMS admin entry for free local visual editing
 - OpenAI-compatible translation script for Chinese-to-English post generation
 
 ## Content model
@@ -49,16 +50,52 @@ If no avatar file is found, the site falls back to `public/avatar-sponge.svg`.
 
 ## Comments setup
 
-The site is already pointed at the dedicated comments repository:
+The site points to the dedicated comments repository:
 
 - `yangliubin9-cyber/Blogs-Comment`
 
-To enable giscus comments, do this:
+If you ever need to update the giscus wiring, the active values live in `src/lib/site.ts`.
 
-1. Enable GitHub Discussions on the `Blogs-Comment` repository.
-2. Create the categories you want to use, such as `General`, `Ideas`, `Q&A`, and `Showcase`.
-3. Generate the giscus config values at [giscus.app](https://giscus.app).
-4. Fill in `SITE.giscus.repoId` and `SITE.giscus.categoryId` in `src/lib/site.ts`.
+## Search
+
+You can search in two ways:
+
+- Blog index filtering: `/zh/blog/` or `/en/blog/`
+- Dedicated search page: `/zh/search/` or `/en/search/`
+
+Both search surfaces work entirely on the client with no paid API or external search service.
+
+## Visual editing
+
+### Built-in Studio
+
+The built-in Studio lives at:
+
+- `/zh/studio/`
+- `/en/studio/`
+
+It is best for MDX-friendly drafting, frontmatter generation, and bilingual writing workflows.
+
+### Decap CMS
+
+The Decap admin entry lives at:
+
+- `/admin/`
+
+This repository is configured for a free local editing workflow on top of GitHub Pages.
+Because GitHub Pages does not provide a built-in OAuth callback for Decap, the recommended way to use it is locally:
+
+```bash
+npm install
+npm run dev
+npm run cms:proxy
+```
+
+Then open:
+
+- `http://localhost:4321/admin/`
+
+This lets you visually edit post frontmatter and Markdown content for free. For advanced MDX components, continue using the built-in Studio or your code editor.
 
 ## AI translation
 
@@ -68,7 +105,7 @@ It reads `.env.local` or `.env` and supports OpenAI-compatible and Anthropic-com
 Example:
 
 ```bash
-npm run translate:post -- --source=src/content/posts/zh/ai-translation-workflows.mdx --write=true
+npm run translate:post -- --source=src/content/posts/zh/personal-infrastructure.mdx --write=true
 ```
 
 Environment template:

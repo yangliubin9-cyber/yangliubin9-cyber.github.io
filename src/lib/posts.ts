@@ -1,4 +1,4 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+﻿import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Locale } from './site';
 
 export type PostEntry = CollectionEntry<'posts'>;
@@ -37,4 +37,14 @@ export function getCategories(posts: PostEntry[]) {
 
 export function getTags(posts: PostEntry[]) {
   return [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+}
+
+export function getAdjacentPosts(posts: PostEntry[], currentPost: PostEntry) {
+  const sorted = sortPosts(posts.filter((post) => post.data.locale === currentPost.data.locale));
+  const currentIndex = sorted.findIndex((post) => post.id === currentPost.id);
+
+  return {
+    previous: currentIndex > 0 ? sorted[currentIndex - 1] : undefined,
+    next: currentIndex >= 0 && currentIndex < sorted.length - 1 ? sorted[currentIndex + 1] : undefined
+  };
 }
