@@ -1,0 +1,167 @@
+---
+import PageIntro from '../../../components/PageIntro.astro';
+import PostCard from '../../../components/PostCard.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCategories, getPosts, getTags } from '../../../lib/posts';
+import { LOCALES, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../../lib/site';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({
+    params: { locale },
+    props: { locale }
+  }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const copy = getDictionary(locale);
+const posts = await getPosts(locale);
+const categories = getCategories(posts);
+const tags = getTags(posts);
+const paths = getLanguagePaths('blog');
+const filterScript = `(() => {
+  const root = document.querySelector('[data-blog-filters]');
+  if (!root) {
+    return;
+  }
+
+  const cards = [...root.querySelectorAll('[data-post-card]')];
+  const searchInput = root.querySelector('[data-search-input]');
+  const categoryButtons = [...root.querySelectorAll('[data-category-filter]')];
+  const tagButtons = [...root.querySelectorAll('[data-tag-filter]')];
+  const count = root.querySelector('[data-results-count]');
+  const empty = root.querySelector('[data-empty-state]');
+  const params = new URLSearchParams(window.location.search);
+  const state = {
+    query: params.get('q') || '',
+    category: params.get('category') || 'all',
+    tag: params.get('tag') || 'all'
+  };
+
+  const syncButtons = (buttons, value, key) => {
+    buttons.forEach((button) => {
+      const active = button.dataset[key] === value;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  };
+
+  const apply = () => {
+    const query = state.query.trim().toLowerCase();
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const matchesQuery = !query || (card.dataset.searchText || '').includes(query);
+      const matchesCategory = state.category === 'all' || card.dataset.category === state.category;
+      const matchesTag = state.tag === 'all' || (card.dataset.tags || '').split('|').includes(state.tag);
+      const show = matchesQuery && matchesCategory && matchesTag;
+      card.hidden = !show;
+      if (show) {
+        visible += 1;
+      }
+    });
+
+    if (count) {
+      count.textContent = visible + ' ' + ${JSON.stringify(copy.blog.resultLabel)};
+    }
+
+    if (empty) {
+      empty.hidden = visible !== 0;
+    }
+
+    const nextParams = new URLSearchParams();
+    if (state.query) nextParams.set('q', state.query);
+    if (state.category !== 'all') nextParams.set('category', state.category);
+    if (state.tag !== 'all') nextParams.set('tag', state.tag);
+    const nextParamsValue = nextParams.toString();
+    history.replaceState({}, '', nextParamsValue ? window.location.pathname + '?' + nextParamsValue : window.location.pathname);
+    syncButtons(categoryButtons, state.category, 'categoryFilter');
+    syncButtons(tagButtons, state.tag, 'tagFilter');
+  };
+
+  if (searchInput) {
+    searchInput.value = state.query;
+    searchInput.addEventListener('input', (event) => {
+      state.query = event.target.value;
+      apply();
+    });
+  }
+
+  categoryButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      state.category = button.dataset.categoryFilter || 'all';
+      apply();
+    });
+  });
+
+  tagButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      state.tag = button.dataset.tagFilter || 'all';
+      apply();
+    });
+  });
+
+  apply();
+})();`;
+---
+
+<BaseLayout
+  locale={locale}
+  currentNav="blog"
+  pagePath={getLocalizedPath(locale, 'blog')}
+  paths={paths}
+  title={`${copy.nav.blog} | ${copy.branding.title}`}
+  description={copy.blog.description}
+>
+  <PageIntro eyebrow={copy.blog.eyebrow} title={copy.blog.title} description={copy.blog.description} />
+
+  <section class="blog-filters section" data-blog-filters>
+    <div class="surface filter-panel">
+      <label class="filter-panel__search">
+        <span>{copy.blog.searchLabel}</span>
+        <input type="search" placeholder={copy.blog.searchPlaceholder} data-search-input />
+      </label>
+
+      <div class="filter-group">
+        <span>{copy.blog.categoryLabel}</span>
+        <div class="chip-group">
+          <button type="button" class="filter-chip is-active" data-category-filter="all">{copy.blog.allCategories}</button>
+          {categories.map((category) => (
+            <button type="button" class="filter-chip" data-category-filter={category}>{category}</button>
+          ))}
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span>{copy.blog.tagLabel}</span>
+        <div class="chip-group">
+          <button type="button" class="filter-chip is-active" data-tag-filter="all">{copy.blog.allTags}</button>
+          {tags.map((tag) => (
+            <button type="button" class="filter-chip" data-tag-filter={tag}>{tag}</button>
+          ))}
+        </div>
+      </div>
+
+      <p class="filter-panel__count" data-results-count>{`${posts.length} ${copy.blog.resultLabel}`}</p>
+    </div>
+
+    <div class="posts-grid posts-grid--catalog">
+      {posts.map((post) => (
+        <div
+          data-post-card
+          data-search-text={`${post.data.title} ${post.data.excerpt} ${post.data.category} ${post.data.tags.join(' ')}`.toLowerCase()}
+          data-category={post.data.category}
+          data-tags={post.data.tags.join('|')}
+        >
+          <PostCard post={post} locale={locale} />
+        </div>
+      ))}
+    </div>
+
+    <div class="surface empty-state" data-empty-state hidden>
+      <h2>{copy.blog.emptyTitle}</h2>
+      <p>{copy.blog.emptyBody}</p>
+    </div>
+  </section>
+
+  <script is:inline set:html={filterScript}></script>
+</BaseLayout>

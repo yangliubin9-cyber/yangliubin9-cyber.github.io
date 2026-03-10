@@ -1,9 +1,10 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
+import GiscusComments from '../../../components/GiscusComments.astro';
 import PostCard from '../../../components/PostCard.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { findTranslation, formatDate, sortPosts } from '../../../lib/posts';
-import { getDictionary, getHomePath, getOtherLocale, getPostPath, type Locale } from '../../../lib/site';
+import { getDictionary, getLocalizedPath, type Locale } from '../../../lib/site';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -11,7 +12,7 @@ export async function getStaticPaths() {
   return posts.map((post) => ({
     params: {
       locale: post.data.locale,
-      slug: post.slug
+      slug: post.data.pathSlug
     },
     props: { post }
   }));
@@ -21,43 +22,44 @@ const { post } = Astro.props as { post: CollectionEntry<'posts'> };
 const locale = post.data.locale as Locale;
 const copy = getDictionary(locale);
 const allPosts = await getCollection('posts');
-const otherLocale = getOtherLocale(locale);
+const otherLocale = locale === 'zh' ? 'en' : 'zh';
 const translation = findTranslation(allPosts, post.data.translationKey, otherLocale);
 const relatedPosts = sortPosts(
   allPosts.filter((entry) => entry.data.locale === locale && entry.id !== post.id)
 ).slice(0, 2);
 const { Content, headings } = await render(post);
 const paths = {
-  zh: locale === 'zh' ? getPostPath('zh', post.slug) : getHomePath('zh'),
-  en: locale === 'en' ? getPostPath('en', post.slug) : getHomePath('en')
+  zh: locale === 'zh' ? getLocalizedPath('zh', `blog/${post.data.pathSlug}`) : getLocalizedPath('zh', 'blog'),
+  en: locale === 'en' ? getLocalizedPath('en', `blog/${post.data.pathSlug}`) : getLocalizedPath('en', 'blog')
 };
 
 if (translation) {
-  paths[translation.data.locale] = getPostPath(translation.data.locale, translation.slug);
+  paths[translation.data.locale] = getLocalizedPath(translation.data.locale, `blog/${translation.data.pathSlug}`);
 }
 ---
 
 <BaseLayout
   locale={locale}
-  title={post.data.title}
-  description={post.data.excerpt}
-  pagePath={getPostPath(locale, post.slug)}
+  currentNav="blog"
+  pagePath={getLocalizedPath(locale, `blog/${post.data.pathSlug}`)}
   paths={paths}
+  title={`${post.data.title} | ${copy.branding.title}`}
+  description={post.data.excerpt}
 >
   <article class="article-layout">
     <section class="article-hero panel">
-      <a class="text-link" href={getHomePath(locale)}>{copy.article.back}</a>
-      <p class="eyebrow">{post.data.heroEyebrow ?? 'Essay'}</p>
+      <a class="text-link" href={getLocalizedPath(locale, 'blog')}>{copy.post.backToBlog}</a>
+      <p class="eyebrow">{post.data.heroEyebrow ?? post.data.category}</p>
       <h1>{post.data.title}</h1>
-      <p class="article-hero__excerpt">{post.data.excerpt}</p>
+      <p class="page-intro__description">{post.data.excerpt}</p>
 
       <div class="article-meta">
-        <span>{copy.article.published}: {formatDate(post.data.publishedAt, locale)}</span>
-        {post.data.updatedAt && <span>{copy.article.updated}: {formatDate(post.data.updatedAt, locale)}</span>}
-        <span>{post.data.readingTime}</span>
+        <span>{copy.post.published}: {formatDate(post.data.publishedAt, locale)}</span>
+        <span>{copy.post.category}: {post.data.category}</span>
+        {post.data.updatedAt && <span>{copy.post.updated}: {formatDate(post.data.updatedAt, locale)}</span>}
       </div>
 
-      <div class="tag-row">
+      <div class="tag-row tag-row--wrap">
         {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
       </div>
     </section>
@@ -68,7 +70,7 @@ if (translation) {
       </div>
 
       <aside class="surface toc">
-        <p class="toc__title">{copy.article.contents}</p>
+        <p class="eyebrow">{copy.post.contents}</p>
         {headings.length > 0 ? (
           <nav class="toc__nav">
             {headings.map((heading) => (
@@ -78,19 +80,19 @@ if (translation) {
             ))}
           </nav>
         ) : (
-          <p class="toc__empty">
-            {locale === 'zh' ? '这篇文章没有分节目录。' : 'This essay does not have a generated table of contents.'}
-          </p>
+          <p class="page-intro__description">{locale === 'zh' ? '当前文章没有自动目录。' : 'This post has no generated table of contents.'}</p>
         )}
       </aside>
     </div>
   </article>
 
+  <GiscusComments locale={locale} />
+
   {relatedPosts.length > 0 && (
-    <section class="section section--compact">
+    <section class="section">
       <div class="section-heading">
-        <p class="eyebrow">{copy.essays.eyebrow}</p>
-        <h2>{copy.article.related}</h2>
+        <p class="eyebrow">BLOG / MORE</p>
+        <h2>{copy.post.related}</h2>
       </div>
       <div class="posts-grid">
         {relatedPosts.map((entry) => <PostCard post={entry} locale={locale} />)}

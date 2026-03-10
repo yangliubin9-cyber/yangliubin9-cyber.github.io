@@ -1,0 +1,79 @@
+---
+import { SITE, getDictionary, type Locale } from '../lib/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props as Props;
+const copy = getDictionary(locale);
+const enabled = Boolean(SITE.giscus.repoId && SITE.giscus.categoryId);
+const serializedConfig = JSON.stringify({
+  src: 'https://giscus.app/client.js',
+  repo: SITE.giscus.repo,
+  repoId: SITE.giscus.repoId,
+  category: SITE.giscus.category,
+  categoryId: SITE.giscus.categoryId,
+  mapping: SITE.giscus.mapping,
+  strict: SITE.giscus.strict,
+  reactionsEnabled: SITE.giscus.reactionsEnabled,
+  emitMetadata: SITE.giscus.emitMetadata,
+  inputPosition: SITE.giscus.inputPosition,
+  lang: copy.giscusLang,
+  crossorigin: 'anonymous'
+});
+const giscusScript = `(() => {
+  const root = document.querySelector('[data-giscus-root]');
+  if (!root || root.dataset.loaded === 'true') {
+    return;
+  }
+
+  const options = ${serializedConfig};
+  options.theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const script = document.createElement('script');
+  script.src = options.src;
+  script.async = true;
+  delete options.src;
+
+  Object.entries(options).forEach(([key, value]) => {
+    script.setAttribute(key, String(value));
+  });
+
+  root.dataset.loaded = 'true';
+  root.appendChild(script);
+
+  const syncTheme = (theme) => {
+    const frame = document.querySelector('iframe.giscus-frame');
+    if (!frame?.contentWindow) {
+      return;
+    }
+
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'light' ? 'light' : 'dark' } } },
+      'https://giscus.app'
+    );
+  };
+
+  window.addEventListener('themechange', (event) => syncTheme(event.detail.theme));
+})();`;
+---
+
+<section class="comments-panel surface">
+  <div class="section-heading section-heading--tight">
+    <p class="eyebrow">GitHub Discussions</p>
+    <h2>{copy.post.comments}</h2>
+    <p>{copy.post.commentsHint}</p>
+  </div>
+
+  {enabled ? (
+    <div data-giscus-root></div>
+  ) : (
+    <div class="comments-panel__placeholder">
+      <p>{copy.post.commentsHint}</p>
+      <a class="text-link" href="https://giscus.app" target="_blank" rel="noreferrer">giscus.app</a>
+    </div>
+  )}
+</section>
+
+{enabled && <script is:inline set:html={giscusScript}></script>}

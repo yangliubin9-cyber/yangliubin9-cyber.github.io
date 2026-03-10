@@ -1,0 +1,36 @@
+---
+import PageIntro from '../../components/PageIntro.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const copy = getDictionary(locale);
+const paths = getLanguagePaths('contact');
+---
+
+<BaseLayout
+  locale={locale}
+  currentNav="contact"
+  pagePath={getLocalizedPath(locale, 'contact')}
+  paths={paths}
+  title={`${copy.nav.contact} | ${copy.branding.title}`}
+  description={copy.contact.description}
+>
+  <PageIntro eyebrow={copy.contact.eyebrow} title={copy.contact.title} description={copy.contact.description} />
+
+  <section class="section">
+    <div class="card-grid card-grid--three">
+      {copy.contact.items.map((item) => (
+        <a class="surface contact-card" href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined}>
+          <span class="pill">{item.label}</span>
+          <h2>{item.value}</h2>
+          <p>{item.label}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

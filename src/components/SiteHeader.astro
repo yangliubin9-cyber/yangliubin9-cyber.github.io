@@ -1,34 +1,40 @@
 ---
 import LocaleSwitch from './LocaleSwitch.astro';
 import ThemeToggle from './ThemeToggle.astro';
-import { getDictionary, getHomePath, type Locale } from '../lib/site';
+import { NAV_ITEMS, PROFILE, getDictionary, getLocalizedPath, type Locale, type NavKey } from '../lib/site';
 
 interface Props {
   locale: Locale;
+  currentNav: NavKey;
   paths: Record<Locale, string>;
 }
 
-const { locale, paths } = Astro.props as Props;
+const { locale, currentNav, paths } = Astro.props as Props;
 const copy = getDictionary(locale);
-const homePath = getHomePath(locale);
+const brandPath = getLocalizedPath(locale);
 ---
 
 <header class="site-header">
-  <a class="brand" href={homePath}>
+  <a class="brand" href={brandPath}>
     <span class="brand__mark">YL</span>
     <span class="brand__text">
-      <strong>Yang Liubin</strong>
-      <small>{copy.meta.tag}</small>
+      <strong>{copy.branding.title}</strong>
+      <small>{copy.branding.subtitle}</small>
     </span>
   </a>
 
   <nav class="site-nav" aria-label="Primary">
-    <a href={`${homePath}#essays`}>{copy.nav.essays}</a>
-    <a href={`${homePath}#manifesto`}>{copy.nav.manifesto}</a>
-    <a href={`${homePath}#system`}>{copy.nav.system}</a>
+    {NAV_ITEMS.map((item) => (
+      <a class:list={['site-nav__item', currentNav === item && 'is-active']} href={getLocalizedPath(locale, item === 'home' ? '' : item)}>
+        {copy.nav[item]}
+      </a>
+    ))}
   </nav>
 
   <div class="site-header__actions">
+    <div class="site-header__identity">
+      <span>{PROFILE.name[locale]}</span>
+    </div>
     <LocaleSwitch locale={locale} paths={paths} />
     <ThemeToggle locale={locale} />
   </div>

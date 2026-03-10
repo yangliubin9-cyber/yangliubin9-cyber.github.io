@@ -29,6 +29,7 @@ const copy = getDictionary(locale);
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
     localStorage.setItem(themeStorageKey, theme);
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
   };
 
   const syncThemeButtons = () => {

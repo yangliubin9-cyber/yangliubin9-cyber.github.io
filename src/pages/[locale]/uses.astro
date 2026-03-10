@@ -1,0 +1,37 @@
+---
+import PageIntro from '../../components/PageIntro.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LOCALES, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const copy = getDictionary(locale);
+const paths = getLanguagePaths('uses');
+---
+
+<BaseLayout
+  locale={locale}
+  currentNav="uses"
+  pagePath={getLocalizedPath(locale, 'uses')}
+  paths={paths}
+  title={`${copy.nav.uses} | ${copy.branding.title}`}
+  description={copy.uses.description}
+>
+  <PageIntro eyebrow={copy.uses.eyebrow} title={copy.uses.title} description={copy.uses.description} />
+
+  <section class="section">
+    <div class="card-grid card-grid--three">
+      {copy.uses.groups.map((group) => (
+        <article class="surface stack-card">
+          <p class="eyebrow">{group.name}</p>
+          <div class="check-list">
+            {group.items.map((item) => <p>{item}</p>)}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

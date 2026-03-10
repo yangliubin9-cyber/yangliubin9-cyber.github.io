@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" rx="48" fill="#111316"/>
+  <rect x="36" y="36" width="1128" height="558" rx="36" stroke="rgba(255,255,255,0.12)"/>
+  <circle cx="190" cy="134" r="84" fill="#FFD54A"/>
+  <circle cx="182" cy="126" r="20" fill="#111316"/>
+  <circle cx="218" cy="126" r="20" fill="#111316"/>
+  <path d="M150 172c18 22 38 32 60 32s42-10 60-32" stroke="#111316" stroke-width="12" stroke-linecap="round"/>
+  <text x="110" y="330" fill="#F5F7FB" font-size="92" font-family="Segoe UI, Arial, sans-serif" font-weight="700">杨刘彬·言</text>
+  <text x="110" y="420" fill="#9FA8B7" font-size="54" font-family="Segoe UI, Arial, sans-serif">Yang’s Log</text>
+  <text x="110" y="494" fill="#9FA8B7" font-size="36" font-family="Segoe UI, Arial, sans-serif">Where code meets life</text>
+</svg>

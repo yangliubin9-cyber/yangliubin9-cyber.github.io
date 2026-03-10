@@ -1,57 +1,48 @@
 ---
-slug: personal-infrastructure
+pathSlug: ai-translation-workflows
 locale: en
-translationKey: personal-infrastructure
-title: Building personal infrastructure that lasts
-excerpt: A blog becomes a long-term asset only when writing, publishing, and maintenance all feel light enough to repeat.
-publishedAt: 2026-03-08
-readingTime: 7 min
+translationKey: ai-translation-workflows
+title: Using AI to extend a Chinese blog into English
+excerpt: If Chinese is your native language, the smartest bilingual workflow is not writing everything twice. It is writing in Chinese first and using AI to support the English version.
+category: Engineering Practice
+publishedAt: 2026-03-09
 featured: true
 tags:
-  - Engineering
+  - AI
+  - Bilingual blog
   - Workflow
-  - Writing
-accent: violet
-heroEyebrow: System Note
+accent: cyan
+heroEyebrow: Workflow
 ---
 
-## Starting is easy. Sustaining is the real challenge.
+## Write in your native language first
 
-Most personal blogs do not fail because the author has nothing to say. They fail because the maintenance burden becomes too heavy. Every update means fixing styles, checking deploys, touching copy, and making sure nothing subtle broke.
+When you maintain a blog over time, the expensive part is not deployment. It is expression. Writing in your native language is usually faster and preserves more nuance.
 
-That is why I keep returning to a simple rule: the architecture of a personal site has to be light enough that it never becomes a reason to stop publishing.
+That is why I prefer a bilingual workflow where Chinese comes first and English follows.
 
-## Why I prefer a static-first model
+## AI behaves more like a second editor
 
-A static site is not a weak site. It is a site that places complexity more intentionally.
+I do not think a model should replace authorial judgment, but it is excellent at a few tasks:
 
-- No extra computation is needed at request time.
-- Content lives in files, which is easier to version and maintain.
-- Deployment stays simple and the cost stays near zero.
+- Drafting an English version from the Chinese source.
+- Keeping terminology consistent.
+- Compressing awkward phrases into cleaner ones.
+- Reworking titles, excerpts, and metadata.
 
-For a personal blog, that tradeoff is almost ideal. You are maintaining a versioned knowledge repository, not a fragile online application that always wants more infrastructure.
+That turns bilingual publishing from writing twice into reviewing once more.
 
-## Theme and language switching are infrastructure too
+## A practical workflow
 
-People often treat language switching and theme switching as optional extras. I think they should feel like core capabilities.
+<aside className="mdx-note">
+  Once you add your preferred model API later, the current content structure is already ready for automation.
+</aside>
 
-For me, that means three things:
+1. Write the source article in `src/content/posts/zh`.
+2. Keep the same `translationKey` and `pathSlug`.
+3. Use AI to generate an English draft in `src/content/posts/en`.
+4. Finish with a human review for tone and accuracy.
 
-1. The same spatial system survives every switch.
-2. The site does not depend on paid services or gated platforms.
-3. Adding a new essay still feels like a stable file-based workflow.
+## Why this works well with GitHub Pages
 
-## A setup worth maintaining over time
-
-The stack I like right now is very simple:
-
-```ts
-const stack = {
-  framework: 'Astro',
-  content: 'MDX',
-  deploy: 'GitHub Pages',
-  automation: 'GitHub Actions'
-};
-```
-
-The strength of this setup is not that it is flashy. It is that it disappears into the background once it is working. For a personal project, that kind of smoothness matters a lot.
+It is still a file-based workflow, still completely free, and naturally versioned with Git. The content behaves like code: visible, reviewable, and maintainable.

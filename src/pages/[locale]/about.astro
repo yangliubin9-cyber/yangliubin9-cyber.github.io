@@ -1,0 +1,63 @@
+---
+import PageIntro from '../../components/PageIntro.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { PROFILE, SITE, LOCALES, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+
+export function getStaticPaths() {
+  return LOCALES.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const copy = getDictionary(locale);
+const paths = getLanguagePaths('about');
+---
+
+<BaseLayout
+  locale={locale}
+  currentNav="about"
+  pagePath={getLocalizedPath(locale, 'about')}
+  paths={paths}
+  title={`${copy.nav.about} | ${copy.branding.title}`}
+  description={copy.about.description}
+>
+  <PageIntro eyebrow={copy.about.eyebrow} title={copy.about.title} description={copy.about.description} />
+
+  <section class="section section--two-columns">
+    <article class="surface profile-panel">
+      <img class="profile-card__avatar profile-card__avatar--large" src={PROFILE.avatar} alt={PROFILE.name[locale]} loading="lazy" />
+      <h2>{PROFILE.name[locale]}</h2>
+      <p>{PROFILE.tagline[locale]}</p>
+    </article>
+
+    <div class="stack-grid">
+      <article class="surface info-card">
+        <p class="eyebrow">{copy.about.sections.background}</p>
+        <div class="check-list">
+          {copy.about.background.map((item) => <p>{item}</p>)}
+        </div>
+      </article>
+
+      <article class="surface info-card">
+        <p class="eyebrow">{copy.about.sections.skills}</p>
+        <div class="tag-row tag-row--wrap">
+          {copy.about.skills.map((item) => <span class="tag">{item}</span>)}
+        </div>
+      </article>
+
+      <article class="surface info-card">
+        <p class="eyebrow">{copy.about.sections.interests}</p>
+        <div class="tag-row tag-row--wrap">
+          {copy.about.interests.map((item) => <span class="tag">{item}</span>)}
+        </div>
+      </article>
+
+      <article class="surface info-card">
+        <p class="eyebrow">{copy.about.sections.contact}</p>
+        <div class="check-list">
+          <a class="text-link" href={SITE.profileUrl} target="_blank" rel="noreferrer">GitHub</a>
+          <a class="text-link" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </div>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

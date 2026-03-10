@@ -1,5 +1,5 @@
 ---
-import { SITE, getDictionary, type Locale } from '../lib/site';
+import { PROFILE, SITE, getDictionary, type Locale } from '../lib/site';
 
 interface Props {
   locale: Locale;
@@ -7,18 +7,17 @@ interface Props {
 
 const { locale } = Astro.props as Props;
 const copy = getDictionary(locale);
-const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div>
+  <div class="site-footer__copy">
     <p class="site-footer__title">{copy.footer.title}</p>
     <p class="site-footer__description">{copy.footer.description}</p>
   </div>
 
-  <div class="site-footer__links">
+  <div class="site-footer__meta">
+    <span>{PROFILE.name[locale]}</span>
     <a href={SITE.profileUrl} target="_blank" rel="noreferrer">GitHub</a>
-    <a href={SITE.repositoryUrl} target="_blank" rel="noreferrer">Repository</a>
-    <span>{year}</span>
+    <a href={`mailto:${SITE.email}`}>Email</a>
   </div>
 </footer>

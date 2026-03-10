@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { formatDate } from '../lib/posts';
-import { getDictionary, getPostPath, type Locale } from '../lib/site';
+import { getDictionary, getLocalizedPath, type Locale } from '../lib/site';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -10,13 +10,13 @@ interface Props {
 
 const { post, locale } = Astro.props as Props;
 const copy = getDictionary(locale);
-const href = getPostPath(locale, post.slug);
+const href = getLocalizedPath(locale, `blog/${post.data.pathSlug}`);
 ---
 
 <article class="post-card" data-accent={post.data.accent}>
-  <div class="post-card__meta">
-    <span>{post.data.heroEyebrow ?? 'Essay'}</span>
-    <span>{post.data.readingTime}</span>
+  <div class="post-card__topline">
+    <span class="pill">{post.data.category}</span>
+    <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale)}</time>
   </div>
 
   <div class="post-card__body">
@@ -25,13 +25,9 @@ const href = getPostPath(locale, post.slug);
   </div>
 
   <div class="post-card__footer">
-    <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale)}</time>
-    <div class="post-card__tags">
+    <div class="tag-row">
       {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
     </div>
+    <a class="text-link" href={href}>{copy.nav.blog}</a>
   </div>
-
-  <a class="post-card__link" href={href}>
-    {copy.essays.more}
-  </a>
 </article>
