@@ -6,10 +6,10 @@
   email: 'yangliubin9-cyber@users.noreply.github.com',
   defaultOgImage: '/og-card.svg',
   giscus: {
-    repo: import.meta.env.PUBLIC_GISCUS_REPO ?? 'yangliubin9-cyber/Blogs-Comment',
-    repoId: import.meta.env.PUBLIC_GISCUS_REPO_ID ?? 'R_kgDORi4F6A',
-    category: import.meta.env.PUBLIC_GISCUS_CATEGORY ?? 'General',
-    categoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID ?? 'DIC_kwDORi4F6M4C4Duo',
+    repo: import.meta.env.PUBLIC_GISCUS_REPO || 'yangliubin9-cyber/Blogs-Comment',
+    repoId: import.meta.env.PUBLIC_GISCUS_REPO_ID || 'R_kgDORi4F6A',
+    category: import.meta.env.PUBLIC_GISCUS_CATEGORY || 'General',
+    categoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID || 'DIC_kwDORi4F6M4C4Duo',
     availableCategories: ['General', 'Ideas', 'Q&A', 'Showcase'],
     mapping: 'pathname',
     strict: '0',
@@ -446,5 +446,6 @@ export function getLanguagePaths(path = ''): Record<Locale, string> {
     en: getLocalizedPath('en', path)
   };
 }
+
 
 

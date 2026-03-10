@@ -1,4 +1,4 @@
----
+﻿---
 import { SITE, getDictionary, type Locale } from '../lib/site';
 
 interface Props {
@@ -8,6 +8,11 @@ interface Props {
 const { locale } = Astro.props as Props;
 const copy = getDictionary(locale);
 const enabled = Boolean(SITE.giscus.repoId && SITE.giscus.categoryId);
+const introText = enabled
+  ? locale === 'zh'
+    ? '评论由 GitHub Discussions 提供，登录 GitHub 后即可参与讨论。'
+    : 'Comments are powered by GitHub Discussions. Sign in with GitHub to join the conversation.'
+  : copy.post.commentsHint;
 const serializedConfig = JSON.stringify({
   src: 'https://giscus.app/client.js',
   repo: SITE.giscus.repo,
@@ -63,7 +68,7 @@ const giscusScript = `(() => {
   <div class="section-heading section-heading--tight">
     <p class="eyebrow">GitHub Discussions</p>
     <h2>{copy.post.comments}</h2>
-    <p>{copy.post.commentsHint}</p>
+    <p>{introText}</p>
   </div>
 
   {enabled ? (
