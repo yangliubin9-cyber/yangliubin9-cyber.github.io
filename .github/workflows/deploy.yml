@@ -18,6 +18,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PUBLIC_GISCUS_REPO: ${{ vars.PUBLIC_GISCUS_REPO || secrets.PUBLIC_GISCUS_REPO }}
+      PUBLIC_GISCUS_REPO_ID: ${{ vars.PUBLIC_GISCUS_REPO_ID || secrets.PUBLIC_GISCUS_REPO_ID }}
+      PUBLIC_GISCUS_CATEGORY: ${{ vars.PUBLIC_GISCUS_CATEGORY || secrets.PUBLIC_GISCUS_CATEGORY }}
+      PUBLIC_GISCUS_CATEGORY_ID: ${{ vars.PUBLIC_GISCUS_CATEGORY_ID || secrets.PUBLIC_GISCUS_CATEGORY_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,11 +40,6 @@ jobs:
         run: npm ci
 
       - name: Verify giscus variables
-        env:
-          PUBLIC_GISCUS_REPO: ${{ vars.PUBLIC_GISCUS_REPO }}
-          PUBLIC_GISCUS_REPO_ID: ${{ vars.PUBLIC_GISCUS_REPO_ID }}
-          PUBLIC_GISCUS_CATEGORY: ${{ vars.PUBLIC_GISCUS_CATEGORY }}
-          PUBLIC_GISCUS_CATEGORY_ID: ${{ vars.PUBLIC_GISCUS_CATEGORY_ID }}
         run: |
           echo "PUBLIC_GISCUS_REPO=${PUBLIC_GISCUS_REPO}"
           echo "PUBLIC_GISCUS_CATEGORY=${PUBLIC_GISCUS_CATEGORY}"
@@ -49,11 +49,6 @@ jobs:
           test -n "${PUBLIC_GISCUS_CATEGORY_ID}" || (echo "Missing PUBLIC_GISCUS_CATEGORY_ID" && exit 1)
 
       - name: Build site
-        env:
-          PUBLIC_GISCUS_REPO: ${{ vars.PUBLIC_GISCUS_REPO }}
-          PUBLIC_GISCUS_REPO_ID: ${{ vars.PUBLIC_GISCUS_REPO_ID }}
-          PUBLIC_GISCUS_CATEGORY: ${{ vars.PUBLIC_GISCUS_CATEGORY }}
-          PUBLIC_GISCUS_CATEGORY_ID: ${{ vars.PUBLIC_GISCUS_CATEGORY_ID }}
         run: npm run build
 
       - name: Upload Pages artifact
