@@ -11,6 +11,11 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      FEISHU_OPEN_BASE_URL: ${{ secrets.FEISHU_OPEN_BASE_URL }}
+      FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+      FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+      FEISHU_USER_REFRESH_TOKEN: ${{ secrets.FEISHU_USER_REFRESH_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,17 +32,12 @@ jobs:
         run: npm ci
 
       - name: Skip when Feishu credentials are missing
-        if: ${{ secrets.FEISHU_APP_ID == '' || secrets.FEISHU_APP_SECRET == '' }}
+        if: ${{ env.FEISHU_APP_ID == '' || env.FEISHU_APP_SECRET == '' }}
         run: echo "Skipping Feishu sync because FEISHU_APP_ID / FEISHU_APP_SECRET are not configured yet."
 
       - name: Sync Feishu posts
-        if: ${{ secrets.FEISHU_APP_ID != '' && secrets.FEISHU_APP_SECRET != '' }}
+        if: ${{ env.FEISHU_APP_ID != '' && env.FEISHU_APP_SECRET != '' }}
         run: npm run sync:feishu
-        env:
-          FEISHU_OPEN_BASE_URL: ${{ secrets.FEISHU_OPEN_BASE_URL }}
-          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
-          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
-          FEISHU_USER_REFRESH_TOKEN: ${{ secrets.FEISHU_USER_REFRESH_TOKEN }}
 
       - name: Verify build
         env:
