@@ -137,7 +137,7 @@ async function expandSources({ sources, config, baseUrl, accessToken, existingIn
           locale: folderSource.locale,
           pathSlug,
           translationKey: existing?.frontmatter.translationKey || `${folderSource.translationKeyPrefix}${file.token}`,
-          category: folderSource.category,
+          category: resolveFolderSourceCategory(folderSource, file),
           tags: folderSource.tags,
           heroEyebrow: folderSource.heroEyebrow,
           accent: folderSource.accent,
@@ -163,12 +163,14 @@ async function expandSources({ sources, config, baseUrl, accessToken, existingIn
 }
 
 async function listFolderDocuments({ baseUrl, accessToken, folderToken, recursive }) {
-  const queue = [folderToken];
+  const queue = [{ token: folderToken, folderNames: [] }];
   const visitedFolders = new Set();
   const documents = [];
 
   while (queue.length > 0) {
-    const currentFolderToken = queue.shift();
+    const currentFolder = queue.shift();
+    const currentFolderToken = currentFolder?.token || '';
+    const currentFolderNames = currentFolder?.folderNames || [];
     if (!currentFolderToken || visitedFolders.has(currentFolderToken)) continue;
     visitedFolders.add(currentFolderToken);
 
@@ -186,12 +188,18 @@ async function listFolderDocuments({ baseUrl, accessToken, folderToken, recursiv
 
       for (const file of files) {
         if (file.type === 'docx') {
-          documents.push(file);
+          documents.push({
+            ...file,
+            folderNames: currentFolderNames
+          });
           continue;
         }
 
         if (recursive && file.type === 'folder') {
-          queue.push(file.token);
+          queue.push({
+            token: file.token,
+            folderNames: [...currentFolderNames, file.name].filter(Boolean)
+          });
         }
       }
 
@@ -222,8 +230,21 @@ function normalizeFolderSource(source, config) {
     excerpt: source.excerpt,
     folderToken: source.folderToken,
     slugStrategy: source.slugStrategy || 'title',
-    translationKeyPrefix: source.translationKeyPrefix || 'feishu-'
+    translationKeyPrefix: source.translationKeyPrefix || 'feishu-',
+    categoryStrategy: source.categoryStrategy || 'default'
   };
+}
+
+function resolveFolderSourceCategory(folderSource, file) {
+  if (folderSource.categoryStrategy === 'top-folder') {
+    return file.folderNames?.[0] || folderSource.category;
+  }
+
+  if (folderSource.categoryStrategy === 'full-folder-path') {
+    return file.folderNames?.join(' / ') || folderSource.category;
+  }
+
+  return folderSource.category;
 }
 
 function normalizeDocumentSource(source, config, existingIndex) {

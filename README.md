@@ -118,7 +118,10 @@ If you prefer writing in Feishu and publishing through GitHub Pages, this repo c
 
 The repo is currently pointed at:
 
-- `https://my.feishu.cn/drive/folder/IfgPfdnzdlNvAQdXwgncHtVRnP0`
+- `https://my.feishu.cn/drive/folder/LXcvfNKDSlM3pfdPAlPcQQt7ncf`
+
+The sync treats first-level subfolders under that root as blog categories.
+Documents placed directly in the root folder fall back to `未分类`.
 
 ### Schedule
 
@@ -131,8 +134,10 @@ The repo is currently pointed at:
 
 ```bash
 FEISHU_OPEN_BASE_URL=https://open.feishu.cn
+FEISHU_AUTH_BASE_URL=https://accounts.feishu.cn
 FEISHU_APP_ID=your_feishu_app_id
 FEISHU_APP_SECRET=your_feishu_app_secret
+FEISHU_AUTH_SCOPE=offline_access drive:drive docx:document
 ```
 
 2. Adjust `feishu-sync.config.mjs` when you want to change folder URL, locale, tags, or recursion behavior
@@ -143,10 +148,11 @@ Folder example:
 {
   enabled: true,
   kind: 'folder',
-  url: 'https://my.feishu.cn/drive/folder/IfgPfdnzdlNvAQdXwgncHtVRnP0',
+  url: 'https://my.feishu.cn/drive/folder/LXcvfNKDSlM3pfdPAlPcQQt7ncf',
   locale: 'zh',
   recursive: true,
-  slugStrategy: 'title'
+  slugStrategy: 'title',
+  categoryStrategy: 'top-folder'
 }
 ```
 
@@ -211,7 +217,7 @@ npm run dev
 
 For personal Feishu folders, use user identity instead of app identity.
 
-1. Keep `FEISHU_AUTH_REDIRECT_URI=http://127.0.0.1:4390/feishu/callback` in your local `.env.local`
+1. Keep `FEISHU_AUTH_REDIRECT_URI=http://127.0.0.1:4390/feishu/callback` and `FEISHU_AUTH_SCOPE=offline_access drive:drive docx:document` in your local `.env.local`
 2. Make sure the same redirect URI is configured in Feishu app security settings
 3. Run:
 

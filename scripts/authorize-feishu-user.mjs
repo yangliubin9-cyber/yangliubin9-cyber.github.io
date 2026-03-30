@@ -13,7 +13,9 @@ await loadEnvFile(path.join(rootDir, '.env'));
 const appId = process.env.FEISHU_APP_ID ?? '';
 const appSecret = process.env.FEISHU_APP_SECRET ?? '';
 const baseUrl = trimTrailingSlash(process.env.FEISHU_OPEN_BASE_URL || 'https://open.feishu.cn');
+const authBaseUrl = trimTrailingSlash(process.env.FEISHU_AUTH_BASE_URL || 'https://accounts.feishu.cn');
 const redirectUri = process.env.FEISHU_AUTH_REDIRECT_URI || 'http://127.0.0.1:4390/feishu/callback';
+const authScope = process.env.FEISHU_AUTH_SCOPE || '';
 
 if (!appId || !appSecret) {
   throw new Error('Missing FEISHU_APP_ID or FEISHU_APP_SECRET in .env.local or .env.');
@@ -26,10 +28,11 @@ if (!redirect.hostname || !redirect.port) {
 
 const state = randomUUID();
 const authUrl = buildFeishuAuthorizeUrl({
-  baseUrl,
   appId,
   redirectUri,
-  state
+  state,
+  authBaseUrl,
+  scope: authScope
 });
 
 const result = await waitForAuthorization({
@@ -51,11 +54,12 @@ const tokenSet = await exchangeUserToken({
 });
 
 if (!tokenSet.refreshToken) {
-  throw new Error('Feishu did not return a refresh token. Please verify your user identity auth settings and try again.');
+  throw new Error('Feishu did not return a refresh token. Please verify user identity OAuth settings, effective permissions, and whether offline access is enabled for this app.');
 }
 
 await upsertEnvValues(localEnvPath, {
   FEISHU_OPEN_BASE_URL: baseUrl,
+  FEISHU_AUTH_BASE_URL: authBaseUrl,
   FEISHU_APP_ID: appId,
   FEISHU_APP_SECRET: appSecret,
   FEISHU_AUTH_REDIRECT_URI: redirectUri,

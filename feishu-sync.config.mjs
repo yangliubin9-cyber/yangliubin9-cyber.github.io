@@ -1,6 +1,6 @@
 const feishuSyncConfig = {
   timezone: 'Asia/Shanghai',
-  defaultCategory: 'Feishu Sync',
+  defaultCategory: '未分类',
   defaultAccent: 'cyan',
   defaultHeroEyebrow: 'Feishu',
   defaultTags: ['Feishu'],
@@ -8,11 +8,12 @@ const feishuSyncConfig = {
     {
       enabled: true,
       kind: 'folder',
-      url: 'https://my.feishu.cn/drive/folder/IfgPfdnzdlNvAQdXwgncHtVRnP0',
+      url: 'https://my.feishu.cn/drive/folder/LXcvfNKDSlM3pfdPAlPcQQt7ncf',
       locale: 'zh',
       recursive: true,
       slugStrategy: 'title',
-      category: 'Feishu Sync',
+      categoryStrategy: 'top-folder',
+      category: '未分类',
       tags: ['Feishu', 'Cloud Docs'],
       heroEyebrow: 'Feishu Folder',
       accent: 'cyan',

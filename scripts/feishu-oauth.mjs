@@ -19,11 +19,13 @@ export function trimTrailingSlash(value) {
   return String(value || '').replace(/\/$/, '');
 }
 
-export function buildFeishuAuthorizeUrl({ baseUrl, appId, redirectUri, state }) {
-  const url = new URL('/open-apis/authen/v1/index', trimTrailingSlash(baseUrl));
-  url.searchParams.set('app_id', appId);
+export function buildFeishuAuthorizeUrl({ appId, redirectUri, state, authBaseUrl, scope }) {
+  const url = new URL('/open-apis/authen/v1/authorize', trimTrailingSlash(authBaseUrl || 'https://accounts.feishu.cn'));
+  url.searchParams.set('client_id', appId);
+  url.searchParams.set('response_type', 'code');
   url.searchParams.set('redirect_uri', redirectUri);
   url.searchParams.set('state', state);
+  if (scope) url.searchParams.set('scope', scope);
   return url.toString();
 }
 
@@ -186,7 +188,7 @@ function normalizeUserTokenPayload(payload) {
   const data = payload?.data ?? payload ?? {};
   return {
     accessToken: data.access_token || data.user_access_token || '',
-    refreshToken: data.refresh_token || '',
+    refreshToken: data.refresh_token || data.user_refresh_token || '',
     expiresIn: data.expires_in || 0,
     openId: data.open_id || '',
     unionId: data.union_id || '',
