@@ -24,12 +24,12 @@ const homeCopy = locale === 'zh'
       profileEyebrow: 'Author Profile',
       latestEyebrow: 'Latest Posts',
       latestTitle: '最新文章',
-      latestDescription: '首页只展示最近发布的几篇内容，作为最主要的阅读入口。',
+      latestDescription: '',
       latestAction: '查看全部文章',
       readAction: '阅读全文',
       archiveEyebrow: 'Archive',
-      archiveTitle: '按分类、标签和发布时间继续浏览完整博客归档。',
-      archiveDescription: '如果你想系统地查看全部内容，博客页会提供更完整的筛选和顺序阅读入口。',
+      archiveTitle: '博客归档',
+      archiveDescription: '按分类、标签和发布时间浏览全部内容。',
       archivePrimary: '打开博客',
       archiveSecondary: '查看关于'
     }
@@ -41,12 +41,12 @@ const homeCopy = locale === 'zh'
       profileEyebrow: 'Author Profile',
       latestEyebrow: 'Latest Posts',
       latestTitle: 'Latest posts',
-      latestDescription: 'The front page stays focused on a small set of recent writing instead of too many competing entry points.',
+      latestDescription: '',
       latestAction: 'View all posts',
       readAction: 'Read post',
       archiveEyebrow: 'Archive',
-      archiveTitle: 'Browse the full archive by category, tag, and publish date.',
-      archiveDescription: 'The blog index keeps the full list available for filtering and chronological reading.',
+      archiveTitle: 'Blog archive',
+      archiveDescription: 'Browse the full archive by category, tag, and publish date.',
       archivePrimary: 'Open blog',
       archiveSecondary: 'About the author'
     };
@@ -95,7 +95,7 @@ const homeCopy = locale === 'zh'
       <div>
         <p class="eyebrow">{homeCopy.latestEyebrow}</p>
         <h2>{homeCopy.latestTitle}</h2>
-        <p>{homeCopy.latestDescription}</p>
+        {homeCopy.latestDescription && <p>{homeCopy.latestDescription}</p>}
       </div>
 
       <a class="text-link" href={getBlogPath(locale)}>{homeCopy.latestAction}</a>

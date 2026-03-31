@@ -13,27 +13,37 @@ const paths = getLanguagePaths('contact');
 const contactCopy = locale === 'zh'
   ? {
       emailAction: '发送邮件',
-      windowEyebrow: 'Contact Window',
-      windowTitle: '联系入口保持尽量简单，邮箱优先。',
-      windowBody: '这一页不再堆叠过多模块，只保留清晰的沟通入口。GitHub 作为补充链接存在，正式沟通以邮箱为主。',
-      notes: [
-        '适合讨论博客、前端实现、自动化工作流和云上工程。',
-        '如果需要更完整的上下文，邮件通常是最稳定的方式。'
+      intro: '欢迎通过邮件或代码仓库与我交流。',
+      cards: [
+        {
+          label: '联系邮箱',
+          value: SITE.email,
+          href: `mailto:${SITE.email}`
+        },
+        {
+          label: '代码主页',
+          value: 'github.com/yangliubin9-cyber',
+          href: SITE.profileUrl
+        }
       ],
-      emailEyebrow: 'Email',
-      emailTitle: '主要联系邮箱'
+      footerAction: '代码主页'
     }
   : {
       emailAction: 'Send email',
-      windowEyebrow: 'Contact Window',
-      windowTitle: 'The contact layer stays minimal, with email as the primary channel.',
-      windowBody: 'This page intentionally removes extra modules and keeps only the clearest communication path. GitHub remains as a lightweight secondary link.',
-      notes: [
-        'Best for conversations about the blog, frontend implementation, automation workflows, and cloud systems.',
-        'For anything that needs more context, email is the most reliable route.'
+      intro: 'You can reach me through email or the code repository.',
+      cards: [
+        {
+          label: 'Email',
+          value: SITE.email,
+          href: `mailto:${SITE.email}`
+        },
+        {
+          label: 'Code home',
+          value: 'github.com/yangliubin9-cyber',
+          href: SITE.profileUrl
+        }
       ],
-      emailEyebrow: 'Email',
-      emailTitle: 'Primary contact address'
+      footerAction: 'Code home'
     };
 ---
 
@@ -66,20 +76,25 @@ const contactCopy = locale === 'zh'
     </div>
   </PageIntro>
 
-  <section class="section folio-contact-shell">
-    <article class="surface folio-contact-main">
-      <p class="eyebrow">{contactCopy.windowEyebrow}</p>
-      <h2>{contactCopy.windowTitle}</h2>
-      <p>{contactCopy.windowBody}</p>
-      <div class="folio-check-list">
-        {contactCopy.notes.map((item) => <p>{item}</p>)}
-      </div>
-    </article>
+  <section class="section ref-contact-panel surface">
+    <div class="ref-contact-panel__copy">
+      <p>{contactCopy.intro}</p>
+    </div>
 
-    <article class="surface folio-contact-email">
-      <p class="eyebrow">{contactCopy.emailEyebrow}</p>
-      <h2>{contactCopy.emailTitle}</h2>
-      <a class="text-link" href={`mailto:${SITE.email}`}>{SITE.email}</a>
-    </article>
+    <div class="ref-contact-grid">
+      {contactCopy.cards.map((item) => (
+        <a
+          class="ref-contact-card"
+          href={item.href}
+          target={item.href.startsWith('http') ? '_blank' : undefined}
+          rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
+        >
+          <span>{item.label}</span>
+          <strong>{item.value}</strong>
+        </a>
+      ))}
+    </div>
+
+    <a class="ref-contact-button" href={SITE.profileUrl} target="_blank" rel="noreferrer">{contactCopy.footerAction}</a>
   </section>
 </BaseLayout>

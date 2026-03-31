@@ -10,17 +10,6 @@ export function getStaticPaths() {
 const { locale } = Astro.props as { locale: Locale };
 const copy = getDictionary(locale);
 const paths = getLanguagePaths('uses');
-const stackCopy = locale === 'zh'
-  ? {
-      noteEyebrow: 'Technical Direction',
-      noteTitle: '技术页更像一份工作说明，而不是装备清单。',
-      noteBody: '我更关心哪些工具真的帮助表达、交付和长期维护，因此这里保留的是方法和栈，而不是堆砌参数。'
-    }
-  : {
-      noteEyebrow: 'Technical Direction',
-      noteTitle: 'This page reads more like a working stack note than a gear checklist.',
-      noteBody: 'The emphasis stays on tools and preferences that actually improve expression, delivery, and long-term maintenance.'
-    };
 ---
 
 <BaseLayout
@@ -43,14 +32,6 @@ const stackCopy = locale === 'zh'
           </div>
         </article>
       ))}
-    </div>
-  </section>
-
-  <section class="surface folio-uses-note">
-    <div class="folio-uses-note__copy">
-      <p class="eyebrow">{stackCopy.noteEyebrow}</p>
-      <h2>{stackCopy.noteTitle}</h2>
-      <p>{stackCopy.noteBody}</p>
     </div>
   </section>
 </BaseLayout>

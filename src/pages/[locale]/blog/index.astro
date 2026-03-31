@@ -23,8 +23,6 @@ const blogCopy = locale === 'zh'
   ? {
       eyebrow: 'Blog Archive',
       description: '保留分类、标签和按发布时间排序的文章列表，减少无关入口，让归档页更像一个稳定的内容目录。',
-      noteEyebrow: 'Reading Mode',
-      noteBody: '文章默认按发布时间倒序排列，筛选结果会即时更新，不改动现有内容系统。',
       listEyebrow: 'Recent Posts',
       listTitle: '最近发布',
       listDescription: '按时间线查看更新，并通过分类与标签快速收束范围。',
@@ -34,8 +32,6 @@ const blogCopy = locale === 'zh'
   : {
       eyebrow: 'Blog Archive',
       description: 'The index keeps only the essentials: category, tag, and a reverse-chronological list of posts.',
-      noteEyebrow: 'Reading Mode',
-      noteBody: 'Results update instantly as filters change while the underlying content system stays untouched.',
       listEyebrow: 'Recent Posts',
       listTitle: 'Recent posts',
       listDescription: 'Browse the latest writing in publish order and narrow the list by category or tag.',
@@ -50,7 +46,6 @@ const filterScript = `(() => {
   const categoryButtons = [...root.querySelectorAll('[data-category-filter]')];
   const tagButtons = [...root.querySelectorAll('[data-tag-filter]')];
   const count = root.querySelector('[data-results-count]');
-  const empty = root.querySelector('[data-empty-state]');
   const params = new URLSearchParams(window.location.search);
   const state = {
     category: params.get('category') || 'all',
@@ -77,7 +72,6 @@ const filterScript = `(() => {
     });
 
     if (count) count.textContent = visible + ' ' + ${JSON.stringify(resultLabel)};
-    if (empty) empty.hidden = visible !== 0;
 
     const nextParams = new URLSearchParams();
     if (state.category !== 'all') nextParams.set('category', state.category);
@@ -121,11 +115,6 @@ const filterScript = `(() => {
       <h1>{copy.blog.title}</h1>
       <p class="folio-blog-head__description">{blogCopy.description}</p>
     </div>
-
-    <aside class="surface folio-blog-head__note">
-      <p class="eyebrow">{blogCopy.noteEyebrow}</p>
-      <p>{blogCopy.noteBody}</p>
-    </aside>
   </section>
 
   <section class="section folio-blog-shell" data-blog-filters>
@@ -197,11 +186,6 @@ const filterScript = `(() => {
           </div>
         </article>
       ))}
-    </div>
-
-    <div class="surface empty-state" data-empty-state hidden>
-      <h2>{copy.blog.emptyTitle}</h2>
-      <p>{copy.blog.emptyBody}</p>
     </div>
   </section>
 
