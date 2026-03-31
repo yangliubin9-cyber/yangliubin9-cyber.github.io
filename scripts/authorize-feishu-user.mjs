@@ -69,6 +69,7 @@ await upsertEnvValues(localEnvPath, {
 console.log('Feishu user authorization succeeded.');
 console.log('Stored FEISHU_USER_REFRESH_TOKEN in .env.local');
 console.log('Next step: add FEISHU_USER_REFRESH_TOKEN to GitHub Actions Secrets, then rerun Sync Feishu Posts.');
+console.log('If GH_ACTIONS_SECRET_WRITER_TOKEN is configured in GitHub Actions Secrets, future workflow runs will rotate FEISHU_USER_REFRESH_TOKEN automatically.');
 
 async function waitForAuthorization({ hostname, port, pathname, authUrl, state, timeoutMs }) {
   console.log('Open this URL in your browser and complete the Feishu authorization:');

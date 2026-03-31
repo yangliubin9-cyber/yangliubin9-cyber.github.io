@@ -1,4 +1,4 @@
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { appendFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -35,6 +35,11 @@ const { accessToken, authMode, refreshToken } = await getFeishuAccessToken({
   userRefreshToken
 });
 console.log(`Using Feishu ${authMode} token mode.`);
+await publishGitHubOutputs({
+  authMode,
+  currentRefreshToken: userRefreshToken,
+  nextRefreshToken: refreshToken
+});
 await persistUserRefreshToken({
   authMode,
   localEnvPath,
@@ -519,4 +524,25 @@ async function persistUserRefreshToken({ authMode, localEnvPath, currentRefreshT
   });
   console.log('Updated FEISHU_USER_REFRESH_TOKEN in .env.local');
   console.log('Reminder: update GitHub Actions secret FEISHU_USER_REFRESH_TOKEN before the next scheduled sync.');
+}
+
+async function publishGitHubOutputs({ authMode, currentRefreshToken, nextRefreshToken }) {
+  const outputPath = process.env.GITHUB_OUTPUT || '';
+  if (!outputPath) return;
+
+  const rotated = authMode === 'user'
+    && Boolean(currentRefreshToken)
+    && Boolean(nextRefreshToken)
+    && nextRefreshToken !== currentRefreshToken;
+
+  const lines = [
+    `feishu_refresh_token_rotated=${rotated ? 'true' : 'false'}`
+  ];
+
+  if (rotated) {
+    lines.push(`next_feishu_refresh_token=${nextRefreshToken}`);
+    console.log('Captured rotated FEISHU_USER_REFRESH_TOKEN for GitHub Actions secret update.');
+  }
+
+  await appendFile(outputPath, `${lines.join('\n')}\n`, 'utf8');
 }

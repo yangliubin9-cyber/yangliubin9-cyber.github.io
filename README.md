@@ -134,13 +134,21 @@ Documents placed directly in the root folder fall back to `未分类`.
 
 ```bash
 FEISHU_OPEN_BASE_URL=https://open.feishu.cn
-FEISHU_AUTH_BASE_URL=https://accounts.feishu.cn
 FEISHU_APP_ID=your_feishu_app_id
 FEISHU_APP_SECRET=your_feishu_app_secret
+FEISHU_USER_REFRESH_TOKEN=refresh_token_from_npm_run_auth_feishu
+GH_ACTIONS_SECRET_WRITER_TOKEN=github_token_that_can_update_repository_actions_secrets
+```
+
+2. Keep these local-only values in `.env.local`
+
+```bash
+FEISHU_AUTH_BASE_URL=https://accounts.feishu.cn
+FEISHU_AUTH_REDIRECT_URI=http://127.0.0.1:4390/feishu/callback
 FEISHU_AUTH_SCOPE=offline_access drive:drive docx:document
 ```
 
-2. Adjust `feishu-sync.config.mjs` when you want to change folder URL, locale, tags, or recursion behavior
+3. Adjust `feishu-sync.config.mjs` when you want to change folder URL, locale, tags, or recursion behavior
 
 Folder example:
 
@@ -226,4 +234,5 @@ npm run auth:feishu
 ```
 
 The script prints an authorization URL, waits for the callback locally, and stores `FEISHU_USER_REFRESH_TOKEN` in `.env.local`.
-Then add the same `FEISHU_USER_REFRESH_TOKEN` value to GitHub Actions Secrets so nightly sync can read your personal Feishu folder.
+Then add that `FEISHU_USER_REFRESH_TOKEN` value to GitHub Actions Secrets once so nightly sync can read your personal Feishu folder.
+Also add `GH_ACTIONS_SECRET_WRITER_TOKEN` so each successful workflow run can write the rotated `FEISHU_USER_REFRESH_TOKEN` back to GitHub automatically.

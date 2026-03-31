@@ -16,6 +16,7 @@ jobs:
       FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
       FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
       FEISHU_USER_REFRESH_TOKEN: ${{ secrets.FEISHU_USER_REFRESH_TOKEN }}
+      GH_ACTIONS_SECRET_WRITER_TOKEN: ${{ secrets.GH_ACTIONS_SECRET_WRITER_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -42,8 +43,13 @@ jobs:
             echo "::error::Missing FEISHU_USER_REFRESH_TOKEN in GitHub Actions secrets. Personal Feishu folders require a user refresh token."
             exit 1
           fi
+          if [ -z "${GH_ACTIONS_SECRET_WRITER_TOKEN}" ]; then
+            echo "::error::Missing GH_ACTIONS_SECRET_WRITER_TOKEN in GitHub Actions secrets. This workflow auto-rotates FEISHU_USER_REFRESH_TOKEN after each successful refresh."
+            exit 1
+          fi
 
       - name: Sync Feishu posts
+        id: sync_feishu
         shell: bash
         run: |
           set -o pipefail
@@ -55,6 +61,24 @@ jobs:
             echo "::error::FEISHU_USER_REFRESH_TOKEN is invalid or expired. Run npm run auth:feishu locally, update GitHub Actions secret FEISHU_USER_REFRESH_TOKEN, then rerun Sync Feishu Posts."
           fi
           exit 1
+
+      - name: Persist rotated Feishu refresh token
+        if: ${{ steps.sync_feishu.outputs.feishu_refresh_token_rotated == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACTIONS_SECRET_WRITER_TOKEN }}
+          NEXT_FEISHU_REFRESH_TOKEN: ${{ steps.sync_feishu.outputs.next_feishu_refresh_token }}
+        shell: bash
+        run: |
+          if [ -z "${NEXT_FEISHU_REFRESH_TOKEN}" ]; then
+            echo "::error::Feishu sync reported refresh token rotation, but no replacement token was captured."
+            exit 1
+          fi
+          if ! command -v gh >/dev/null 2>&1; then
+            echo "::error::GitHub CLI is not available on the runner, so FEISHU_USER_REFRESH_TOKEN cannot be updated."
+            exit 1
+          fi
+          gh secret set FEISHU_USER_REFRESH_TOKEN --repo "${GITHUB_REPOSITORY}" --body "${NEXT_FEISHU_REFRESH_TOKEN}"
+          echo "Updated FEISHU_USER_REFRESH_TOKEN in GitHub Actions secrets."
 
       - name: Verify build
         env:
