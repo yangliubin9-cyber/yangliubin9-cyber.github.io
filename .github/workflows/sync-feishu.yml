@@ -18,12 +18,12 @@ jobs:
       FEISHU_USER_REFRESH_TOKEN: ${{ secrets.FEISHU_USER_REFRESH_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -44,7 +44,17 @@ jobs:
           fi
 
       - name: Sync Feishu posts
-        run: npm run sync:feishu
+        shell: bash
+        run: |
+          set -o pipefail
+          log_file="$(mktemp)"
+          if npm run sync:feishu 2>&1 | tee "$log_file"; then
+            exit 0
+          fi
+          if grep -q 'FEISHU_USER_REFRESH_TOKEN is invalid or expired' "$log_file"; then
+            echo "::error::FEISHU_USER_REFRESH_TOKEN is invalid or expired. Run npm run auth:feishu locally, update GitHub Actions secret FEISHU_USER_REFRESH_TOKEN, then rerun Sync Feishu Posts."
+          fi
+          exit 1
 
       - name: Verify build
         env:

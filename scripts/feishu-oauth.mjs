@@ -119,7 +119,12 @@ export async function exchangeUserToken({ baseUrl, appId, appSecret, grantType, 
         return normalized;
       }
 
-      lastError = new Error(`User token exchange failed for ${url}: ${response.status} ${JSON.stringify(payload)}`);
+      lastError = buildUserTokenExchangeError({
+        url,
+        response,
+        payload,
+        grantType
+      });
     } catch (error) {
       lastError = error;
     }
@@ -182,6 +187,21 @@ async function readJson(response) {
   } catch {
     return { raw: text };
   }
+}
+
+function buildUserTokenExchangeError({ url, response, payload, grantType }) {
+  if (grantType === 'refresh_token' && isInvalidRefreshTokenPayload(payload)) {
+    return new Error(`FEISHU_USER_REFRESH_TOKEN is invalid or expired. Run "npm run auth:feishu", update FEISHU_USER_REFRESH_TOKEN in .env.local and GitHub Actions secrets, then rerun sync. Feishu response from ${url}: ${response.status} ${JSON.stringify(payload)}`);
+  }
+
+  return new Error(`User token exchange failed for ${url}: ${response.status} ${JSON.stringify(payload)}`);
+}
+
+function isInvalidRefreshTokenPayload(payload) {
+  const code = String(payload?.code ?? '');
+  const message = String(payload?.msg ?? payload?.message ?? '').toLowerCase();
+  return code === '20026'
+    || (message.includes('refresh token') && (message.includes('not found') || message.includes('invalid') || message.includes('expired')));
 }
 
 function normalizeUserTokenPayload(payload) {

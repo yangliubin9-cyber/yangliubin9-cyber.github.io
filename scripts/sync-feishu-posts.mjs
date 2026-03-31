@@ -2,12 +2,13 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { fetchFeishuJson, getDocumentInfo, getFeishuAccessToken, loadEnvFile, trimTrailingSlash } from './feishu-oauth.mjs';
+import { fetchFeishuJson, getDocumentInfo, getFeishuAccessToken, loadEnvFile, trimTrailingSlash, upsertEnvValues } from './feishu-oauth.mjs';
 
 const rootDir = process.cwd();
+const localEnvPath = path.join(rootDir, '.env.local');
 const postsRoot = path.join(rootDir, 'src', 'content', 'posts');
 
-await loadEnvFile(path.join(rootDir, '.env.local'));
+await loadEnvFile(localEnvPath);
 await loadEnvFile(path.join(rootDir, '.env'));
 
 const config = await loadSyncConfig();
@@ -27,13 +28,19 @@ if (!appId || !appSecret) {
   throw new Error('Missing FEISHU_APP_ID or FEISHU_APP_SECRET. Add them to .env.local or GitHub Actions secrets.');
 }
 
-const { accessToken, authMode } = await getFeishuAccessToken({
+const { accessToken, authMode, refreshToken } = await getFeishuAccessToken({
   baseUrl,
   appId,
   appSecret,
   userRefreshToken
 });
 console.log(`Using Feishu ${authMode} token mode.`);
+await persistUserRefreshToken({
+  authMode,
+  localEnvPath,
+  currentRefreshToken: userRefreshToken,
+  nextRefreshToken: refreshToken
+});
 
 const existingIndex = await buildExistingPostIndex(postsRoot);
 const discoveredSources = await expandSources({
@@ -500,4 +507,16 @@ function startCase(value) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
+}
+
+async function persistUserRefreshToken({ authMode, localEnvPath, currentRefreshToken, nextRefreshToken }) {
+  if (authMode !== 'user') return;
+  if (process.env.GITHUB_ACTIONS === 'true') return;
+  if (!currentRefreshToken || !nextRefreshToken || nextRefreshToken === currentRefreshToken) return;
+
+  await upsertEnvValues(localEnvPath, {
+    FEISHU_USER_REFRESH_TOKEN: nextRefreshToken
+  });
+  console.log('Updated FEISHU_USER_REFRESH_TOKEN in .env.local');
+  console.log('Reminder: update GitHub Actions secret FEISHU_USER_REFRESH_TOKEN before the next scheduled sync.');
 }
