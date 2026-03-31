@@ -6,7 +6,7 @@ title: "Harbor部署"
 excerpt: "部署安装Harbor 下载软件包 安装docker 安装docker compose 下载harbor离线安装包，或者Githu..."
 category: "服务搭建"
 publishedAt: "2026-03-30"
-updatedAt: "2026-03-30"
+updatedAt: "2026-03-31"
 featured: false
 tags:
   - "Feishu"
