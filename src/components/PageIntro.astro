@@ -6,11 +6,19 @@ interface Props {
 }
 
 const { eyebrow, title, description } = Astro.props as Props;
+const hasSupplementary = Astro.slots.has('default');
 ---
 
-<section class="page-intro panel">
-  <p class="eyebrow">{eyebrow}</p>
-  <h1>{title}</h1>
-  <p class="page-intro__description">{description}</p>
-  <slot />
+<section class:list={['page-intro', 'panel', hasSupplementary && 'page-intro--with-aside']}>
+  <div class="page-intro__content">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1>{title}</h1>
+    <p class="page-intro__description">{description}</p>
+  </div>
+
+  {hasSupplementary && (
+    <div class="page-intro__aside">
+      <slot />
+    </div>
+  )}
 </section>

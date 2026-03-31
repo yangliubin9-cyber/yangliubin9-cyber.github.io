@@ -13,19 +13,27 @@ const { locale, currentNav, paths } = Astro.props as Props;
 const copy = getDictionary(locale);
 const brandPath = getLocalizedPath(locale);
 const searchLabel = locale === 'zh' ? '搜索' : 'Search';
+const archiveLabel = locale === 'zh' ? '现场笔记' : 'Field notes';
+const identityLabel = locale === 'zh' ? '作者' : 'Author';
+const isChineseHome = locale === 'zh' && currentNav === 'home';
+const navItems = isChineseHome ? (['blog', 'about'] as NavKey[]) : NAV_ITEMS;
 ---
 
-<header class="site-header">
+<header class:list={['site-header', isChineseHome && 'site-header--home-zh']}>
   <a class="brand" href={brandPath}>
     <span class="brand__mark">YL</span>
     <span class="brand__text">
       <strong>{copy.branding.title}</strong>
       <small>{copy.branding.subtitle}</small>
+      <span class="brand__ledger">
+        <span>{archiveLabel}</span>
+        <span>{isChineseHome ? '中文首页' : copy.nav[currentNav]}</span>
+      </span>
     </span>
   </a>
 
   <nav class="site-nav" aria-label="Primary">
-    {NAV_ITEMS.map((item) => (
+    {navItems.map((item) => (
       <a class:list={['site-nav__item', currentNav === item && 'is-active']} href={getLocalizedPath(locale, item === 'home' ? '' : item)}>
         {copy.nav[item]}
       </a>
@@ -34,12 +42,13 @@ const searchLabel = locale === 'zh' ? '搜索' : 'Search';
 
   <div class="site-header__actions">
     <div class="site-header__identity">
-      <span>{PROFILE.name[locale]}</span>
+      <span class="site-header__identity-label">{identityLabel}</span>
+      <strong>{PROFILE.name[locale]}</strong>
     </div>
 
     <div class="site-header__links">
       <a class="site-header__utility" href={getLocalizedPath(locale, 'search')}>{searchLabel}</a>
-      <a class="site-header__utility" href={getLocalizedPath(locale, 'studio')}>{copy.nav.studio}</a>
+      {!isChineseHome && <a class="site-header__utility" href={getLocalizedPath(locale, 'studio')}>{copy.nav.studio}</a>}
     </div>
 
     <LocaleSwitch locale={locale} paths={paths} />

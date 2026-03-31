@@ -37,6 +37,12 @@ const defaultMarkup = `<h2>${messages.defaultHeading}</h2><p>${messages.defaultP
   data-default-markup={defaultMarkup}
 >
   <div class="surface studio-meta">
+    <div class="studio-meta__header">
+      <p class="eyebrow">{copy.studio.eyebrow}</p>
+      <h2>{copy.studio.title}</h2>
+      <p>{copy.studio.description}</p>
+    </div>
+
     <div class="studio-meta__grid">
       <label>
         <span>{copy.studio.meta.locale}</span>
@@ -56,27 +62,27 @@ const defaultMarkup = `<h2>${messages.defaultHeading}</h2><p>${messages.defaultP
         <input data-field="translationKey" placeholder="my-post-slug" />
       </label>
 
-      <label>
+      <label class="studio-meta__field studio-meta__field--wide">
         <span>{copy.studio.meta.category}</span>
         <input data-field="category" placeholder={locale === 'zh' ? '工程实践 / 设计' : 'Engineering / Design'} />
       </label>
 
-      <label>
+      <label class="studio-meta__field studio-meta__field--wide">
         <span>{copy.studio.meta.title}</span>
         <input data-field="title" placeholder={locale === 'zh' ? '输入文章标题' : 'Enter article title'} />
       </label>
 
-      <label>
+      <label class="studio-meta__field studio-meta__field--wide">
         <span>{copy.studio.meta.excerpt}</span>
         <input data-field="excerpt" placeholder={locale === 'zh' ? '输入文章摘要' : 'Enter excerpt'} />
       </label>
 
-      <label>
+      <label class="studio-meta__field studio-meta__field--wide">
         <span>{copy.studio.meta.tags}</span>
         <input data-field="tags" placeholder="AI, Workflow, Blog" />
       </label>
 
-      <label>
+      <label class="studio-meta__field studio-meta__field--wide">
         <span>{copy.studio.meta.heroEyebrow}</span>
         <input data-field="heroEyebrow" placeholder="Workflow" />
       </label>
@@ -103,6 +109,14 @@ const defaultMarkup = `<h2>${messages.defaultHeading}</h2><p>${messages.defaultP
   </div>
 
   <div class="surface studio-editor">
+    <div class="studio-editor__header">
+      <div>
+        <p class="eyebrow">{locale === 'zh' ? 'EDITOR / OUTPUT' : 'EDITOR / OUTPUT'}</p>
+        <h2>{locale === 'zh' ? '写作与导出' : 'Write and export'}</h2>
+      </div>
+      <p>{copy.studio.notes.autosave}</p>
+    </div>
+
     <div class="studio-toolbar">
       <button type="button" data-command="h2">{copy.studio.toolbar.h2}</button>
       <button type="button" data-command="h3">{copy.studio.toolbar.h3}</button>
@@ -119,15 +133,17 @@ const defaultMarkup = `<h2>${messages.defaultHeading}</h2><p>${messages.defaultP
       <button type="button" data-tab-target="output">{copy.studio.tabs.output}</button>
     </div>
 
-    <div class="studio-panel is-active" data-tab-panel="editor">
-      <article class="studio-surface" contenteditable="true" spellcheck="true" data-editor-surface>
-        <h2>{messages.defaultHeading}</h2>
-        <p>{messages.defaultParagraph}</p>
-      </article>
-    </div>
+    <div class="studio-editor__stage">
+      <div class="studio-panel is-active" data-tab-panel="editor">
+        <article class="studio-surface" contenteditable="true" spellcheck="true" data-editor-surface>
+          <h2>{messages.defaultHeading}</h2>
+          <p>{messages.defaultParagraph}</p>
+        </article>
+      </div>
 
-    <div class="studio-panel" data-tab-panel="output">
-      <textarea class="studio-output" data-output readonly></textarea>
+      <div class="studio-panel" data-tab-panel="output">
+        <textarea class="studio-output" data-output readonly></textarea>
+      </div>
     </div>
 
     <div class="studio-actions">

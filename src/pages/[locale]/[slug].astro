@@ -1,10 +1,25 @@
-﻿---
+---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import GiscusComments from '../../components/GiscusComments.astro';
 import PostCard from '../../components/PostCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { findTranslation, formatDate, getAdjacentPosts, sortPosts } from '../../lib/posts';
-import { getBlogPath, getDictionary, getPostPath, type Locale } from '../../lib/site';
+import { getBlogPath, getDictionary, getLocalizedPath, getPostPath, type Locale } from '../../lib/site';
+
+function estimateReadingMinutes(body: string, locale: Locale) {
+  const normalized = body
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\[[^\]]*\]\([^)]+\)/g, ' ')
+    .replace(/[#>*_\-\n]/g, ' ')
+    .trim();
+  const cjkChars = (normalized.match(/[\u3400-\u9fff]/g) || []).length;
+  const latinWords = normalized.replace(/[\u3400-\u9fff]/g, ' ').split(/\s+/).filter(Boolean).length;
+  const effort = locale === 'zh' ? cjkChars / 280 + latinWords / 180 : latinWords / 180 + cjkChars / 320;
+
+  return Math.max(1, Math.ceil(effort));
+}
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -30,6 +45,56 @@ const adjacentPosts = getAdjacentPosts(allPosts, post);
 const previousLabel = locale === 'zh' ? '上一篇' : 'Previous';
 const nextLabel = locale === 'zh' ? '下一篇' : 'Next';
 const { Content, headings } = await render(post);
+const publishedLabel = formatDate(post.data.publishedAt, locale);
+const updatedLabel = post.data.updatedAt ? formatDate(post.data.updatedAt, locale) : null;
+const readingMinutes = estimateReadingMinutes(post.body, locale);
+const issueCode = `${post.data.publishedAt.getFullYear()}.${String(post.data.publishedAt.getMonth() + 1).padStart(2, '0')}`;
+const guideHeadings = headings.filter((heading) => heading.depth === 2).slice(0, 3);
+const resolvedGuideItems = (
+  guideHeadings.length > 0
+    ? guideHeadings.map((heading, index) => ({
+        index: String(index + 1).padStart(2, '0'),
+        text: heading.text
+      }))
+    : (post.data.tags.length > 0 ? post.data.tags.slice(0, 3) : [post.data.category]).map((item, index) => ({
+        index: String(index + 1).padStart(2, '0'),
+        text: item
+      }))
+);
+const zhReadingMetrics = [
+  { label: '发布', value: publishedLabel },
+  { label: '更新', value: updatedLabel ?? '首发版本' },
+  { label: '阅读', value: `${readingMinutes} 分钟` },
+  { label: '章节', value: String(Math.max(headings.length, 1)).padStart(2, '0') }
+];
+const zhRouteLinks = [
+  {
+    label: 'Archive',
+    title: '回到中文索引',
+    description: '按分类、标签或搜索继续选读',
+    href: getBlogPath(locale)
+  },
+  {
+    label: 'Search',
+    title: '打开搜索页',
+    description: '直接检索标题、摘要与标签',
+    href: getLocalizedPath(locale, 'search')
+  },
+  translation
+    ? {
+        label: 'English',
+        title: '切换到英文版',
+        description: translation.data.title,
+        href: getPostPath(translation.data.locale, translation.data.pathSlug)
+      }
+    : {
+        label: 'Cover',
+        title: '返回中文首页',
+        description: '先从封面页重新进入阅读路径',
+        href: getLocalizedPath(locale)
+      }
+];
+const articlePath = `/${locale}/${post.data.pathSlug}/`;
 const paths = {
   zh: locale === 'zh' ? getPostPath('zh', post.data.pathSlug) : getBlogPath('zh'),
   en: locale === 'en' ? getPostPath('en', post.data.pathSlug) : getBlogPath('en')
@@ -48,81 +113,243 @@ if (translation) {
   title={`${post.data.title} | ${copy.branding.title}`}
   description={post.data.excerpt}
 >
-  <article class="article-layout">
-    <section class="article-hero panel">
-      <a class="text-link" href={getBlogPath(locale)}>{copy.post.backToBlog}</a>
-      <p class="eyebrow">{post.data.heroEyebrow ?? post.data.category}</p>
-      <h1>{post.data.title}</h1>
-      <p class="page-intro__description">{post.data.excerpt}</p>
+  {locale === 'zh' ? (
+    <>
+      <article class="article-layout article-layout--zh">
+        <section class="article-zh-cover panel">
+          <div class="article-zh-cover__masthead">
+            <a class="text-link" href={getBlogPath(locale)}>{copy.post.backToBlog}</a>
+            <div class="article-zh-cover__issue">
+              <span>{`Issue ${issueCode}`}</span>
+              <span>{post.data.category}</span>
+            </div>
+          </div>
 
-      <div class="article-meta">
-        <span>{copy.post.published}: {formatDate(post.data.publishedAt, locale)}</span>
-        <span>{copy.post.category}: {post.data.category}</span>
-        {post.data.updatedAt && <span>{copy.post.updated}: {formatDate(post.data.updatedAt, locale)}</span>}
-      </div>
+          <div class="article-zh-cover__grid">
+            <div class="article-zh-cover__copy">
+              <p class="article-zh-cover__label">{post.data.heroEyebrow ?? post.data.category}</p>
+              <h1>{post.data.title}</h1>
+              <p class="article-zh-cover__dek">{post.data.excerpt}</p>
 
-      <div class="tag-row tag-row--wrap">
-        {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
-      </div>
-    </section>
+              <div class="article-zh-cover__routes">
+                <div class="tag-row tag-row--wrap">
+                  {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+                </div>
 
-    <div class="article-grid">
-      <div class="surface article-body">
-        <Content />
-      </div>
+                <div class="article-zh-cover__actions">
+                  <a class="button button--ghost" href="#article-body">进入正文</a>
+                  <a class="text-link" href="#discussion">参与讨论</a>
+                </div>
+              </div>
+            </div>
 
-      <aside class="surface toc">
-        <p class="eyebrow">{copy.post.contents}</p>
-        {headings.length > 0 ? (
-          <nav class="toc__nav">
-            {headings.map((heading) => (
-              <a href={`#${heading.slug}`} class={`toc__level toc__level--${heading.depth}`}>
-                {heading.text}
+            <aside class="article-zh-cover__desk surface" data-tilt="off">
+              <p class="eyebrow">Reading Ledger</p>
+
+              <div class="article-zh-cover__metrics">
+                {zhReadingMetrics.map((metric) => (
+                  <article class="article-zh-cover__metric">
+                    <span>{metric.label}</span>
+                    <strong>{metric.value}</strong>
+                  </article>
+                ))}
+              </div>
+
+              <div class="article-zh-cover__guide">
+                <p class="article-zh-cover__guide-title">本页导读</p>
+                <div class="article-zh-cover__guide-list">
+                  {resolvedGuideItems.map((item) => (
+                    <div class="article-zh-cover__guide-item">
+                      <span>{item.index}</span>
+                      <p>{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div class="article-zh-cover__translation">
+                <p>{translation ? '同主题英文版已经整理完成，可以直接切换查看。' : '当前主题暂时只有中文版本，后续如补齐英文稿会自动关联。'}</p>
+                {translation ? (
+                  <a class="text-link" href={getPostPath(translation.data.locale, translation.data.pathSlug)}>打开英文版</a>
+                ) : (
+                  <a class="text-link" href={getBlogPath(locale)}>继续浏览归档</a>
+                )}
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <div class="article-zh-main">
+          <div class="article-zh-body-shell">
+            <div class="article-zh-body-mark">
+              <span>Article Body</span>
+              <span>{articlePath}</span>
+            </div>
+
+            <div id="article-body" class="surface article-body article-body--zh" data-tilt="off">
+              <Content />
+            </div>
+          </div>
+
+          <aside class="article-zh-sidebar">
+            <section class="surface toc article-zh-sidebar__panel" data-tilt="off">
+              <p class="eyebrow">{copy.post.contents}</p>
+              {headings.length > 0 ? (
+                <nav class="toc__nav">
+                  {headings.map((heading) => (
+                    <a href={`#${heading.slug}`} class={`toc__level toc__level--${heading.depth}`}>
+                      {heading.text}
+                    </a>
+                  ))}
+                </nav>
+              ) : (
+                <p class="page-intro__description">{copy.post.noContents}</p>
+              )}
+            </section>
+
+            <section class="surface article-zh-sidebar__panel" data-tilt="off">
+              <p class="eyebrow">Route / 阅读路径</p>
+              <div class="article-zh-route">
+                {zhRouteLinks.map((link) => (
+                  <a class="article-zh-route__link" href={link.href}>
+                    <span>{link.label}</span>
+                    <strong>{link.title}</strong>
+                    <span>{link.description}</span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          </aside>
+        </div>
+      </article>
+
+      {(adjacentPosts.previous || adjacentPosts.next) && (
+        <section class="section article-zh-pagination">
+          <div class="section-heading section-heading--tight">
+            <p class="eyebrow">Archive Route / 前后文章</p>
+            <h2>沿着这条阅读线继续往下读</h2>
+          </div>
+
+          <div class="surface post-pagination post-pagination--zh" data-tilt="off">
+            {adjacentPosts.previous ? (
+              <a class="post-pagination__link" href={getPostPath(locale, adjacentPosts.previous.data.pathSlug)}>
+                <span class="eyebrow">{previousLabel}</span>
+                <strong>{adjacentPosts.previous.data.title}</strong>
+                <span>{adjacentPosts.previous.data.excerpt}</span>
               </a>
-            ))}
-          </nav>
-        ) : (
-          <p class="page-intro__description">{copy.post.noContents}</p>
-        )}
-      </aside>
-    </div>
-  </article>
+            ) : (
+              <div class="post-pagination__spacer"></div>
+            )}
 
-  {(adjacentPosts.previous || adjacentPosts.next) && (
-    <section class="surface post-pagination">
-      {adjacentPosts.previous ? (
-        <a class="post-pagination__link" href={getPostPath(locale, adjacentPosts.previous.data.pathSlug)}>
-          <span class="eyebrow">{previousLabel}</span>
-          <strong>{adjacentPosts.previous.data.title}</strong>
-          <span>{adjacentPosts.previous.data.excerpt}</span>
-        </a>
-      ) : (
-        <div class="post-pagination__spacer"></div>
+            {adjacentPosts.next ? (
+              <a class="post-pagination__link post-pagination__link--next" href={getPostPath(locale, adjacentPosts.next.data.pathSlug)}>
+                <span class="eyebrow">{nextLabel}</span>
+                <strong>{adjacentPosts.next.data.title}</strong>
+                <span>{adjacentPosts.next.data.excerpt}</span>
+              </a>
+            ) : (
+              <div class="post-pagination__spacer"></div>
+            )}
+          </div>
+        </section>
       )}
 
-      {adjacentPosts.next ? (
-        <a class="post-pagination__link post-pagination__link--next" href={getPostPath(locale, adjacentPosts.next.data.pathSlug)}>
-          <span class="eyebrow">{nextLabel}</span>
-          <strong>{adjacentPosts.next.data.title}</strong>
-          <span>{adjacentPosts.next.data.excerpt}</span>
-        </a>
-      ) : (
-        <div class="post-pagination__spacer"></div>
+      <div id="discussion">
+        <GiscusComments locale={locale} />
+      </div>
+
+      {relatedPosts.length > 0 && (
+        <section class="section">
+          <div class="section-heading">
+            <p class="eyebrow">Further Reading / 延伸阅读</p>
+            <h2>{copy.post.related}</h2>
+            <p>正文读完之后，再从相近主题继续扩展，而不是重新掉回杂乱入口。</p>
+          </div>
+          <div class="posts-grid">
+            {relatedPosts.map((entry) => <PostCard post={entry} locale={locale} />)}
+          </div>
+        </section>
       )}
-    </section>
-  )}
+    </>
+  ) : (
+    <>
+      <article class="article-layout">
+        <section class="article-hero panel">
+          <a class="text-link" href={getBlogPath(locale)}>{copy.post.backToBlog}</a>
+          <p class="eyebrow">{post.data.heroEyebrow ?? post.data.category}</p>
+          <h1>{post.data.title}</h1>
+          <p class="page-intro__description">{post.data.excerpt}</p>
 
-  <GiscusComments locale={locale} />
+          <div class="article-meta">
+            <span>{copy.post.published}: {publishedLabel}</span>
+            <span>{copy.post.category}: {post.data.category}</span>
+            {post.data.updatedAt && <span>{copy.post.updated}: {updatedLabel}</span>}
+          </div>
 
-  {relatedPosts.length > 0 && (
-    <section class="section">
-      <div class="section-heading">
-        <p class="eyebrow">BLOG / MORE</p>
-        <h2>{copy.post.related}</h2>
-      </div>
-      <div class="posts-grid">
-        {relatedPosts.map((entry) => <PostCard post={entry} locale={locale} />)}
-      </div>
-    </section>
+          <div class="tag-row tag-row--wrap">
+            {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+          </div>
+        </section>
+
+        <div class="article-grid">
+          <div class="surface article-body" data-tilt="off">
+            <Content />
+          </div>
+
+          <aside class="surface toc" data-tilt="off">
+            <p class="eyebrow">{copy.post.contents}</p>
+            {headings.length > 0 ? (
+              <nav class="toc__nav">
+                {headings.map((heading) => (
+                  <a href={`#${heading.slug}`} class={`toc__level toc__level--${heading.depth}`}>
+                    {heading.text}
+                  </a>
+                ))}
+              </nav>
+            ) : (
+              <p class="page-intro__description">{copy.post.noContents}</p>
+            )}
+          </aside>
+        </div>
+      </article>
+
+      {(adjacentPosts.previous || adjacentPosts.next) && (
+        <section class="surface post-pagination" data-tilt="off">
+          {adjacentPosts.previous ? (
+            <a class="post-pagination__link" href={getPostPath(locale, adjacentPosts.previous.data.pathSlug)}>
+              <span class="eyebrow">{previousLabel}</span>
+              <strong>{adjacentPosts.previous.data.title}</strong>
+              <span>{adjacentPosts.previous.data.excerpt}</span>
+            </a>
+          ) : (
+            <div class="post-pagination__spacer"></div>
+          )}
+
+          {adjacentPosts.next ? (
+            <a class="post-pagination__link post-pagination__link--next" href={getPostPath(locale, adjacentPosts.next.data.pathSlug)}>
+              <span class="eyebrow">{nextLabel}</span>
+              <strong>{adjacentPosts.next.data.title}</strong>
+              <span>{adjacentPosts.next.data.excerpt}</span>
+            </a>
+          ) : (
+            <div class="post-pagination__spacer"></div>
+          )}
+        </section>
+      )}
+
+      <GiscusComments locale={locale} />
+
+      {relatedPosts.length > 0 && (
+        <section class="section">
+          <div class="section-heading">
+            <p class="eyebrow">BLOG / MORE</p>
+            <h2>{copy.post.related}</h2>
+          </div>
+          <div class="posts-grid">
+            {relatedPosts.map((entry) => <PostCard post={entry} locale={locale} />)}
+          </div>
+        </section>
+      )}
+    </>
   )}
 </BaseLayout>

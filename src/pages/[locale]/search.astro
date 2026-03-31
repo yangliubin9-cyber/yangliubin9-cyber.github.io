@@ -15,6 +15,11 @@ export function getStaticPaths() {
 const { locale } = Astro.props as { locale: Locale };
 const posts = await getAllPosts();
 const paths = getLanguagePaths('search');
+const localeBreakdown = [
+  { label: locale === 'zh' ? '全部' : 'All', value: posts.length },
+  { label: locale === 'zh' ? '简中' : 'ZH', value: posts.filter((post) => post.data.locale === 'zh').length },
+  { label: 'EN', value: posts.filter((post) => post.data.locale === 'en').length }
+];
 const copy = locale === 'zh'
   ? {
       eyebrow: 'SEARCH / INDEX',
@@ -46,6 +51,17 @@ const copy = locale === 'zh'
       openStudio: 'Open studio',
       openAdmin: 'Open CMS'
     };
+const searchNotes = locale === 'zh'
+  ? [
+      '输入标题片段、标签、分类或语言名都可以触发匹配。',
+      '如果你想浏览而不是检索，直接回博客索引更合适。',
+      '搜索结果与博客卡片共用同一套排版，阅读状态更连续。'
+    ]
+  : [
+      'Search matches titles, tags, categories, excerpts, and locale keywords.',
+      'If you want to browse instead of query, the blog index is the better surface.',
+      'Results reuse the same card system as the blog catalog for continuity.'
+    ];
 
 const filterScript = `(() => {
   const root = document.querySelector('[data-search-page]');
@@ -128,40 +144,69 @@ const filterScript = `(() => {
     </div>
   </PageIntro>
 
-  <section class="section search-layout" data-search-page>
-    <div class="surface filter-panel">
-      <label class="filter-panel__search">
-        <span>{copy.title}</span>
-        <input type="search" placeholder={copy.placeholder} data-search-input />
-      </label>
+  <section class="catalog-shell section" data-search-page>
+    <aside class="catalog-sidebar">
+      <article class="surface dossier-card">
+        <p class="eyebrow">SEARCH / SNAPSHOT</p>
+        <h2>{locale === 'zh' ? '检索面板' : 'Search console'}</h2>
+        <p>{copy.description}</p>
 
-      <div class="filter-group">
-        <span>{locale === 'zh' ? '语言' : 'Language'}</span>
-        <div class="chip-group">
-          <button type="button" class="filter-chip is-active" data-locale-filter="all">{copy.allLocales}</button>
-          <button type="button" class="filter-chip" data-locale-filter="zh">{copy.zh}</button>
-          <button type="button" class="filter-chip" data-locale-filter="en">{copy.en}</button>
+        <div class="locale-stack">
+          {localeBreakdown.map((item) => (
+            <div class="locale-stack__item">
+              <span>{item.label}</span>
+              <strong>{String(item.value).padStart(2, '0')}</strong>
+            </div>
+          ))}
         </div>
+
+        <div class="note-list">
+          {searchNotes.map((item) => <p>{item}</p>)}
+        </div>
+      </article>
+
+      <div class="surface filter-panel">
+        <label class="filter-panel__search">
+          <span>{copy.title}</span>
+          <input type="search" placeholder={copy.placeholder} data-search-input />
+        </label>
+
+        <div class="filter-group">
+          <span>{locale === 'zh' ? '语言' : 'Language'}</span>
+          <div class="chip-group">
+            <button type="button" class="filter-chip is-active" data-locale-filter="all">{copy.allLocales}</button>
+            <button type="button" class="filter-chip" data-locale-filter="zh">{copy.zh}</button>
+            <button type="button" class="filter-chip" data-locale-filter="en">{copy.en}</button>
+          </div>
+        </div>
+
+        <p class="filter-panel__count" data-results-count>{`${posts.length} ${copy.resultLabel}`}</p>
+      </div>
+    </aside>
+
+    <div class="catalog-stage">
+      <div class="section-heading">
+        <p class="eyebrow">{locale === 'zh' ? 'RESULTS / STREAM' : 'RESULTS / STREAM'}</p>
+        <h2>{locale === 'zh' ? '匹配结果' : 'Matching posts'}</h2>
+        <p>{locale === 'zh' ? '输入任意关键词后，结果会立即过滤。' : 'Start typing and the result stream tightens immediately.'}</p>
       </div>
 
-      <p class="filter-panel__count" data-results-count>{`${posts.length} ${copy.resultLabel}`}</p>
-    </div>
+      <div class="posts-grid posts-grid--catalog search-results">
+        {posts.map((post) => (
+          <div
+            data-search-card
+            data-locale={post.data.locale}
+            data-search-text={`${post.data.locale} ${post.data.title} ${post.data.excerpt} ${post.data.category} ${post.data.tags.join(' ')}`.toLowerCase()}
+          >
+            <PostCard post={post} locale={locale} />
+          </div>
+        ))}
+      </div>
 
-    <div class="posts-grid posts-grid--catalog search-results">
-      {posts.map((post) => (
-        <div
-          data-search-card
-          data-locale={post.data.locale}
-          data-search-text={`${post.data.locale} ${post.data.title} ${post.data.excerpt} ${post.data.category} ${post.data.tags.join(' ')}`.toLowerCase()}
-        >
-          <PostCard post={post} locale={locale} />
-        </div>
-      ))}
-    </div>
-
-    <div class="surface empty-state" data-empty-state hidden>
-      <h2>{copy.emptyTitle}</h2>
-      <p>{copy.emptyBody}</p>
+      <div class="surface empty-state" data-empty-state hidden>
+        <h2>{copy.emptyTitle}</h2>
+        <p>{copy.emptyBody}</p>
+      </div>
     </div>
   </section>
 

@@ -1,8 +1,8 @@
 ---
 import PostCard from '../../components/PostCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getPosts } from '../../lib/posts';
-import { LOCALES, PROFILE, getBlogPath, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+import { formatDate, getPosts } from '../../lib/posts';
+import { LOCALES, PROFILE, getBlogPath, getDictionary, getLanguagePaths, getLocalizedPath, getPostPath, type Locale } from '../../lib/site';
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({
@@ -15,6 +15,15 @@ const { locale } = Astro.props as { locale: Locale };
 const copy = getDictionary(locale);
 const posts = await getPosts(locale);
 const featuredPosts = posts.filter((post) => post.data.featured).slice(0, 3);
+const spotlightPosts = featuredPosts.length > 0 ? featuredPosts : posts.slice(0, 3);
+const capabilityTags = copy.about.skills.slice(0, 4);
+const leadPost = spotlightPosts[0] ?? null;
+const supportingPosts = spotlightPosts.slice(1, 3);
+const editorialNotes = [
+  '关注云计算运维、自动化工程、界面表达与长期写作。',
+  '首页只保留最重要的阅读入口，不把所有页面都堆到第一屏。',
+  '内容优先，视觉只负责建立秩序、气质与节奏。'
+];
 const paths = getLanguagePaths();
 ---
 
@@ -26,75 +35,162 @@ const paths = getLanguagePaths();
   title={`${copy.branding.title} | ${copy.branding.subtitle}`}
   description={copy.home.heroDescription}
 >
-  <section class="hero panel hero--home">
-    <div class="hero__copy">
-      <p class="eyebrow">{copy.home.eyebrow}</p>
-      <h1>{copy.branding.title}</h1>
-      <p class="hero__subtitle">{copy.branding.subtitle}</p>
-      <p class="hero__headline">{copy.home.heroTitle}</p>
-      <p class="page-intro__description">{copy.home.heroDescription}</p>
-      <div class="hero__actions">
-        <a class="button" href={getBlogPath(locale)}>{copy.home.primary}</a>
-        <a class="button button--ghost" href={getLocalizedPath(locale, 'about')}>{copy.home.secondary}</a>
-      </div>
-    </div>
+  {locale === 'zh' ? (
+    <>
+      <section class="home-zh-hero panel">
+        <div class="home-zh-hero__masthead">
+          <p class="eyebrow">{copy.home.eyebrow}</p>
+          <span class="home-zh-hero__issue">第 01 期 / 中文主页</span>
+        </div>
 
-    <aside class="profile-card surface">
-      <img class="profile-card__avatar" src={PROFILE.avatar} alt={PROFILE.name[locale]} loading="lazy" onerror={`this.onerror=null;this.src='${PROFILE.avatarFallback}'`} />
-      <div class="profile-card__content">
-        <p class="eyebrow">{copy.home.introTitle}</p>
-        <h2>{PROFILE.name[locale]}</h2>
-        <p>{PROFILE.tagline[locale]}</p>
-        <p>{copy.home.introBody}</p>
-      </div>
-    </aside>
-  </section>
+        <div class="home-zh-hero__grid">
+          <div class="home-zh-hero__copy">
+            <p class="home-zh-hero__label">Technical Publication</p>
+            <h1>把博客做成一份真正值得阅读的技术刊物。</h1>
+            <p class="home-zh-hero__dek">
+              这里不是模板化的个人站首页，而是一张面向长期写作的封面页。内容围绕工程、云上基础设施、设计表达与系统化工作流展开，视觉只服务于阅读秩序。
+            </p>
 
-  <section class="section">
-    <div class="section-heading section-heading--with-action">
-      <div>
-        <p class="eyebrow">{copy.home.eyebrow}</p>
-        <h2>{copy.home.latestTitle}</h2>
-        <p>{copy.home.latestDescription}</p>
-      </div>
-      <a class="text-link" href={getBlogPath(locale)}>{copy.nav.blog}</a>
-    </div>
+            <div class="hero__actions">
+              <a class="button" href={getBlogPath(locale)}>进入文章索引</a>
+              <a class="button button--ghost" href={getLocalizedPath(locale, 'about')}>认识作者</a>
+            </div>
+          </div>
 
-    <div class="posts-grid">
-      {featuredPosts.map((post) => <PostCard post={post} locale={locale} />)}
-    </div>
-  </section>
+          <aside class="home-zh-hero__aside surface">
+            <p class="eyebrow">刊物说明</p>
 
-  <section class="section section--split-grid">
-    <article class="surface spotlight-card">
-      <p class="eyebrow">SYSTEM / RATIONALE</p>
-      <h2>{copy.home.spotlightTitle}</h2>
-      <div class="check-list">
-        {copy.home.spotlightItems.map((item) => <p>{item}</p>)}
-      </div>
-    </article>
+            <div class="home-zh-hero__author">
+              <img class="home-zh-hero__avatar" src={PROFILE.avatar} alt={PROFILE.name[locale]} loading="lazy" onerror={`this.onerror=null;this.src='${PROFILE.avatarFallback}'`} />
+              <div>
+                <strong>{PROFILE.name[locale]}</strong>
+                <p>{PROFILE.tagline[locale]}</p>
+              </div>
+            </div>
 
-    <div class="link-grid">
-      <a class="surface link-card" href={getLocalizedPath(locale, 'about')}>
-        <span class="pill">{copy.nav.about}</span>
-        <h3>{copy.nav.about}</h3>
-        <p>{copy.about.description}</p>
-      </a>
-      <a class="surface link-card" href={getLocalizedPath(locale, 'projects')}>
-        <span class="pill">{copy.nav.projects}</span>
-        <h3>{copy.nav.projects}</h3>
-        <p>{copy.projects.description}</p>
-      </a>
-      <a class="surface link-card" href={getLocalizedPath(locale, 'uses')}>
-        <span class="pill">{copy.nav.uses}</span>
-        <h3>{copy.nav.uses}</h3>
-        <p>{copy.uses.description}</p>
-      </a>
-      <a class="surface link-card" href={getLocalizedPath(locale, 'contact')}>
-        <span class="pill">{copy.nav.contact}</span>
-        <h3>{copy.nav.contact}</h3>
-        <p>{copy.contact.description}</p>
-      </a>
-    </div>
-  </section>
+            <div class="tag-row tag-row--wrap">
+              {capabilityTags.map((item) => <span class="tag">{item}</span>)}
+            </div>
+
+            <div class="note-list">
+              {editorialNotes.map((item) => <p>{item}</p>)}
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      {leadPost && (
+        <section class="section home-zh-features">
+          <div class="section-heading section-heading--with-action">
+            <div>
+              <p class="eyebrow">Editor’s Picks / 主编精选</p>
+              <h2>先从这几篇开始读。</h2>
+              <p>{copy.home.latestDescription}</p>
+            </div>
+            <a class="text-link" href={getBlogPath(locale)}>查看全部文章</a>
+          </div>
+
+          <div class="home-zh-features__grid">
+            <article class="feature-lead surface">
+              <div class="feature-lead__meta">
+                <span class="pill">{leadPost.data.category}</span>
+                <time datetime={leadPost.data.publishedAt.toISOString()}>{formatDate(leadPost.data.publishedAt, locale)}</time>
+              </div>
+
+              <div class="feature-lead__body">
+                <p class="eyebrow">Lead Story</p>
+                <h3>{leadPost.data.title}</h3>
+                <p>{leadPost.data.excerpt}</p>
+              </div>
+
+              <div class="tag-row tag-row--wrap">
+                {leadPost.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+              </div>
+
+              <a class="button feature-lead__cta" href={getPostPath(leadPost.data.locale, leadPost.data.pathSlug)}>开始阅读</a>
+            </article>
+
+            <div class="feature-stack">
+              {supportingPosts.map((post, index) => (
+                <article class="feature-note surface">
+                  <div class="feature-note__meta">
+                    <span class="eyebrow">{String(index + 2).padStart(2, '0')}</span>
+                    <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale)}</time>
+                  </div>
+                  <h3>{post.data.title}</h3>
+                  <p>{post.data.excerpt}</p>
+                  <a class="text-link" href={getPostPath(post.data.locale, post.data.pathSlug)}>继续阅读</a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section class="home-zh-archive surface">
+        <div class="home-zh-archive__copy">
+          <p class="eyebrow">Archive / 阅读路径</p>
+          <h2>如果你想按主题系统阅读，直接进入博客索引。</h2>
+          <p>索引页保留完整的搜索、分类和标签筛选。首页只负责建立第一印象，后续阅读应该交给真正的文章目录。</p>
+        </div>
+
+        <div class="home-zh-archive__actions">
+          <a class="button" href={getBlogPath(locale)}>打开博客索引</a>
+          <a class="text-link" href={getLocalizedPath(locale, 'search')}>搜索文章</a>
+        </div>
+      </section>
+    </>
+  ) : (
+    <>
+      <section class="hero panel hero--home">
+        <div class="hero__copy">
+          <p class="eyebrow">{copy.home.eyebrow}</p>
+          <h1>{copy.branding.title}</h1>
+          <p class="hero__subtitle">{copy.home.heroTitle}</p>
+          <p class="hero__headline">{copy.branding.subtitle}</p>
+          <p class="page-intro__description">{copy.home.heroDescription}</p>
+          <div class="hero__actions">
+            <a class="button" href={getBlogPath(locale)}>{copy.home.primary}</a>
+            <a class="button button--ghost" href={getLocalizedPath(locale, 'about')}>{copy.home.secondary}</a>
+          </div>
+        </div>
+
+        <aside class="hero__panel">
+          <div class="profile-card surface">
+            <img class="profile-card__avatar" src={PROFILE.avatar} alt={PROFILE.name[locale]} loading="lazy" onerror={`this.onerror=null;this.src='${PROFILE.avatarFallback}'`} />
+            <div class="profile-card__content">
+              <p class="eyebrow">{copy.home.introTitle}</p>
+              <h2>{PROFILE.name[locale]}</h2>
+              <p>{PROFILE.tagline[locale]}</p>
+              <div class="tag-row">
+                {capabilityTags.map((item) => <span class="tag">{item}</span>)}
+              </div>
+            </div>
+          </div>
+
+          <article class="surface spotlight-card">
+            <p class="eyebrow">Current Focus</p>
+            <div class="check-list">
+              {copy.home.spotlightItems.map((item) => <p>{item}</p>)}
+            </div>
+          </article>
+        </aside>
+      </section>
+
+      <section class="section">
+        <div class="section-heading section-heading--with-action">
+          <div>
+            <p class="eyebrow">{copy.home.eyebrow}</p>
+            <h2>{copy.home.latestTitle}</h2>
+            <p>{copy.home.latestDescription}</p>
+          </div>
+          <a class="text-link" href={getBlogPath(locale)}>{copy.nav.blog}</a>
+        </div>
+
+        <div class="posts-grid">
+          {spotlightPosts.map((post) => <PostCard post={post} locale={locale} />)}
+        </div>
+      </section>
+    </>
+  )}
 </BaseLayout>

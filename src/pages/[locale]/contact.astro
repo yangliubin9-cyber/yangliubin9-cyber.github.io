@@ -1,7 +1,7 @@
 ---
 import PageIntro from '../../components/PageIntro.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { LOCALES, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+import { LOCALES, SITE, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale }, props: { locale } }));
@@ -10,6 +10,15 @@ export function getStaticPaths() {
 const { locale } = Astro.props as { locale: Locale };
 const copy = getDictionary(locale);
 const paths = getLanguagePaths('contact');
+const contactNotes = locale === 'zh'
+  ? [
+      '适合讨论博客、前端体验、自动化工作流和云上工程。',
+      '如果需要长链路沟通，邮件通常比即时消息更稳。'
+    ]
+  : [
+      'Best suited for conversations about the blog, frontend craft, automation workflows, and cloud systems.',
+      'For longer threads, email is usually the clearest channel.'
+    ];
 ---
 
 <BaseLayout
@@ -20,13 +29,27 @@ const paths = getLanguagePaths('contact');
   title={`${copy.nav.contact} | ${copy.branding.title}`}
   description={copy.contact.description}
 >
-  <PageIntro eyebrow={copy.contact.eyebrow} title={copy.contact.title} description={copy.contact.description} />
+  <PageIntro eyebrow={copy.contact.eyebrow} title={copy.contact.title} description={copy.contact.description}>
+    <div class="page-intro__actions">
+      <a class="button" href={SITE.profileUrl} target="_blank" rel="noreferrer">GitHub</a>
+      <a class="button button--ghost" href={`mailto:${SITE.email}`}>Email</a>
+    </div>
+  </PageIntro>
 
-  <section class="section">
+  <section class="section contact-shell">
+    <article class="surface contact-hero">
+      <p class="eyebrow">CONTACT / WINDOW</p>
+      <h2>{locale === 'zh' ? '保持轻量，但保持可达。' : 'Stay lightweight, stay reachable.'}</h2>
+      <p>{locale === 'zh' ? '这个站点没有复杂的社交层，联络方式被收成几个稳定入口。' : 'The site keeps its contact layer intentionally lean, with a few stable entry points.'}</p>
+      <div class="note-list">
+        {contactNotes.map((item) => <p>{item}</p>)}
+      </div>
+    </article>
+
     <div class="card-grid card-grid--three">
-      {copy.contact.items.map((item) => (
+      {copy.contact.items.map((item, index) => (
         <a class="surface contact-card" href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined}>
-          <span class="pill">{item.label}</span>
+          <span class="eyebrow">{String(index + 1).padStart(2, '0')}</span>
           <h2>{item.value}</h2>
           <p>{item.label}</p>
         </a>
