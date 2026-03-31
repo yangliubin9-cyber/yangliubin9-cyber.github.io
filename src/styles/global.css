@@ -3694,3 +3694,507 @@ h4 {
     align-items: flex-start;
   }
 }
+
+/* Enterprise editorial refinements */
+:root {
+  --bg: #eef2f7;
+  --bg-elevated: rgba(247, 249, 252, 0.9);
+  --panel: rgba(255, 255, 255, 0.92);
+  --panel-strong: rgba(255, 255, 255, 0.98);
+  --surface-soft: rgba(15, 23, 42, 0.03);
+  --text: #0f172a;
+  --muted: #64748b;
+  --muted-strong: #334155;
+  --line: rgba(15, 23, 42, 0.08);
+  --line-strong: rgba(15, 23, 42, 0.14);
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --shadow-soft: 0 20px 40px rgba(15, 23, 42, 0.06);
+  --shadow: 0 28px 56px rgba(15, 23, 42, 0.1);
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b1220;
+  --bg-elevated: rgba(10, 16, 28, 0.9);
+  --panel: rgba(10, 16, 28, 0.88);
+  --panel-strong: rgba(10, 16, 28, 0.96);
+  --surface-soft: rgba(148, 163, 184, 0.08);
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --muted-strong: #cbd5e1;
+  --line: rgba(148, 163, 184, 0.14);
+  --line-strong: rgba(148, 163, 184, 0.24);
+  --accent: #60a5fa;
+  --accent-strong: #3b82f6;
+  --shadow-soft: 0 22px 46px rgba(2, 6, 23, 0.28);
+  --shadow: 0 30px 60px rgba(2, 6, 23, 0.34);
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 22%),
+    linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%);
+  color: var(--text);
+}
+
+:root[data-theme='dark'] body {
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.12), transparent 24%),
+    linear-gradient(180deg, #020617 0%, var(--bg) 100%);
+}
+
+.page-shell {
+  width: min(1160px, calc(100% - 32px));
+}
+
+.site-header {
+  top: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow-soft);
+}
+
+:root[data-theme='dark'] .site-header {
+  background: rgba(8, 15, 30, 0.88);
+}
+
+.site-header::before {
+  display: none;
+}
+
+.panel,
+.surface,
+.post-card {
+  background: var(--panel);
+}
+
+.folio-home-hero,
+.folio-home-hero__copy,
+.folio-home-profile,
+.folio-home-profile__body,
+.folio-home-post,
+.folio-home-post__body,
+.folio-home-archive__copy,
+.folio-blog-head,
+.folio-blog-head__copy,
+.folio-blog-head__note,
+.folio-blog-filter-card,
+.folio-blog-list,
+.folio-blog-item,
+.folio-blog-item__body,
+.folio-blog-item__footer,
+.folio-about-shell,
+.folio-about-profile,
+.folio-about-profile__header,
+.folio-about-profile__body,
+.folio-about-grid,
+.folio-about-card,
+.folio-projects-overview,
+.folio-projects-feature,
+.folio-projects-side,
+.folio-projects-summary,
+.folio-projects-grid,
+.folio-project-card,
+.folio-uses-grid,
+.folio-uses-card,
+.folio-uses-note,
+.folio-uses-note__copy,
+.folio-contact-shell,
+.folio-contact-main,
+.folio-contact-email,
+.folio-check-list,
+.folio-project-card__focus {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.folio-home-hero,
+.folio-blog-head,
+.folio-projects-overview,
+.folio-contact-shell {
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  align-items: stretch;
+}
+
+.folio-home-hero__lead {
+  max-width: 24ch;
+  color: var(--muted-strong);
+  font-size: clamp(1.18rem, 2vw, 1.42rem);
+  line-height: 1.55;
+  font-weight: 600;
+}
+
+.folio-home-hero__description,
+.folio-blog-head__description,
+.folio-projects-feature > p:last-of-type,
+.folio-projects-summary p:last-of-type,
+.folio-about-profile__body p,
+.folio-contact-main > p:last-of-type,
+.folio-contact-email .text-link,
+.folio-uses-note__copy p:last-of-type {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.78;
+}
+
+.folio-home-hero__actions,
+.folio-home-archive__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.folio-home-profile {
+  align-content: center;
+  justify-items: start;
+  padding: 28px;
+}
+
+.folio-home-profile__avatar,
+.folio-about-profile__avatar {
+  width: 108px;
+  height: 108px;
+  border-radius: 20px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.folio-home-profile__body h2,
+.folio-about-profile__body h2,
+.folio-projects-feature h2,
+.folio-projects-summary h2,
+.folio-project-card h2,
+.folio-uses-note__copy h2,
+.folio-contact-main h2,
+.folio-contact-email h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  line-height: 1.05;
+}
+
+.folio-home-posts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.folio-home-post {
+  min-height: 256px;
+  align-content: start;
+}
+
+.folio-home-post__meta,
+.folio-projects-feature__topline,
+.folio-blog-item__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.folio-home-post__body h3,
+.folio-blog-item__body h3 {
+  font-size: clamp(1.28rem, 2vw, 1.6rem);
+  line-height: 1.28;
+}
+
+.folio-home-post__body p,
+.folio-blog-item__body p,
+.folio-project-card p,
+.folio-uses-card p {
+  color: var(--muted);
+}
+
+.folio-home-archive {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+}
+
+.folio-blog-head__note {
+  align-content: start;
+}
+
+.folio-blog-shell {
+  gap: 24px;
+}
+
+.folio-blog-filter-card,
+.folio-about-card,
+.folio-projects-summary,
+.folio-uses-card,
+.folio-contact-email {
+  align-content: start;
+}
+
+.folio-blog-list {
+  gap: 16px;
+}
+
+.folio-blog-item {
+  grid-template-columns: minmax(160px, 190px) minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.folio-blog-item__meta {
+  display: grid;
+  justify-content: start;
+  gap: 10px;
+}
+
+.folio-blog-item__footer {
+  justify-items: end;
+  align-content: start;
+}
+
+.folio-blog-item__footer .tag-row {
+  justify-content: flex-end;
+}
+
+.folio-about-shell {
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.folio-about-profile {
+  height: 100%;
+  align-content: space-between;
+}
+
+.folio-about-profile__metrics,
+.folio-projects-feature__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.folio-stat-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-soft);
+}
+
+.folio-stat-card span,
+.folio-project-card__focus span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.folio-stat-card strong,
+.folio-project-card__focus strong {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.folio-about-profile__signals {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.folio-about-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.folio-about-card--wide {
+  grid-column: 1 / -1;
+}
+
+.folio-check-list {
+  gap: 12px;
+}
+
+.folio-check-list p {
+  position: relative;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.folio-check-list p::before {
+  content: '';
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 8px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.folio-projects-side,
+.folio-projects-grid {
+  gap: 18px;
+}
+
+.folio-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.folio-project-card__meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.folio-project-card__focus {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.folio-uses-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.folio-uses-note {
+  align-items: center;
+}
+
+.folio-contact-main {
+  min-height: 100%;
+}
+
+.folio-contact-email {
+  width: min(100%, 360px);
+  justify-self: end;
+}
+
+.folio-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.folio-icon-link:hover {
+  transform: translateY(-1px);
+  color: var(--accent-strong);
+  border-color: var(--line-strong);
+}
+
+.folio-icon-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes folioRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.folio-home-hero,
+.folio-blog-head,
+.folio-about-profile,
+.folio-projects-feature,
+.folio-contact-main,
+.folio-contact-email,
+.folio-home-post,
+.folio-blog-item,
+.folio-about-card,
+.folio-projects-summary,
+.folio-project-card,
+.folio-uses-card,
+.folio-uses-note {
+  animation: folioRise 560ms ease both;
+}
+
+.folio-home-post:nth-child(2),
+.folio-blog-item:nth-child(2),
+.folio-about-card:nth-child(2),
+.folio-project-card:nth-child(2),
+.folio-uses-card:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.folio-home-post:nth-child(3),
+.folio-blog-item:nth-child(3),
+.folio-about-card:nth-child(3),
+.folio-project-card:nth-child(3),
+.folio-uses-card:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+@media (max-width: 1100px) {
+  .folio-home-hero,
+  .folio-blog-head,
+  .folio-projects-overview,
+  .folio-contact-shell,
+  .folio-about-shell,
+  .folio-home-archive {
+    grid-template-columns: 1fr;
+  }
+
+  .folio-home-posts,
+  .folio-projects-grid,
+  .folio-uses-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .folio-blog-item {
+    grid-template-columns: 1fr;
+  }
+
+  .folio-blog-item__footer {
+    justify-items: start;
+  }
+
+  .folio-blog-item__footer .tag-row {
+    justify-content: flex-start;
+  }
+
+  .folio-contact-email {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-shell {
+    width: min(100% - 20px, 1160px);
+  }
+
+  .folio-home-posts,
+  .folio-about-grid,
+  .folio-projects-grid,
+  .folio-uses-grid,
+  .folio-about-profile__metrics,
+  .folio-projects-feature__meta {
+    grid-template-columns: 1fr;
+  }
+
+  .folio-home-archive__actions,
+  .folio-home-hero__actions {
+    width: 100%;
+  }
+
+  .folio-home-archive__actions .button,
+  .folio-home-hero__actions .button {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}

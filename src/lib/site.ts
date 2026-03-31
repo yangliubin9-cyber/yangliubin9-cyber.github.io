@@ -55,7 +55,7 @@ const dictionaries = {
       blog: '博客',
       about: '关于',
       projects: '项目',
-      uses: '装备',
+      uses: '技术',
       contact: '联系',
       studio: '工作台',
       theme: '切换亮暗主题',
@@ -83,7 +83,7 @@ const dictionaries = {
     blog: {
       eyebrow: 'INDEX / SEARCH',
       title: '博客',
-      description: '跨中英文统一搜索，支持分类、标签与本地静态搜索。',
+      description: '按当前语言浏览文章，支持分类、标签与时间顺序阅读。',
       searchPlaceholder: '搜索标题、摘要、标签、分类或语言',
       searchLabel: '搜索',
       categoryLabel: '分类',
@@ -138,9 +138,9 @@ const dictionaries = {
       ]
     },
     uses: {
-      eyebrow: 'USES / STACK',
-      title: '装备',
-      description: '开发者也会关心你平时用什么工作，这一页天然能拉近距离。',
+      eyebrow: 'TECH / STACK',
+      title: '技术',
+      description: '这里整理我日常使用的技术栈、开发工具和工作偏好，保持简洁但足够明确。',
       groups: [
         {
           name: '软件',
@@ -268,7 +268,7 @@ const dictionaries = {
     blog: {
       eyebrow: 'INDEX / SEARCH',
       title: 'Blog',
-      description: 'Search across Chinese and English posts with category, tag, and static local search.',
+      description: 'Browse posts in the current locale with category, tag, and chronological reading.',
       searchPlaceholder: 'Search title, excerpt, tags, category, or language',
       searchLabel: 'Search',
       categoryLabel: 'Category',

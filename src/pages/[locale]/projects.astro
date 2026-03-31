@@ -10,6 +10,73 @@ export function getStaticPaths() {
 const { locale } = Astro.props as { locale: Locale };
 const copy = getDictionary(locale);
 const paths = getLanguagePaths('projects');
+const leadProject = copy.projects.items[0];
+const secondaryProjects = copy.projects.items.slice(1);
+const projectCopy = locale === 'zh'
+  ? {
+      frameworkEyebrow: 'Project Frame',
+      frameworkTitle: '用更像企业案例页的方式组织项目，而不是简单罗列卡片。',
+      frameworkItems: [
+        '先说明项目定位，再说明交付方式和能力边界。',
+        '让作品页表达方法论，而不只是展示名称。',
+        '结构上更适合后续继续替换成真实项目案例。'
+      ],
+      leadEyebrow: 'Featured Project',
+      leadLabels: [
+        { label: '定位', value: '内容平台 / 双语博客' },
+        { label: '交付', value: '静态部署 / GitHub Pages' },
+        { label: '重点', value: '信息架构 / 体验收束' }
+      ],
+      sideCards: [
+        {
+          eyebrow: 'Delivery Logic',
+          title: '站点本身就是一个完整的产品化样例。',
+          body: '从内容组织、前端实现到自动化部署，这个博客更像一个持续迭代的工程载体。'
+        },
+        {
+          eyebrow: 'Capabilities',
+          title: '前端、自动化、内容系统三条线并行推进。',
+          body: '页面层负责表达，脚本层负责提效，内容层负责长期沉淀。'
+        }
+      ],
+      cardMeta: [
+        { status: '长期维护', focus: '平台结构' },
+        { status: '流程提效', focus: '自动化工具' },
+        { status: '界面研究', focus: '交互实验' }
+      ]
+    }
+  : {
+      frameworkEyebrow: 'Project Frame',
+      frameworkTitle: 'Structure the page like a compact enterprise case overview instead of a loose card list.',
+      frameworkItems: [
+        'Clarify project positioning before listing implementation details.',
+        'Let the page communicate method and judgment, not only titles.',
+        'Keep the structure ready for swapping in real project cases later.'
+      ],
+      leadEyebrow: 'Featured Project',
+      leadLabels: [
+        { label: 'Role', value: 'Content platform / bilingual blog' },
+        { label: 'Delivery', value: 'Static deployment / GitHub Pages' },
+        { label: 'Focus', value: 'Information hierarchy / UX restraint' }
+      ],
+      sideCards: [
+        {
+          eyebrow: 'Delivery Logic',
+          title: 'The site itself works as a product case study.',
+          body: 'Content structure, frontend implementation, and deployment flow are treated as one connected system.'
+        },
+        {
+          eyebrow: 'Capabilities',
+          title: 'Frontend craft, automation, and content operations move together.',
+          body: 'The UI handles presentation, scripts reduce repeated work, and the content layer remains durable.'
+        }
+      ],
+      cardMeta: [
+        { status: 'Long-term', focus: 'Platform structure' },
+        { status: 'Efficiency', focus: 'Automation tooling' },
+        { status: 'Exploration', focus: 'Interface experiments' }
+      ]
+    };
 ---
 
 <BaseLayout
@@ -22,13 +89,59 @@ const paths = getLanguagePaths('projects');
 >
   <PageIntro eyebrow={copy.projects.eyebrow} title={copy.projects.title} description={copy.projects.description} />
 
+  <section class="section folio-projects-overview">
+    <article class="surface folio-projects-feature">
+      <p class="eyebrow">{projectCopy.leadEyebrow}</p>
+      <div class="folio-projects-feature__topline">
+        <span class="pill">{leadProject.type}</span>
+        <span class="pill">{projectCopy.cardMeta[0].status}</span>
+      </div>
+      <h2>{leadProject.name}</h2>
+      <p>{leadProject.description}</p>
+
+      <div class="folio-projects-feature__meta">
+        {projectCopy.leadLabels.map((item) => (
+          <div class="folio-stat-card">
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+    </article>
+
+    <div class="folio-projects-side">
+      <article class="surface folio-projects-summary">
+        <p class="eyebrow">{projectCopy.frameworkEyebrow}</p>
+        <h2>{projectCopy.frameworkTitle}</h2>
+        <div class="folio-check-list">
+          {projectCopy.frameworkItems.map((item) => <p>{item}</p>)}
+        </div>
+      </article>
+
+      {projectCopy.sideCards.map((card) => (
+        <article class="surface folio-projects-summary">
+          <p class="eyebrow">{card.eyebrow}</p>
+          <h2>{card.title}</h2>
+          <p>{card.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
   <section class="section">
-    <div class="card-grid card-grid--three">
-      {copy.projects.items.map((item) => (
-        <article class="surface project-card">
-          <span class="pill">{item.type}</span>
+    <div class="folio-projects-grid">
+      {secondaryProjects.map((item, index) => (
+        <article class="surface folio-project-card">
+          <div class="folio-project-card__meta">
+            <span class="pill">{item.type}</span>
+            <span class="pill">{projectCopy.cardMeta[index + 1].status}</span>
+          </div>
           <h2>{item.name}</h2>
           <p>{item.description}</p>
+          <div class="folio-project-card__focus">
+            <span>{locale === 'zh' ? '重点' : 'Focus'}</span>
+            <strong>{projectCopy.cardMeta[index + 1].focus}</strong>
+          </div>
         </article>
       ))}
     </div>
