@@ -24,7 +24,7 @@ const adminLabel = locale === 'zh' ? 'Decap CMS' : 'Decap CMS';
 >
   <PageIntro eyebrow={copy.studio.eyebrow} title={copy.studio.title} description={copy.studio.description}>
     <div class="page-intro__actions">
-      <a class="button button--ghost" href={SITE.repositoryUrl} target="_blank" rel="noreferrer">Repository</a>
+      <a class="button button--ghost" href={getLocalizedPath(locale, 'blog')}>{locale === 'zh' ? '进入博客' : 'Open blog'}</a>
       <a class="text-link" href="/admin/" target="_blank" rel="noreferrer">{adminLabel}</a>
       <a class="text-link" href={SITE.commentsRepositoryUrl} target="_blank" rel="noreferrer">Comments Repo</a>
     </div>

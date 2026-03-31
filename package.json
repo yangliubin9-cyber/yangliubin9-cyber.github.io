@@ -2,6 +2,7 @@
   "name": "yangliubin9-cyber.github.io",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "sync:assets": "node scripts/sync-assets.mjs",

@@ -1,7 +1,7 @@
 ---
 import PageIntro from '../../components/PageIntro.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { LOCALES, SITE, getBlogPath, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
+import { LOCALES, getBlogPath, getDictionary, getLanguagePaths, getLocalizedPath, type Locale } from '../../lib/site';
 
 export function getStaticPaths() {
   return LOCALES.map((locale) => ({ params: { locale }, props: { locale } }));
@@ -13,33 +13,33 @@ const paths = getLanguagePaths('projects');
 const projectCards = locale === 'zh'
   ? [
       {
-        title: '代码仓库',
-        description: '集中维护个人技术项目与自动化脚本，持续迭代工程实践、部署流程与可复用能力组件。',
-        status: '维护中',
-        action: '查看项目',
-        href: SITE.repositoryUrl
+        title: '写作工作流',
+        description: '围绕双语写作、内容整理与发布构建的内部工作流，用来保证博客的长期维护与稳定交付。',
+        status: '内部维护',
+        action: '打开工作台',
+        href: getLocalizedPath(locale, 'studio')
       },
       {
         title: "Yang's 博客",
-        description: '双语博客系统，支持 MDX、主题切换、全文搜索与 GitHub Pages 自动部署。',
-        status: '维护中',
-        action: '查看项目',
+        description: '面向读者的双语博客归档与文章阅读入口，持续发布技术、工程与生活观察。',
+        status: '在线',
+        action: '进入博客',
         href: getBlogPath(locale)
       }
     ]
   : [
       {
-        title: 'Code Repository',
-        description: 'A maintained collection of personal engineering work, automation scripts, and reusable delivery experiments.',
-        status: 'Active',
-        action: 'View project',
-        href: SITE.repositoryUrl
+        title: 'Publishing Workflow',
+        description: 'An internal writing and publishing workflow for bilingual drafts, editorial cleanup, and steady long-term maintenance.',
+        status: 'Internal',
+        action: 'Open studio',
+        href: getLocalizedPath(locale, 'studio')
       },
       {
         title: "Yang's Blog",
-        description: 'A bilingual blog system with MDX, theme switching, search, and GitHub Pages deployment.',
-        status: 'Active',
-        action: 'View project',
+        description: 'The reader-facing bilingual archive where technical notes, engineering practice, and life observations are published over time.',
+        status: 'Live',
+        action: 'Open blog',
         href: getBlogPath(locale)
       }
     ];

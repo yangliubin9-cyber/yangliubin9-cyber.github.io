@@ -1,6 +1,5 @@
 ﻿export const SITE = {
   origin: 'https://yangliubin9-cyber.github.io',
-  repositoryUrl: 'https://github.com/yangliubin9-cyber/yangliubin9-cyber.github.io',
   commentsRepositoryUrl: 'https://github.com/yangliubin9-cyber/Blogs-Comment',
   profileUrl: 'https://github.com/yangliubin9-cyber',
   email: 'yangliubin9-cyber@users.noreply.github.com',

@@ -1,6 +1,19 @@
 # Yang’s Log / 杨刘彬·言
 
 A bilingual personal blog and portfolio built with Astro for GitHub Pages.
+This repository is maintained for the author's own site operations and authorized maintainers only.
+
+> Repository status: Proprietary / closed-source.
+> Unless a file explicitly states otherwise, no permission is granted to copy,
+> modify, redistribute, publish, or create derivative works from this repository
+> without prior written permission from Yang Liubin.
+> See `LICENSE` and `THIRD_PARTY_NOTICES.md`.
+
+## License status
+
+- This repository is not open source.
+- Source code, articles, design assets, configuration, and documentation are all rights reserved unless a file says otherwise.
+- Third-party packages and fonts used by this project remain subject to their own licenses.
 
 ## Features
 
@@ -14,7 +27,7 @@ A bilingual personal blog and portfolio built with Astro for GitHub Pages.
 - GitHub Actions deployment for GitHub Pages
 - SEO essentials: sitemap, Open Graph metadata, and localized titles
 - Local visual writing studio that exports Markdown / MDX drafts
-- Decap CMS admin entry for free local visual editing
+- Decap CMS admin entry for local visual editing
 - OpenAI-compatible translation script for Chinese-to-English post generation
 - Nightly Feishu Docs sync into blog content files
 
@@ -86,7 +99,8 @@ The Decap admin entry lives at:
 
 - `/admin/`
 
-This repository is configured for a free local editing workflow on top of GitHub Pages.
+This repository is configured for a local editing workflow on top of GitHub Pages.
+It is intended for authorized maintainers only.
 Because GitHub Pages does not provide a built-in OAuth callback for Decap, the recommended way to use it is locally:
 
 ```bash
@@ -99,7 +113,7 @@ Then open:
 
 - `http://localhost:4321/admin/`
 
-This lets you visually edit post frontmatter and Markdown content for free. For advanced MDX components, continue using the built-in Studio or your code editor.
+This lets authorized maintainers visually edit post frontmatter and Markdown content locally. For advanced MDX components, continue using the built-in Studio or your code editor.
 
 
 ## Feishu sync
@@ -211,6 +225,8 @@ AI_TRANSLATION_MODEL=glm-5
 
 ## Local development
 
+For authorized maintainers only.
+
 ```bash
 npm install
 npm run dev
@@ -218,9 +234,17 @@ npm run dev
 
 ## Deployment
 
+For authorized maintainers only.
+
 1. Push to the `main` branch of `yangliubin9-cyber.github.io`.
 2. In GitHub `Settings > Pages`, choose `GitHub Actions`.
 3. The workflow in `.github/workflows/deploy.yml` will build and publish automatically.
+
+## Licensing
+
+- Repository license: see `LICENSE`
+- Third-party notices: see `THIRD_PARTY_NOTICES.md`
+
 ## Feishu user auth
 
 For personal Feishu folders, use user identity instead of app identity.
