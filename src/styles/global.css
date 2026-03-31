@@ -4549,3 +4549,141 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Cohesion pass */
+.folio-home-hero {
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.folio-home-hero__masthead,
+.folio-blog-head__masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.folio-home-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(260px, 0.82fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.folio-home-hero__stats,
+.folio-blog-head__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.folio-inline-stat {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-soft);
+}
+
+.folio-inline-stat span {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.folio-inline-stat strong {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.folio-home-profile {
+  gap: 18px;
+  padding: 24px;
+}
+
+.folio-home-profile__body {
+  gap: 12px;
+}
+
+.folio-home-archive {
+  border-style: solid;
+}
+
+.folio-blog-head {
+  gap: 18px;
+}
+
+.folio-blog-head__stats {
+  max-width: 640px;
+}
+
+.folio-blog-filter-card {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+}
+
+.folio-blog-filter-card .filter-panel__count {
+  align-self: start;
+  justify-self: end;
+}
+
+.folio-blog-list {
+  gap: 14px;
+}
+
+.folio-blog-item {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.folio-blog-item:hover,
+.ref-project-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.folio-about-profile {
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.05), transparent 36%),
+    var(--panel);
+}
+
+.ref-project-card,
+.ref-contact-panel {
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.04), transparent 28%),
+    var(--panel);
+}
+
+@media (max-width: 1100px) {
+  .folio-home-hero__grid,
+  .folio-blog-filter-card {
+    grid-template-columns: 1fr;
+  }
+
+  .folio-blog-filter-card .filter-panel__count {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .folio-home-hero__stats,
+  .folio-blog-head__stats {
+    grid-template-columns: 1fr;
+  }
+}

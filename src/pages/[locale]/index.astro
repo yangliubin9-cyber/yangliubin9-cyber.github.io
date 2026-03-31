@@ -15,6 +15,17 @@ const copy = getDictionary(locale);
 const posts = await getPosts(locale);
 const latestPosts = posts.slice(0, 6);
 const paths = getLanguagePaths();
+const homeStats = locale === 'zh'
+  ? [
+      { label: '文章', value: String(posts.length).padStart(2, '0') },
+      { label: '语言', value: 'ZH / EN' },
+      { label: '主题', value: '工程写作' }
+    ]
+  : [
+      { label: 'Posts', value: String(posts.length).padStart(2, '0') },
+      { label: 'Locale', value: 'ZH / EN' },
+      { label: 'Focus', value: 'Engineering' }
+    ];
 const homeCopy = locale === 'zh'
   ? {
       eyebrow: 'Personal Journal',
@@ -61,33 +72,49 @@ const homeCopy = locale === 'zh'
   description={copy.home.heroDescription}
 >
   <section class="folio-home-hero panel">
-    <div class="folio-home-hero__copy">
-      <p class="eyebrow">{homeCopy.eyebrow}</p>
-      <h1>{copy.branding.title}</h1>
-      <p class="folio-home-hero__lead">{homeCopy.lead}</p>
-      <p class="folio-home-hero__description">{homeCopy.description}</p>
-
-      <div class="folio-home-hero__actions">
-        <a class="button" href={getBlogPath(locale)}>{homeCopy.archivePrimary}</a>
-        <a class="button button--ghost" href={getLocalizedPath(locale, 'about')}>{homeCopy.archiveSecondary}</a>
-      </div>
+    <div class="folio-home-hero__masthead">
+      <span>{homeCopy.eyebrow}</span>
+      <span>{locale === 'zh' ? `Latest ${latestPosts.length}` : `Latest ${latestPosts.length}`}</span>
     </div>
 
-    <aside class="surface folio-home-profile">
-      <img
-        class="folio-home-profile__avatar"
-        src={PROFILE.avatar}
-        alt={PROFILE.name[locale]}
-        loading="lazy"
-        onerror={`this.onerror=null;this.src='${PROFILE.avatarFallback}'`}
-      />
+    <div class="folio-home-hero__grid">
+      <div class="folio-home-hero__copy">
+        <p class="eyebrow">{homeCopy.eyebrow}</p>
+        <h1>{copy.branding.title}</h1>
+        <p class="folio-home-hero__lead">{homeCopy.lead}</p>
+        <p class="folio-home-hero__description">{homeCopy.description}</p>
 
-      <div class="folio-home-profile__body">
-        <p class="eyebrow">{homeCopy.profileEyebrow}</p>
-        <h2>{PROFILE.name[locale]}</h2>
-        <p>{PROFILE.tagline[locale]}</p>
+        <div class="folio-home-hero__stats">
+          {homeStats.map((item) => (
+            <div class="folio-inline-stat">
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
+            </div>
+          ))}
+        </div>
+
+        <div class="folio-home-hero__actions">
+          <a class="button" href={getBlogPath(locale)}>{homeCopy.archivePrimary}</a>
+          <a class="button button--ghost" href={getLocalizedPath(locale, 'about')}>{homeCopy.archiveSecondary}</a>
+        </div>
       </div>
-    </aside>
+
+      <aside class="surface folio-home-profile">
+        <img
+          class="folio-home-profile__avatar"
+          src={PROFILE.avatar}
+          alt={PROFILE.name[locale]}
+          loading="lazy"
+          onerror={`this.onerror=null;this.src='${PROFILE.avatarFallback}'`}
+        />
+
+        <div class="folio-home-profile__body">
+          <p class="eyebrow">{homeCopy.profileEyebrow}</p>
+          <h2>{PROFILE.name[locale]}</h2>
+          <p>{PROFILE.tagline[locale]}</p>
+        </div>
+      </aside>
+    </div>
   </section>
 
   <section class="section">

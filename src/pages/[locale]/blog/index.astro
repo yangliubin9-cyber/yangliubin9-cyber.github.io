@@ -19,6 +19,17 @@ const categories = getCategories(blogPosts);
 const tags = getTags(blogPosts);
 const paths = getLanguagePaths('blog');
 const resultLabel = copy.blog.resultLabel;
+const blogStats = locale === 'zh'
+  ? [
+      { label: '文章', value: String(blogPosts.length).padStart(2, '0') },
+      { label: '分类', value: String(categories.length).padStart(2, '0') },
+      { label: '标签', value: String(tags.length).padStart(2, '0') }
+    ]
+  : [
+      { label: 'Posts', value: String(blogPosts.length).padStart(2, '0') },
+      { label: 'Categories', value: String(categories.length).padStart(2, '0') },
+      { label: 'Tags', value: String(tags.length).padStart(2, '0') }
+    ];
 const blogCopy = locale === 'zh'
   ? {
       eyebrow: 'Blog Archive',
@@ -110,10 +121,24 @@ const filterScript = `(() => {
   description={copy.blog.description}
 >
   <section class="folio-blog-head panel">
+    <div class="folio-blog-head__masthead">
+      <span>{blogCopy.eyebrow}</span>
+      <span>{locale === 'zh' ? 'Chronological Index' : 'Chronological Index'}</span>
+    </div>
+
     <div class="folio-blog-head__copy">
       <p class="eyebrow">{blogCopy.eyebrow}</p>
       <h1>{copy.blog.title}</h1>
       <p class="folio-blog-head__description">{blogCopy.description}</p>
+    </div>
+
+    <div class="folio-blog-head__stats">
+      {blogStats.map((item) => (
+        <div class="folio-inline-stat">
+          <span>{item.label}</span>
+          <strong>{item.value}</strong>
+        </div>
+      ))}
     </div>
   </section>
 
