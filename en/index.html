@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="en" data-theme="light"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="This site covers engineering, design, cloud operations, and everyday thinking. The interface borrows restraint from Apple and structure from Linear so the writing stays in focus."><meta name="generator" content="Astro v5.18.0"><meta name="theme-color" content="#f8fafc"><link rel="canonical" href="https://yangliubin9-cyber.github.io/en/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta property="og:title" content="Yang’s Log | Where code meets life"><meta property="og:description" content="This site covers engineering, design, cloud operations, and everyday thinking. The interface borrows restraint from Apple and structure from Linear so the writing stays in focus."><meta property="og:type" content="website"><meta property="og:url" content="https://yangliubin9-cyber.github.io/en/"><meta property="og:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><meta property="og:site_name" content="Yang’s Log"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Yang’s Log | Where code meets life"><meta name="twitter:description" content="This site covers engineering, design, cloud operations, and everyday thinking. The interface borrows restraint from Apple and structure from Linear so the writing stays in focus."><meta name="twitter:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><title>Yang’s Log | Where code meets life</title><script>(() => {
+  const key = 'ylb-theme';
+  try {
+    const saved = localStorage.getItem(key);
+    const theme = saved === 'dark' || saved === 'light' ? saved : 'light';
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  } catch {
+    document.documentElement.dataset.theme = 'light';
+    document.documentElement.style.colorScheme = 'light';
+  }
+})();</script><link rel="stylesheet" href="/_astro/_slug_.DfcX__2C.css"></head> <body> <div class="page-shell"> <header class="site-header"> <a class="brand" href="/en/"> <span class="brand__mark">YL</span> <span class="brand__text"> <strong>Yang’s Log</strong> <small>Where code meets life</small> </span> </a> <nav class="site-nav" aria-label="Primary"> <a class="site-nav__item is-active" href="/en/"> Home </a><a class="site-nav__item" href="/en/blog/"> Blog </a><a class="site-nav__item" href="/en/about/"> About </a><a class="site-nav__item" href="/en/projects/"> Projects </a><a class="site-nav__item" href="/en/uses/"> Uses </a><a class="site-nav__item" href="/en/contact/"> Contact </a> </nav> <div class="site-header__actions"> <a class="site-header__utility" href="/en/search/">Search</a> <div class="locale-switch" aria-label="Switch language"> <a class="locale-switch__item" href="/zh/" data-locale-choice="zh">
+简中
+</a> <a class="locale-switch__item is-active" href="/en/" data-locale-choice="en">
+EN
+</a> </div> <button class="theme-toggle" type="button" data-theme-toggle data-locale="en" aria-label="Toggle light and dark theme"> <span class="theme-toggle__track" aria-hidden="true"> <span class="theme-toggle__indicator"></span> </span> <span class="theme-toggle__label" data-theme-label></span> </button> <script>
+  const themeStorageKey = 'ylb-theme';
+  const themeCopy = {
+    zh: { light: '浅色', dark: '深色', next: { light: '切换到浅色', dark: '切换到深色' } },
+    en: { light: 'Light', dark: 'Dark', next: { light: 'Switch to light', dark: 'Switch to dark' } }
+  };
+
+  const getTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const applyTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    localStorage.setItem(themeStorageKey, theme);
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+  };
+
+  const syncThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      const locale = button.dataset.locale === 'en' ? 'en' : 'zh';
+      const currentTheme = getTheme();
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      const label = button.querySelector('[data-theme-label]');
+
+      if (label) {
+        label.textContent = themeCopy[locale][currentTheme];
+      }
+
+      button.dataset.nextTheme = nextTheme;
+      button.setAttribute('aria-label', themeCopy[locale].next[nextTheme]);
+    });
+  };
+
+  const attachThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      if (button.dataset.bound === 'true') {
+        return;
+      }
+
+      button.dataset.bound = 'true';
+      button.addEventListener('click', () => {
+        const nextTheme = button.dataset.nextTheme === 'light' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        syncThemeButtons();
+      });
+    });
+
+    syncThemeButtons();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachThemeButtons, { once: true });
+  } else {
+    attachThemeButtons();
+  }
+</script> </div> </header> <main class="page-main">  <section class="folio-home-hero panel"> <div class="folio-home-hero__masthead"> <span>Personal Journal</span> <span>Latest 3</span> </div> <div class="folio-home-hero__grid"> <div class="folio-home-hero__copy"> <p class="eyebrow">Personal Journal</p> <h1>Yang’s Log</h1> <p class="folio-home-hero__lead">A restrained technical blog with an editorial frame.</p> <p class="folio-home-hero__description">The homepage stays intentionally concise: who I am, what kind of work I care about, and the latest writing worth opening first.</p> <div class="folio-home-hero__stats"> <div class="folio-inline-stat"> <span>Posts</span> <strong>03</strong> </div><div class="folio-inline-stat"> <span>Locale</span> <strong>ZH / EN</strong> </div><div class="folio-inline-stat"> <span>Focus</span> <strong>Engineering</strong> </div> </div> <div class="folio-home-hero__actions"> <a class="button" href="/en/blog/">Open blog</a> <a class="button button--ghost" href="/en/about/">About the author</a> </div> </div> <aside class="surface folio-home-profile"> <img class="folio-home-profile__avatar" src="/Avatar.jpg" alt="Yang Liubin (Bin)" loading="lazy" onerror="this.onerror=null;this.src='/avatar-sponge.svg'"> <div class="folio-home-profile__body"> <p class="eyebrow">Author Profile</p> <h2>Yang Liubin (Bin)</h2> <p>Full-stack dev · Design enthusiast · Cloud Ops engineer · Telling stories with code</p> </div> </aside> </div> </section> <section class="section"> <div class="section-heading section-heading--with-action"> <div> <p class="eyebrow">Latest Posts</p> <h2>Latest posts</h2>  </div> <a class="text-link" href="/en/blog/">View all posts</a> </div> <div class="folio-home-posts"> <article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">Design &amp; Writing</span> <time datetime="2026-03-10T00:00:00.000Z">March 10, 2026</time> </div> <div class="folio-home-post__body"> <h3>Giving a personal blog product-level signal-to-noise</h3> <p>I do not want a blog to feel like a pile of posts. I want it to feel like a carefully designed digital product.</p> </div> <a class="text-link" href="/en/signal-over-noise/">Read post</a> </article><article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">Engineering Practice</span> <time datetime="2026-03-09T00:00:00.000Z">March 9, 2026</time> </div> <div class="folio-home-post__body"> <h3>Using AI to extend a Chinese blog into English</h3> <p>If Chinese is your native language, the smartest bilingual workflow is not writing everything twice. It is writing in Chinese first and using AI to support the English version.</p> </div> <a class="text-link" href="/en/ai-translation-workflows/">Read post</a> </article><article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">Systems Thinking</span> <time datetime="2026-03-07T00:00:00.000Z">March 7, 2026</time> </div> <div class="folio-home-post__body"> <h3>Long-lived websites start with lighter systems</h3> <p>Publishing becomes sustainable only when the delivery chain is light enough to repeat.</p> </div> <a class="text-link" href="/en/steady-systems/">Read post</a> </article> </div> </section> <section class="surface folio-home-archive"> <div class="folio-home-archive__copy"> <p class="eyebrow">Archive</p> <h2>Blog archive</h2> <p>Browse the full archive by category, tag, and publish date.</p> </div> <div class="folio-home-archive__actions"> <a class="button" href="/en/blog/">Open blog</a> <a class="button button--ghost" href="/en/about/">About the author</a> </div> </section>  </main> <footer class="site-footer"> <div class="site-footer__copy"> <p class="site-footer__title">Yang’s Log</p> <p class="site-footer__description">Where code meets life.</p> </div> <div class="site-footer__meta"> <span>Yang Liubin (Bin)</span> <a href="https://github.com/yangliubin9-cyber" target="_blank" rel="noreferrer">GitHub</a> <a href="https://github.com/yangliubin9-cyber/Blogs-Comment" target="_blank" rel="noreferrer">Comments</a> <a href="mailto:yangliubin9-cyber@users.noreply.github.com">Email</a> </div> </footer> </div> <script>(() => {
+  const key = 'ylb-locale';
+  try {
+    localStorage.setItem(key, 'en');
+  } catch {}
+
+  const bind = () => {
+    document.querySelectorAll('[data-locale-choice]').forEach((link) => {
+      if (link.dataset.bound === 'true') {
+        return;
+      }
+
+      link.dataset.bound = 'true';
+      link.addEventListener('click', () => {
+        try {
+          localStorage.setItem(key, link.dataset.localeChoice || 'en');
+        } catch {}
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
+})();</script> </body> </html>

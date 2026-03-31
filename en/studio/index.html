@@ -1,0 +1,333 @@
+<!DOCTYPE html><html lang="en" data-theme="light"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="A local visual editor with rich text editing, real-time Markdown / MDX output, draft autosave, and export tools."><meta name="generator" content="Astro v5.18.0"><meta name="theme-color" content="#f8fafc"><link rel="canonical" href="https://yangliubin9-cyber.github.io/en/studio/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta property="og:title" content="Studio | Yang’s Log"><meta property="og:description" content="A local visual editor with rich text editing, real-time Markdown / MDX output, draft autosave, and export tools."><meta property="og:type" content="website"><meta property="og:url" content="https://yangliubin9-cyber.github.io/en/studio/"><meta property="og:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><meta property="og:site_name" content="Yang’s Log"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Studio | Yang’s Log"><meta name="twitter:description" content="A local visual editor with rich text editing, real-time Markdown / MDX output, draft autosave, and export tools."><meta name="twitter:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><title>Studio | Yang’s Log</title><script>(() => {
+  const key = 'ylb-theme';
+  try {
+    const saved = localStorage.getItem(key);
+    const theme = saved === 'dark' || saved === 'light' ? saved : 'light';
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  } catch {
+    document.documentElement.dataset.theme = 'light';
+    document.documentElement.style.colorScheme = 'light';
+  }
+})();</script><link rel="stylesheet" href="/_astro/_slug_.DfcX__2C.css"></head> <body> <div class="page-shell"> <header class="site-header"> <a class="brand" href="/en/"> <span class="brand__mark">YL</span> <span class="brand__text"> <strong>Yang’s Log</strong> <small>Where code meets life</small> </span> </a> <nav class="site-nav" aria-label="Primary"> <a class="site-nav__item" href="/en/"> Home </a><a class="site-nav__item is-active" href="/en/blog/"> Blog </a><a class="site-nav__item" href="/en/about/"> About </a><a class="site-nav__item" href="/en/projects/"> Projects </a><a class="site-nav__item" href="/en/uses/"> Uses </a><a class="site-nav__item" href="/en/contact/"> Contact </a> </nav> <div class="site-header__actions"> <a class="site-header__utility" href="/en/search/">Search</a> <div class="locale-switch" aria-label="Switch language"> <a class="locale-switch__item" href="/zh/studio/" data-locale-choice="zh">
+简中
+</a> <a class="locale-switch__item is-active" href="/en/studio/" data-locale-choice="en">
+EN
+</a> </div> <button class="theme-toggle" type="button" data-theme-toggle data-locale="en" aria-label="Toggle light and dark theme"> <span class="theme-toggle__track" aria-hidden="true"> <span class="theme-toggle__indicator"></span> </span> <span class="theme-toggle__label" data-theme-label></span> </button> <script>
+  const themeStorageKey = 'ylb-theme';
+  const themeCopy = {
+    zh: { light: '浅色', dark: '深色', next: { light: '切换到浅色', dark: '切换到深色' } },
+    en: { light: 'Light', dark: 'Dark', next: { light: 'Switch to light', dark: 'Switch to dark' } }
+  };
+
+  const getTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const applyTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    localStorage.setItem(themeStorageKey, theme);
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+  };
+
+  const syncThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      const locale = button.dataset.locale === 'en' ? 'en' : 'zh';
+      const currentTheme = getTheme();
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      const label = button.querySelector('[data-theme-label]');
+
+      if (label) {
+        label.textContent = themeCopy[locale][currentTheme];
+      }
+
+      button.dataset.nextTheme = nextTheme;
+      button.setAttribute('aria-label', themeCopy[locale].next[nextTheme]);
+    });
+  };
+
+  const attachThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      if (button.dataset.bound === 'true') {
+        return;
+      }
+
+      button.dataset.bound = 'true';
+      button.addEventListener('click', () => {
+        const nextTheme = button.dataset.nextTheme === 'light' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        syncThemeButtons();
+      });
+    });
+
+    syncThemeButtons();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachThemeButtons, { once: true });
+  } else {
+    attachThemeButtons();
+  }
+</script> </div> </header> <main class="page-main">  <section class="page-intro panel page-intro--with-aside"> <div class="page-intro__content"> <p class="eyebrow">STUDIO / EDITOR</p> <h1>Visual writing studio</h1> <p class="page-intro__description">A local visual editor with rich text editing, real-time Markdown / MDX output, draft autosave, and export tools.</p> </div> <div class="page-intro__aside">  <div class="page-intro__actions"> <a class="button button--ghost" href="/en/blog/">Open blog</a> <a class="text-link" href="/admin/" target="_blank" rel="noreferrer">Decap CMS</a> <a class="text-link" href="https://github.com/yangliubin9-cyber/Blogs-Comment" target="_blank" rel="noreferrer">Comments Repo</a> </div>  </div> </section> <section class="studio-shell section" data-studio-root data-default-locale="en" data-messages="{&#34;saveLabel&#34;:&#34;Draft saved&#34;,&#34;clearedLabel&#34;:&#34;Draft cleared&#34;,&#34;copiedLabel&#34;:&#34;Copied to clipboard&#34;,&#34;copyFailedLabel&#34;:&#34;Copy failed. Please copy manually.&#34;,&#34;downloadLabel&#34;:&#34;File prepared&#34;,&#34;defaultHeading&#34;:&#34;Start writing here&#34;,&#34;defaultParagraph&#34;:&#34;This is a visual editing surface. Shape the structure first, then export it as Markdown or MDX.&#34;,&#34;defaultNote&#34;:&#34;Use this block for notes, takeaways, or context.&#34;,&#34;defaultCode&#34;:&#34;// code&#34;,&#34;untitled&#34;:&#34;Untitled post&#34;,&#34;uncategorized&#34;:&#34;Uncategorized&#34;,&#34;defaultTag&#34;:&#34;Draft&#34;,&#34;defaultEyebrow&#34;:&#34;Draft&#34;}" data-default-markup="<h2>Start writing here</h2><p>This is a visual editing surface. Shape the structure first, then export it as Markdown or MDX.</p>"> <div class="surface studio-meta"> <div class="studio-meta__header"> <p class="eyebrow">STUDIO / EDITOR</p> <h2>Visual writing studio</h2> <p>A local visual editor with rich text editing, real-time Markdown / MDX output, draft autosave, and export tools.</p> </div> <div class="studio-meta__grid"> <label> <span>Locale</span> <select data-field="locale"> <option value="zh">简中</option> <option value="en">EN</option> </select> </label> <label> <span>Path slug</span> <input data-field="pathSlug" placeholder="my-post-slug"> </label> <label> <span>Translation key</span> <input data-field="translationKey" placeholder="my-post-slug"> </label> <label class="studio-meta__field studio-meta__field--wide"> <span>Category</span> <input data-field="category" placeholder="Engineering / Design"> </label> <label class="studio-meta__field studio-meta__field--wide"> <span>Title</span> <input data-field="title" placeholder="Enter article title"> </label> <label class="studio-meta__field studio-meta__field--wide"> <span>Excerpt</span> <input data-field="excerpt" placeholder="Enter excerpt"> </label> <label class="studio-meta__field studio-meta__field--wide"> <span>Tags</span> <input data-field="tags" placeholder="AI, Workflow, Blog"> </label> <label class="studio-meta__field studio-meta__field--wide"> <span>Eyebrow</span> <input data-field="heroEyebrow" placeholder="Workflow"> </label> <label> <span>Accent</span> <select data-field="accent"> <option value="yellow">yellow</option> <option value="cyan">cyan</option> <option value="violet">violet</option> </select> </label> <label class="studio-meta__checkbox"> <input data-field="featured" type="checkbox"> <span>Featured</span> </label> </div> <div class="studio-meta__notes"> <p>Drafts are stored in browser localStorage automatically.</p> <p>For English generation later, pair this with scripts/translate-post.mjs and the model settings in .env.local.</p> </div> </div> <div class="surface studio-editor"> <div class="studio-editor__header"> <div> <p class="eyebrow">EDITOR / OUTPUT</p> <h2>Write and export</h2> </div> <p>Drafts are stored in browser localStorage automatically.</p> </div> <div class="studio-toolbar"> <button type="button" data-command="h2">Heading 2</button> <button type="button" data-command="h3">Heading 3</button> <button type="button" data-command="paragraph">Paragraph</button> <button type="button" data-command="bold">Bold</button> <button type="button" data-command="list">List</button> <button type="button" data-command="quote">Quote</button> <button type="button" data-command="code">Code block</button> <button type="button" data-command="note">Note block</button> </div> <div class="studio-tabs"> <button type="button" class="is-active" data-tab-target="editor">Visual editor</button> <button type="button" data-tab-target="output">MDX output</button> </div> <div class="studio-editor__stage"> <div class="studio-panel is-active" data-tab-panel="editor"> <article class="studio-surface" contenteditable="true" spellcheck="true" data-editor-surface> <h2>Start writing here</h2> <p>This is a visual editing surface. Shape the structure first, then export it as Markdown or MDX.</p> </article> </div> <div class="studio-panel" data-tab-panel="output"> <textarea class="studio-output" data-output readonly></textarea> </div> </div> <div class="studio-actions"> <button type="button" data-action="save">Save draft</button> <button type="button" data-action="copy">Copy MDX</button> <button type="button" data-action="download">Download file</button> <button type="button" data-action="clear">Clear draft</button> <span class="studio-actions__status" data-status-node>Drafts are stored in browser localStorage automatically.</span> </div> </div> </section> <script>
+  (() => {
+    const root = document.querySelector('[data-studio-root]');
+    if (!root) return;
+
+    const storageKey = 'ylb-studio-draft-v1';
+    const texts = JSON.parse(root.dataset.messages || '{}');
+    const defaultLocale = root.dataset.defaultLocale || 'zh';
+    const defaultMarkup = root.dataset.defaultMarkup || '<h2>Start writing here</h2><p></p>';
+    const surface = root.querySelector('[data-editor-surface]');
+    const output = root.querySelector('[data-output]');
+    const statusNode = root.querySelector('[data-status-node]');
+    const tabButtons = [...root.querySelectorAll('[data-tab-target]')];
+    const panels = [...root.querySelectorAll('[data-tab-panel]')];
+    const fieldElements = [...root.querySelectorAll('[data-field]')];
+    const fields = Object.fromEntries(fieldElements.map((element) => [element.dataset.field, element]));
+
+    const setStatus = (value) => {
+      if (statusNode) statusNode.textContent = value;
+    };
+
+    const isCheckbox = (element) => element instanceof HTMLInputElement && element.type === 'checkbox';
+
+    const getFieldValue = (element) => (isCheckbox(element) ? element.checked : element.value);
+
+    const setFieldValue = (element, value) => {
+      if (isCheckbox(element)) {
+        element.checked = Boolean(value);
+        return;
+      }
+      element.value = typeof value === 'string' ? value : '';
+    };
+
+    const inlineToMarkdown = (node) => {
+      if (node.nodeType === Node.TEXT_NODE) return node.textContent || '';
+      if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+      const element = node;
+      const tag = element.tagName.toLowerCase();
+      const content = [...element.childNodes].map(inlineToMarkdown).join('');
+
+      if (tag === 'strong' || tag === 'b') return `**${content}**`;
+      if (tag === 'em' || tag === 'i') return `*${content}*`;
+      if (tag === 'code' && element.parentElement?.tagName.toLowerCase() !== 'pre') return `\`${content}\``;
+      if (tag === 'br') return '\n';
+      return content;
+    };
+
+    const blockToMarkdown = (element) => {
+      const tag = element.tagName.toLowerCase();
+      const text = [...element.childNodes].map(inlineToMarkdown).join('').trim();
+
+      if (tag === 'h2') return `## ${text}`;
+      if (tag === 'h3') return `### ${text}`;
+      if (tag === 'p') return text;
+      if (tag === 'blockquote') return text.split(/\n+/).map((line) => `> ${line.trim()}`).join('\n');
+      if (tag === 'ul') return [...element.querySelectorAll(':scope > li')].map((item) => `- ${(item.textContent || '').trim()}`).join('\n');
+      if (tag === 'ol') return [...element.querySelectorAll(':scope > li')].map((item, index) => `${index + 1}. ${(item.textContent || '').trim()}`).join('\n');
+      if (tag === 'pre') return ['```ts', element.textContent?.trim() || '', '```'].join('\n');
+      if (tag === 'aside' && element.classList.contains('mdx-note')) return ['<aside className="mdx-note">', text, '</aside>'].join('\n');
+      if (tag === 'hr') return '---';
+      return text;
+    };
+
+    const serialize = () => {
+      const localeValue = fields.locale?.value || 'zh';
+      const tags = String(fields.tags?.value || '')
+        .split(/[,，]/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+      const blocks = [...surface.children].map((element) => blockToMarkdown(element)).filter(Boolean);
+      const pathSlug = String(fields.pathSlug?.value || 'draft-post').trim() || 'draft-post';
+      const translationKey = String(fields.translationKey?.value || pathSlug).trim() || pathSlug;
+      const title = String(fields.title?.value || texts.untitled).trim() || texts.untitled;
+      const excerpt = String(fields.excerpt?.value || '').trim();
+      const category = String(fields.category?.value || texts.uncategorized).trim() || texts.uncategorized;
+      const accent = String(fields.accent?.value || 'yellow').trim() || 'yellow';
+      const heroEyebrow = String(fields.heroEyebrow?.value || texts.defaultEyebrow).trim() || texts.defaultEyebrow;
+      const featured = fields.featured?.checked ? 'true' : 'false';
+      const frontmatter = [
+        '---',
+        `pathSlug: ${pathSlug}`,
+        `locale: ${localeValue}`,
+        `translationKey: ${translationKey}`,
+        `title: ${title}`,
+        `excerpt: ${excerpt}`,
+        `category: ${category}`,
+        `publishedAt: ${new Date().toISOString().slice(0, 10)}`,
+        `featured: ${featured}`,
+        'tags:',
+        ...(tags.length ? tags.map((tag) => `  - ${tag}`) : [`  - ${texts.defaultTag}`]),
+        `accent: ${accent}`,
+        `heroEyebrow: ${heroEyebrow}`,
+        '---'
+      ].join('\n');
+
+      const body = blocks.join('\n\n').trim();
+      const full = [frontmatter, body].filter(Boolean).join('\n\n') + '\n';
+      output.value = full;
+      return full;
+    };
+
+    const saveDraft = () => {
+      const payload = {
+        html: surface.innerHTML,
+        fields: Object.fromEntries(Object.entries(fields).map(([key, element]) => [key, getFieldValue(element)]))
+      };
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+      setStatus(texts.saveLabel);
+    };
+
+    const restoreDraft = () => {
+      const raw = localStorage.getItem(storageKey);
+      fields.locale.value = defaultLocale;
+      fields.accent.value = 'yellow';
+
+      if (!raw) {
+        surface.innerHTML = defaultMarkup;
+        serialize();
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(raw);
+        surface.innerHTML = payload.html || defaultMarkup;
+        Object.entries(payload.fields || {}).forEach(([key, value]) => {
+          const element = fields[key];
+          if (!element) return;
+          setFieldValue(element, value);
+        });
+      } catch {
+        surface.innerHTML = defaultMarkup;
+        fields.locale.value = defaultLocale;
+        fields.accent.value = 'yellow';
+      }
+
+      serialize();
+    };
+
+    const update = () => {
+      serialize();
+      saveDraft();
+    };
+
+    const focusSurface = () => {
+      surface.focus();
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount > 0) return;
+      const range = document.createRange();
+      range.selectNodeContents(surface);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    };
+
+    root.querySelectorAll('[data-command]').forEach((button) => {
+      button.addEventListener('click', () => {
+        focusSurface();
+        const command = button.dataset.command;
+
+        if (command === 'h2') document.execCommand('formatBlock', false, 'h2');
+        if (command === 'h3') document.execCommand('formatBlock', false, 'h3');
+        if (command === 'paragraph') document.execCommand('formatBlock', false, 'p');
+        if (command === 'bold') document.execCommand('bold');
+        if (command === 'list') document.execCommand('insertUnorderedList');
+        if (command === 'quote') document.execCommand('formatBlock', false, 'blockquote');
+        if (command === 'code') document.execCommand('insertHTML', false, `<pre><code>${texts.defaultCode}</code></pre>`);
+        if (command === 'note') document.execCommand('insertHTML', false, `<aside class="mdx-note">${texts.defaultNote}</aside>`);
+        update();
+      });
+    });
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = button.dataset.tabTarget;
+        tabButtons.forEach((item) => item.classList.toggle('is-active', item === button));
+        panels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.tabPanel === target));
+        if (target === 'output') serialize();
+      });
+    });
+
+    fieldElements.forEach((element) => {
+      element.addEventListener(isCheckbox(element) ? 'change' : 'input', update);
+    });
+    surface.addEventListener('input', update);
+
+    root.querySelector('[data-action="save"]').addEventListener('click', () => {
+      serialize();
+      saveDraft();
+    });
+
+    root.querySelector('[data-action="copy"]').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(serialize());
+        setStatus(texts.copiedLabel);
+      } catch {
+        setStatus(texts.copyFailedLabel);
+      }
+    });
+
+    root.querySelector('[data-action="download"]').addEventListener('click', () => {
+      const content = serialize();
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      const fileName = String(fields.pathSlug?.value || 'draft-post').trim() || 'draft-post';
+      anchor.href = url;
+      anchor.download = `${fileName}.mdx`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setStatus(texts.downloadLabel);
+    });
+
+    root.querySelector('[data-action="clear"]').addEventListener('click', () => {
+      localStorage.removeItem(storageKey);
+      surface.innerHTML = defaultMarkup;
+      Object.entries(fields).forEach(([key, element]) => {
+        if (key === 'locale') {
+          setFieldValue(element, defaultLocale);
+          return;
+        }
+        if (key === 'accent') {
+          setFieldValue(element, 'yellow');
+          return;
+        }
+        if (isCheckbox(element)) {
+          element.checked = false;
+          return;
+        }
+        element.value = '';
+      });
+      serialize();
+      setStatus(texts.clearedLabel);
+    });
+
+    restoreDraft();
+  })();
+</script>  </main> <footer class="site-footer"> <div class="site-footer__copy"> <p class="site-footer__title">Yang’s Log</p> <p class="site-footer__description">Where code meets life.</p> </div> <div class="site-footer__meta"> <span>Yang Liubin (Bin)</span> <a href="https://github.com/yangliubin9-cyber" target="_blank" rel="noreferrer">GitHub</a> <a href="https://github.com/yangliubin9-cyber/Blogs-Comment" target="_blank" rel="noreferrer">Comments</a> <a href="mailto:yangliubin9-cyber@users.noreply.github.com">Email</a> </div> </footer> </div> <script>(() => {
+  const key = 'ylb-locale';
+  try {
+    localStorage.setItem(key, 'en');
+  } catch {}
+
+  const bind = () => {
+    document.querySelectorAll('[data-locale-choice]').forEach((link) => {
+      if (link.dataset.bound === 'true') {
+        return;
+      }
+
+      link.dataset.bound = 'true';
+      link.addEventListener('click', () => {
+        try {
+          localStorage.setItem(key, link.dataset.localeChoice || 'en');
+        } catch {}
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
+})();</script> </body> </html>

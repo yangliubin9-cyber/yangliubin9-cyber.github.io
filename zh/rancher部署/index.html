@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="zh" data-theme="light"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da..."><meta name="generator" content="Astro v5.18.0"><meta name="theme-color" content="#f8fafc"><link rel="canonical" href="https://yangliubin9-cyber.github.io/zh/rancher%E9%83%A8%E7%BD%B2/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta property="og:title" content="Rancher部署 | 杨刘彬·言"><meta property="og:description" content="使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da..."><meta property="og:type" content="website"><meta property="og:url" content="https://yangliubin9-cyber.github.io/zh/rancher%E9%83%A8%E7%BD%B2/"><meta property="og:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><meta property="og:site_name" content="杨刘彬·言"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Rancher部署 | 杨刘彬·言"><meta name="twitter:description" content="使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da..."><meta name="twitter:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><title>Rancher部署 | 杨刘彬·言</title><script>(() => {
+  const key = 'ylb-theme';
+  try {
+    const saved = localStorage.getItem(key);
+    const theme = saved === 'dark' || saved === 'light' ? saved : 'light';
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  } catch {
+    document.documentElement.dataset.theme = 'light';
+    document.documentElement.style.colorScheme = 'light';
+  }
+})();</script><link rel="stylesheet" href="/_astro/_slug_.DfcX__2C.css"></head> <body> <div class="page-shell"> <header class="site-header"> <a class="brand" href="/zh/"> <span class="brand__mark">YL</span> <span class="brand__text"> <strong>杨刘彬·言</strong> <small>探索技术与生活的交叉点</small> </span> </a> <nav class="site-nav" aria-label="Primary"> <a class="site-nav__item" href="/zh/"> 首页 </a><a class="site-nav__item is-active" href="/zh/blog/"> 博客 </a><a class="site-nav__item" href="/zh/about/"> 关于 </a><a class="site-nav__item" href="/zh/projects/"> 项目 </a><a class="site-nav__item" href="/zh/uses/"> 技术 </a><a class="site-nav__item" href="/zh/contact/"> 联系 </a> </nav> <div class="site-header__actions"> <a class="site-header__utility" href="/zh/search/">搜索</a> <div class="locale-switch" aria-label="切换语言"> <a class="locale-switch__item is-active" href="/zh/rancher部署/" data-locale-choice="zh">
+简中
+</a> <a class="locale-switch__item" href="/en/blog/" data-locale-choice="en">
+EN
+</a> </div> <button class="theme-toggle" type="button" data-theme-toggle data-locale="zh" aria-label="切换亮暗主题"> <span class="theme-toggle__track" aria-hidden="true"> <span class="theme-toggle__indicator"></span> </span> <span class="theme-toggle__label" data-theme-label></span> </button> <script>
+  const themeStorageKey = 'ylb-theme';
+  const themeCopy = {
+    zh: { light: '浅色', dark: '深色', next: { light: '切换到浅色', dark: '切换到深色' } },
+    en: { light: 'Light', dark: 'Dark', next: { light: 'Switch to light', dark: 'Switch to dark' } }
+  };
+
+  const getTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const applyTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    localStorage.setItem(themeStorageKey, theme);
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+  };
+
+  const syncThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      const locale = button.dataset.locale === 'en' ? 'en' : 'zh';
+      const currentTheme = getTheme();
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      const label = button.querySelector('[data-theme-label]');
+
+      if (label) {
+        label.textContent = themeCopy[locale][currentTheme];
+      }
+
+      button.dataset.nextTheme = nextTheme;
+      button.setAttribute('aria-label', themeCopy[locale].next[nextTheme]);
+    });
+  };
+
+  const attachThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      if (button.dataset.bound === 'true') {
+        return;
+      }
+
+      button.dataset.bound = 'true';
+      button.addEventListener('click', () => {
+        const nextTheme = button.dataset.nextTheme === 'light' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        syncThemeButtons();
+      });
+    });
+
+    syncThemeButtons();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachThemeButtons, { once: true });
+  } else {
+    attachThemeButtons();
+  }
+</script> </div> </header> <main class="page-main">  <article class="enterprise-article"> <section class="enterprise-article__hero panel"> <div class="enterprise-article__hero-main"> <a class="text-link" href="/zh/blog/">返回博客</a> <p class="eyebrow">Feishu Folder</p> <h1>Rancher部署</h1> <p class="enterprise-article__description">使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da...</p> <div class="enterprise-meta-grid"> <article class="enterprise-meta-grid__item"> <span>发布时间</span> <strong>2026年3月30日</strong> </article><article class="enterprise-meta-grid__item"> <span>最近更新</span> <strong>2026年3月31日</strong> </article><article class="enterprise-meta-grid__item"> <span>预计阅读</span> <strong>2 分钟</strong> </article><article class="enterprise-meta-grid__item"> <span>文章分类</span> <strong>服务搭建</strong> </article> </div> <div class="tag-row tag-row--wrap"> <span class="tag">Feishu</span><span class="tag">Cloud Docs</span> </div> </div> <aside class="enterprise-article__hero-aside surface"> <p class="eyebrow">Article Overview</p> <div class="enterprise-summary-list"> <div class="enterprise-summary-list__item"> <span>路径</span> <strong>/zh/rancher部署/</strong> </div> <div class="enterprise-summary-list__item"> <span>目录数量</span> <strong>09</strong> </div> <div class="enterprise-summary-list__item"> <span>语言版本</span> <strong>当前仅中文</strong> </div> </div> <div class="enterprise-action-stack">  <a class="enterprise-inline-link" href="/zh/search/"> <strong>打开搜索</strong> <span>继续检索相关主题和文章</span> </a> <a class="enterprise-inline-link" href="/zh/blog/"> <strong>回到归档</strong> <span>从归档页按分类或标签继续浏览</span> </a> </div> </aside> </section> <div class="enterprise-article__grid"> <div class="surface article-body article-body--enterprise" data-tilt="off"> <p>使用 Docker-Compose 部署
+⚠️部署前须知⚠️
+文件中所有内容要根据自己的情况修改，列主机名、 image、/data地址、端口号、networks、硬件资源等；需要提前准备好自己的镜像仓库，或镜像在本地。
+部署环境</p>
+<p>系统</p>
+<p>节点</p>
+<p>IP</p>
+<p>Ubuntu24.04</p>
+<p>Redis</p>
+<p>10.14.0.38
+前提准备</p>
+<h1 id="准备好docker与docker-compose服务">准备好Docker与Docker compose服务</h1>
+<p>自主安装</p>
+<h1 id="修改主机名">修改主机名</h1>
+<p>hostnamectl set-hostname Redis</p>
+<h1 id="准备minio镜像版本">准备minio镜像版本</h1>
+<p>rancher/rancher-2.8.2:v1  //我这里使用的镜像为2.8.2的镜像，打的自己的标签上传harbor使用</p>
+<h1 id="创建服务目录">创建服务目录</h1>
+<p>mkdir -p /data/workspace/install-redis &#x26;&#x26; cd /data/workspace/install-redis</p>
+<h1 id="创建minio创建需要的目录">创建minio创建需要的目录</h1>
+<p>mkdir data  resolved.conf</p>
+<h1 id="准备docker-composeyaml文件">准备docker-compose.yaml文件</h1>
+<p>创建网络 docker network create bigdata
+services:
+rancher:
+restart: always
+privileged: true
+image: 10.14.0.37/rancher/rancher-2.8.2:v1
+container_name: rancher
+volumes:
+- /data/workspace/install-rancher/data:/var/lib/rancher
+- /data/workspace/install-rancher/resolved.conf:/etc/resolved.conf
+environment:
+- TZ=Asia/Shanghai
+- CATTLE_BOOTSTRAP_PASSWORD=rancher@!QAZxsw2
+# 关键：添加服务器URL，解决重定向问题
+- CATTLE_SERVER_URL=<a href="https://10.14.0.38:1443">https://10.14.0.38:1443</a>
+ports:
+- “8080:80”
+- “1443:443”
+networks:
+- bigdata</p>
+<h1 id="连接外部网络">连接外部网络</h1>
+<p>networks:
+bigdata:
+external: true</p>
+<h1 id="启动服务">启动服务</h1>
+<p>docker compose up -d</p>
+<h1 id="验证服务">验证服务</h1>
+<p>docker compose ps
+NAME      IMAGE                                 COMMAND           SERVICE   CREATED      STATUS      PORTS
+rancher   10.14.0.37/rancher/rancher-2.8.2:v1   “entrypoint.sh”   rancher   2 days ago   Up 2 days   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp, 0.0.0.0:1443->443/tcp, [::]:1443->443/tcp</p> </div> <aside class="enterprise-article__sidebar"> <section class="surface toc" data-tilt="off"> <p class="eyebrow">目录</p> <nav class="toc__nav"> <a href="#准备好docker与docker-compose服务" class="toc__level toc__level--1"> 准备好Docker与Docker compose服务 </a><a href="#修改主机名" class="toc__level toc__level--1"> 修改主机名 </a><a href="#准备minio镜像版本" class="toc__level toc__level--1"> 准备minio镜像版本 </a><a href="#创建服务目录" class="toc__level toc__level--1"> 创建服务目录 </a><a href="#创建minio创建需要的目录" class="toc__level toc__level--1"> 创建minio创建需要的目录 </a><a href="#准备docker-composeyaml文件" class="toc__level toc__level--1"> 准备docker-compose.yaml文件 </a><a href="#连接外部网络" class="toc__level toc__level--1"> 连接外部网络 </a><a href="#启动服务" class="toc__level toc__level--1"> 启动服务 </a><a href="#验证服务" class="toc__level toc__level--1"> 验证服务 </a> </nav> </section> <section class="surface enterprise-sidebar-card" data-tilt="off"> <p class="eyebrow">Reading Route</p> <div class="enterprise-action-stack"> <a class="enterprise-inline-link" href="/zh/es集群-vip搭建/"> <strong>上一篇</strong> <span>ES集群+VIP搭建</span> </a> <a class="enterprise-inline-link" href="/zh/minio单节点部署/"> <strong>下一篇</strong> <span>Minio单节点部署</span> </a> </div> </section> </aside> </div> </article> <section class="surface post-pagination post-pagination--enterprise" data-tilt="off"> <a class="post-pagination__link" href="/zh/es集群-vip搭建/"> <span class="eyebrow">上一篇</span> <strong>ES集群+VIP搭建</strong> <span>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da...</span> </a> <a class="post-pagination__link post-pagination__link--next" href="/zh/minio单节点部署/"> <span class="eyebrow">下一篇</span> <strong>Minio单节点部署</strong> <span>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da...</span> </a> </section><section class="comments-panel surface" data-tilt="off"> <div class="section-heading section-heading--tight"> <p class="eyebrow">GitHub Discussions</p> <h2>评论</h2> <p>评论由 GitHub Discussions 提供，登录 GitHub 后即可参与讨论。</p> </div> <div data-giscus-root></div> </section> <script>(() => {
+  const root = document.querySelector('[data-giscus-root]');
+  if (!root || root.dataset.loaded === 'true') {
+    return;
+  }
+
+  const options = {"data-repo":"yangliubin9-cyber/Blogs-Comment","data-repo-id":"R_kgDORi4F6A","data-category":"General","data-category-id":"DIC_kwDORi4F6M4C4Duo","data-mapping":"pathname","data-strict":"0","data-reactions-enabled":"1","data-emit-metadata":"0","data-input-position":"bottom","data-theme":"dark","data-lang":"zh-CN","crossorigin":"anonymous"};
+  options['data-theme'] = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const script = document.createElement('script');
+  script.src = 'https://giscus.app/client.js';
+  script.async = true;
+
+  Object.entries(options).forEach(([key, value]) => {
+    script.setAttribute(key, String(value));
+  });
+
+  root.dataset.loaded = 'true';
+  root.appendChild(script);
+
+  const syncTheme = (theme) => {
+    const frame = document.querySelector('iframe.giscus-frame');
+    if (!frame?.contentWindow) {
+      return;
+    }
+
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'light' ? 'light' : 'dark' } } },
+      'https://giscus.app'
+    );
+  };
+
+  window.addEventListener('themechange', (event) => syncTheme(event.detail.theme));
+})();</script> <section class="section"> <div class="section-heading"> <p class="eyebrow">Further Reading</p> <h2>继续阅读</h2> <p>继续从同一主题域扩展阅读，保持稳定的阅读路径。</p> </div> <div class="posts-grid"> <article class="post-card" data-accent="cyan"> <span class="post-card__index" aria-hidden="true"></span> <div class="post-card__topline"> <div class="post-card__badges"> <span class="pill">服务搭建</span> <span class="tag tag--locale">简中</span> </div> <time class="post-card__date" datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <a class="post-card__body" href="/zh/harbor部署-1/"> <h3>Harbor部署</h3> <p>部署安装Harbor 下载软件包 安装docker 安装docker compose 下载harbor离线安装包，或者Githu...</p> </a> <div class="post-card__footer"> <div class="tag-row"> <span class="tag">Feishu</span><span class="tag">Cloud Docs</span> </div> <a class="text-link" href="/zh/harbor部署-1/">阅读文章</a> </div> </article><article class="post-card" data-accent="cyan"> <span class="post-card__index" aria-hidden="true"></span> <div class="post-card__topline"> <div class="post-card__badges"> <span class="pill">服务搭建</span> <span class="tag tag--locale">简中</span> </div> <time class="post-card__date" datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <a class="post-card__body" href="/zh/es集群-vip搭建/"> <h3>ES集群+VIP搭建</h3> <p>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da...</p> </a> <div class="post-card__footer"> <div class="tag-row"> <span class="tag">Feishu</span><span class="tag">Cloud Docs</span> </div> <a class="text-link" href="/zh/es集群-vip搭建/">阅读文章</a> </div> </article> </div> </section> </main> <footer class="site-footer"> <div class="site-footer__copy"> <p class="site-footer__title">杨刘彬·言</p> <p class="site-footer__description">探索技术与生活的交叉点。</p> </div> <div class="site-footer__meta"> <span>杨刘彬 (Bin)</span> <a href="https://github.com/yangliubin9-cyber" target="_blank" rel="noreferrer">GitHub</a> <a href="https://github.com/yangliubin9-cyber/Blogs-Comment" target="_blank" rel="noreferrer">Comments</a> <a href="mailto:yangliubin9-cyber@users.noreply.github.com">Email</a> </div> </footer> </div> <script>(() => {
+  const key = 'ylb-locale';
+  try {
+    localStorage.setItem(key, 'zh');
+  } catch {}
+
+  const bind = () => {
+    document.querySelectorAll('[data-locale-choice]').forEach((link) => {
+      if (link.dataset.bound === 'true') {
+        return;
+      }
+
+      link.dataset.bound = 'true';
+      link.addEventListener('click', () => {
+        try {
+          localStorage.setItem(key, link.dataset.localeChoice || 'zh');
+        } catch {}
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
+})();</script> </body> </html>

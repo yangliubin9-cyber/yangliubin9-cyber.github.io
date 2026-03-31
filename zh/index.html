@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="zh" data-theme="light"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="这里记录工程、设计、云计算运维与生活观察。视觉上借鉴 Apple 的克制和 Linear 的秩序感，让内容、结构与个人气质自然融合。"><meta name="generator" content="Astro v5.18.0"><meta name="theme-color" content="#f8fafc"><link rel="canonical" href="https://yangliubin9-cyber.github.io/zh/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta property="og:title" content="杨刘彬·言 | 探索技术与生活的交叉点"><meta property="og:description" content="这里记录工程、设计、云计算运维与生活观察。视觉上借鉴 Apple 的克制和 Linear 的秩序感，让内容、结构与个人气质自然融合。"><meta property="og:type" content="website"><meta property="og:url" content="https://yangliubin9-cyber.github.io/zh/"><meta property="og:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><meta property="og:site_name" content="杨刘彬·言"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="杨刘彬·言 | 探索技术与生活的交叉点"><meta name="twitter:description" content="这里记录工程、设计、云计算运维与生活观察。视觉上借鉴 Apple 的克制和 Linear 的秩序感，让内容、结构与个人气质自然融合。"><meta name="twitter:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><title>杨刘彬·言 | 探索技术与生活的交叉点</title><script>(() => {
+  const key = 'ylb-theme';
+  try {
+    const saved = localStorage.getItem(key);
+    const theme = saved === 'dark' || saved === 'light' ? saved : 'light';
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  } catch {
+    document.documentElement.dataset.theme = 'light';
+    document.documentElement.style.colorScheme = 'light';
+  }
+})();</script><link rel="stylesheet" href="/_astro/_slug_.DfcX__2C.css"></head> <body> <div class="page-shell"> <header class="site-header"> <a class="brand" href="/zh/"> <span class="brand__mark">YL</span> <span class="brand__text"> <strong>杨刘彬·言</strong> <small>探索技术与生活的交叉点</small> </span> </a> <nav class="site-nav" aria-label="Primary"> <a class="site-nav__item is-active" href="/zh/"> 首页 </a><a class="site-nav__item" href="/zh/blog/"> 博客 </a><a class="site-nav__item" href="/zh/about/"> 关于 </a><a class="site-nav__item" href="/zh/projects/"> 项目 </a><a class="site-nav__item" href="/zh/uses/"> 技术 </a><a class="site-nav__item" href="/zh/contact/"> 联系 </a> </nav> <div class="site-header__actions"> <a class="site-header__utility" href="/zh/search/">搜索</a> <div class="locale-switch" aria-label="切换语言"> <a class="locale-switch__item is-active" href="/zh/" data-locale-choice="zh">
+简中
+</a> <a class="locale-switch__item" href="/en/" data-locale-choice="en">
+EN
+</a> </div> <button class="theme-toggle" type="button" data-theme-toggle data-locale="zh" aria-label="切换亮暗主题"> <span class="theme-toggle__track" aria-hidden="true"> <span class="theme-toggle__indicator"></span> </span> <span class="theme-toggle__label" data-theme-label></span> </button> <script>
+  const themeStorageKey = 'ylb-theme';
+  const themeCopy = {
+    zh: { light: '浅色', dark: '深色', next: { light: '切换到浅色', dark: '切换到深色' } },
+    en: { light: 'Light', dark: 'Dark', next: { light: 'Switch to light', dark: 'Switch to dark' } }
+  };
+
+  const getTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const applyTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    localStorage.setItem(themeStorageKey, theme);
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+  };
+
+  const syncThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      const locale = button.dataset.locale === 'en' ? 'en' : 'zh';
+      const currentTheme = getTheme();
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      const label = button.querySelector('[data-theme-label]');
+
+      if (label) {
+        label.textContent = themeCopy[locale][currentTheme];
+      }
+
+      button.dataset.nextTheme = nextTheme;
+      button.setAttribute('aria-label', themeCopy[locale].next[nextTheme]);
+    });
+  };
+
+  const attachThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      if (button.dataset.bound === 'true') {
+        return;
+      }
+
+      button.dataset.bound = 'true';
+      button.addEventListener('click', () => {
+        const nextTheme = button.dataset.nextTheme === 'light' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        syncThemeButtons();
+      });
+    });
+
+    syncThemeButtons();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachThemeButtons, { once: true });
+  } else {
+    attachThemeButtons();
+  }
+</script> </div> </header> <main class="page-main">  <section class="folio-home-hero panel"> <div class="folio-home-hero__masthead"> <span>Personal Journal</span> <span>Latest 6</span> </div> <div class="folio-home-hero__grid"> <div class="folio-home-hero__copy"> <p class="eyebrow">Personal Journal</p> <h1>杨刘彬·言</h1> <p class="folio-home-hero__lead">一个偏向工程表达的个人博客。</p> <p class="folio-home-hero__description">这里保留最重要的三层信息：我是谁，我正在关注什么，以及最近写了什么。版式尽量克制，让阅读和识别都更直接。</p> <div class="folio-home-hero__stats"> <div class="folio-inline-stat"> <span>文章</span> <strong>09</strong> </div><div class="folio-inline-stat"> <span>语言</span> <strong>ZH / EN</strong> </div><div class="folio-inline-stat"> <span>主题</span> <strong>工程写作</strong> </div> </div> <div class="folio-home-hero__actions"> <a class="button" href="/zh/blog/">打开博客</a> <a class="button button--ghost" href="/zh/about/">查看关于</a> </div> </div> <aside class="surface folio-home-profile"> <img class="folio-home-profile__avatar" src="/Avatar.jpg" alt="杨刘彬 (Bin)" loading="lazy" onerror="this.onerror=null;this.src='/avatar-sponge.svg'"> <div class="folio-home-profile__body"> <p class="eyebrow">Author Profile</p> <h2>杨刘彬 (Bin)</h2> <p>全栈开发者 · 设计爱好者 · 云计算运维工程师 · 用代码讲故事</p> </div> </aside> </div> </section> <section class="section"> <div class="section-heading section-heading--with-action"> <div> <p class="eyebrow">Latest Posts</p> <h2>最新文章</h2>  </div> <a class="text-link" href="/zh/blog/">查看全部文章</a> </div> <div class="folio-home-posts"> <article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">服务搭建</span> <time datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <div class="folio-home-post__body"> <h3>Harbor部署</h3> <p>部署安装Harbor 下载软件包 安装docker 安装docker compose 下载harbor离线安装包，或者Githu...</p> </div> <a class="text-link" href="/zh/harbor部署-1/">阅读全文</a> </article><article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">服务搭建</span> <time datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <div class="folio-home-post__body"> <h3>ES集群+VIP搭建</h3> <p>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da...</p> </div> <a class="text-link" href="/zh/es集群-vip搭建/">阅读全文</a> </article><article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">服务搭建</span> <time datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <div class="folio-home-post__body"> <h3>Rancher部署</h3> <p>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da...</p> </div> <a class="text-link" href="/zh/rancher部署/">阅读全文</a> </article><article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">服务搭建</span> <time datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <div class="folio-home-post__body"> <h3>Minio单节点部署</h3> <p>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da...</p> </div> <a class="text-link" href="/zh/minio单节点部署/">阅读全文</a> </article><article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">服务搭建</span> <time datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <div class="folio-home-post__body"> <h3>Postgres 集群部署</h3> <p>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，比如说 image、/data...</p> </div> <a class="text-link" href="/zh/postgres-集群部署/">阅读全文</a> </article><article class="surface folio-home-post"> <div class="folio-home-post__meta"> <span class="pill">服务搭建</span> <time datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <div class="folio-home-post__body"> <h3>Harbor部署</h3> <p>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，比如说 image、/data...</p> </div> <a class="text-link" href="/zh/harbor部署/">阅读全文</a> </article> </div> </section> <section class="surface folio-home-archive"> <div class="folio-home-archive__copy"> <p class="eyebrow">Archive</p> <h2>博客归档</h2> <p>按分类、标签和发布时间浏览全部内容。</p> </div> <div class="folio-home-archive__actions"> <a class="button" href="/zh/blog/">打开博客</a> <a class="button button--ghost" href="/zh/about/">查看关于</a> </div> </section>  </main> <footer class="site-footer"> <div class="site-footer__copy"> <p class="site-footer__title">杨刘彬·言</p> <p class="site-footer__description">探索技术与生活的交叉点。</p> </div> <div class="site-footer__meta"> <span>杨刘彬 (Bin)</span> <a href="https://github.com/yangliubin9-cyber" target="_blank" rel="noreferrer">GitHub</a> <a href="https://github.com/yangliubin9-cyber/Blogs-Comment" target="_blank" rel="noreferrer">Comments</a> <a href="mailto:yangliubin9-cyber@users.noreply.github.com">Email</a> </div> </footer> </div> <script>(() => {
+  const key = 'ylb-locale';
+  try {
+    localStorage.setItem(key, 'zh');
+  } catch {}
+
+  const bind = () => {
+    document.querySelectorAll('[data-locale-choice]').forEach((link) => {
+      if (link.dataset.bound === 'true') {
+        return;
+      }
+
+      link.dataset.bound = 'true';
+      link.addEventListener('click', () => {
+        try {
+          localStorage.setItem(key, link.dataset.localeChoice || 'zh');
+        } catch {}
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
+})();</script> </body> </html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="en" data-theme="light"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Developer gear pages are simple, practical, and surprisingly good at building affinity."><meta name="generator" content="Astro v5.18.0"><meta name="theme-color" content="#f8fafc"><link rel="canonical" href="https://yangliubin9-cyber.github.io/en/uses/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta property="og:title" content="Uses | Yang’s Log"><meta property="og:description" content="Developer gear pages are simple, practical, and surprisingly good at building affinity."><meta property="og:type" content="website"><meta property="og:url" content="https://yangliubin9-cyber.github.io/en/uses/"><meta property="og:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><meta property="og:site_name" content="Yang’s Log"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Uses | Yang’s Log"><meta name="twitter:description" content="Developer gear pages are simple, practical, and surprisingly good at building affinity."><meta name="twitter:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><title>Uses | Yang’s Log</title><script>(() => {
+  const key = 'ylb-theme';
+  try {
+    const saved = localStorage.getItem(key);
+    const theme = saved === 'dark' || saved === 'light' ? saved : 'light';
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  } catch {
+    document.documentElement.dataset.theme = 'light';
+    document.documentElement.style.colorScheme = 'light';
+  }
+})();</script><link rel="stylesheet" href="/_astro/_slug_.DfcX__2C.css"></head> <body> <div class="page-shell"> <header class="site-header"> <a class="brand" href="/en/"> <span class="brand__mark">YL</span> <span class="brand__text"> <strong>Yang’s Log</strong> <small>Where code meets life</small> </span> </a> <nav class="site-nav" aria-label="Primary"> <a class="site-nav__item" href="/en/"> Home </a><a class="site-nav__item" href="/en/blog/"> Blog </a><a class="site-nav__item" href="/en/about/"> About </a><a class="site-nav__item" href="/en/projects/"> Projects </a><a class="site-nav__item is-active" href="/en/uses/"> Uses </a><a class="site-nav__item" href="/en/contact/"> Contact </a> </nav> <div class="site-header__actions"> <a class="site-header__utility" href="/en/search/">Search</a> <div class="locale-switch" aria-label="Switch language"> <a class="locale-switch__item" href="/zh/uses/" data-locale-choice="zh">
+简中
+</a> <a class="locale-switch__item is-active" href="/en/uses/" data-locale-choice="en">
+EN
+</a> </div> <button class="theme-toggle" type="button" data-theme-toggle data-locale="en" aria-label="Toggle light and dark theme"> <span class="theme-toggle__track" aria-hidden="true"> <span class="theme-toggle__indicator"></span> </span> <span class="theme-toggle__label" data-theme-label></span> </button> <script>
+  const themeStorageKey = 'ylb-theme';
+  const themeCopy = {
+    zh: { light: '浅色', dark: '深色', next: { light: '切换到浅色', dark: '切换到深色' } },
+    en: { light: 'Light', dark: 'Dark', next: { light: 'Switch to light', dark: 'Switch to dark' } }
+  };
+
+  const getTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const applyTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    localStorage.setItem(themeStorageKey, theme);
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+  };
+
+  const syncThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      const locale = button.dataset.locale === 'en' ? 'en' : 'zh';
+      const currentTheme = getTheme();
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      const label = button.querySelector('[data-theme-label]');
+
+      if (label) {
+        label.textContent = themeCopy[locale][currentTheme];
+      }
+
+      button.dataset.nextTheme = nextTheme;
+      button.setAttribute('aria-label', themeCopy[locale].next[nextTheme]);
+    });
+  };
+
+  const attachThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      if (button.dataset.bound === 'true') {
+        return;
+      }
+
+      button.dataset.bound = 'true';
+      button.addEventListener('click', () => {
+        const nextTheme = button.dataset.nextTheme === 'light' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        syncThemeButtons();
+      });
+    });
+
+    syncThemeButtons();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachThemeButtons, { once: true });
+  } else {
+    attachThemeButtons();
+  }
+</script> </div> </header> <main class="page-main">  <section class="page-intro panel"> <div class="page-intro__content"> <p class="eyebrow">USES / STACK</p> <h1>Uses</h1> <p class="page-intro__description">Developer gear pages are simple, practical, and surprisingly good at building affinity.</p> </div>  </section> <section class="section"> <div class="folio-uses-grid"> <article class="surface folio-uses-card"> <p class="eyebrow">Software</p> <div class="folio-check-list"> <p>VS Code / Cursor style editor</p><p>GitHub</p><p>PowerToys</p><p>Chrome / Arc style browser</p> </div> </article><article class="surface folio-uses-card"> <p class="eyebrow">Development</p> <div class="folio-check-list"> <p>Astro / React / TypeScript</p><p>Node.js</p><p>GitHub Actions</p><p>Markdown / MDX workflow</p> </div> </article><article class="surface folio-uses-card"> <p class="eyebrow">Preferences</p> <div class="folio-check-list"> <p>Lightweight static sites</p><p>Maintainable component systems</p><p>Dense but calm UI</p><p>Long-term content assets</p> </div> </article> </div> </section>  </main> <footer class="site-footer"> <div class="site-footer__copy"> <p class="site-footer__title">Yang’s Log</p> <p class="site-footer__description">Where code meets life.</p> </div> <div class="site-footer__meta"> <span>Yang Liubin (Bin)</span> <a href="https://github.com/yangliubin9-cyber" target="_blank" rel="noreferrer">GitHub</a> <a href="https://github.com/yangliubin9-cyber/Blogs-Comment" target="_blank" rel="noreferrer">Comments</a> <a href="mailto:yangliubin9-cyber@users.noreply.github.com">Email</a> </div> </footer> </div> <script>(() => {
+  const key = 'ylb-locale';
+  try {
+    localStorage.setItem(key, 'en');
+  } catch {}
+
+  const bind = () => {
+    document.querySelectorAll('[data-locale-choice]').forEach((link) => {
+      if (link.dataset.bound === 'true') {
+        return;
+      }
+
+      link.dataset.bound = 'true';
+      link.addEventListener('click', () => {
+        try {
+          localStorage.setItem(key, link.dataset.localeChoice || 'en');
+        } catch {}
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
+})();</script> </body> </html>

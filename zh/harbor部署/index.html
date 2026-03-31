@@ -1,0 +1,232 @@
+<!DOCTYPE html><html lang="zh" data-theme="light"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，比如说 image、/data..."><meta name="generator" content="Astro v5.18.0"><meta name="theme-color" content="#f8fafc"><link rel="canonical" href="https://yangliubin9-cyber.github.io/zh/harbor%E9%83%A8%E7%BD%B2/"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta property="og:title" content="Harbor部署 | 杨刘彬·言"><meta property="og:description" content="使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，比如说 image、/data..."><meta property="og:type" content="website"><meta property="og:url" content="https://yangliubin9-cyber.github.io/zh/harbor%E9%83%A8%E7%BD%B2/"><meta property="og:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><meta property="og:site_name" content="杨刘彬·言"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Harbor部署 | 杨刘彬·言"><meta name="twitter:description" content="使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，比如说 image、/data..."><meta name="twitter:image" content="https://yangliubin9-cyber.github.io/og-card.svg"><title>Harbor部署 | 杨刘彬·言</title><script>(() => {
+  const key = 'ylb-theme';
+  try {
+    const saved = localStorage.getItem(key);
+    const theme = saved === 'dark' || saved === 'light' ? saved : 'light';
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  } catch {
+    document.documentElement.dataset.theme = 'light';
+    document.documentElement.style.colorScheme = 'light';
+  }
+})();</script><link rel="stylesheet" href="/_astro/_slug_.DfcX__2C.css"></head> <body> <div class="page-shell"> <header class="site-header"> <a class="brand" href="/zh/"> <span class="brand__mark">YL</span> <span class="brand__text"> <strong>杨刘彬·言</strong> <small>探索技术与生活的交叉点</small> </span> </a> <nav class="site-nav" aria-label="Primary"> <a class="site-nav__item" href="/zh/"> 首页 </a><a class="site-nav__item is-active" href="/zh/blog/"> 博客 </a><a class="site-nav__item" href="/zh/about/"> 关于 </a><a class="site-nav__item" href="/zh/projects/"> 项目 </a><a class="site-nav__item" href="/zh/uses/"> 技术 </a><a class="site-nav__item" href="/zh/contact/"> 联系 </a> </nav> <div class="site-header__actions"> <a class="site-header__utility" href="/zh/search/">搜索</a> <div class="locale-switch" aria-label="切换语言"> <a class="locale-switch__item is-active" href="/zh/harbor部署/" data-locale-choice="zh">
+简中
+</a> <a class="locale-switch__item" href="/en/blog/" data-locale-choice="en">
+EN
+</a> </div> <button class="theme-toggle" type="button" data-theme-toggle data-locale="zh" aria-label="切换亮暗主题"> <span class="theme-toggle__track" aria-hidden="true"> <span class="theme-toggle__indicator"></span> </span> <span class="theme-toggle__label" data-theme-label></span> </button> <script>
+  const themeStorageKey = 'ylb-theme';
+  const themeCopy = {
+    zh: { light: '浅色', dark: '深色', next: { light: '切换到浅色', dark: '切换到深色' } },
+    en: { light: 'Light', dark: 'Dark', next: { light: 'Switch to light', dark: 'Switch to dark' } }
+  };
+
+  const getTheme = () => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const applyTheme = (theme) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    localStorage.setItem(themeStorageKey, theme);
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+  };
+
+  const syncThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      const locale = button.dataset.locale === 'en' ? 'en' : 'zh';
+      const currentTheme = getTheme();
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      const label = button.querySelector('[data-theme-label]');
+
+      if (label) {
+        label.textContent = themeCopy[locale][currentTheme];
+      }
+
+      button.dataset.nextTheme = nextTheme;
+      button.setAttribute('aria-label', themeCopy[locale].next[nextTheme]);
+    });
+  };
+
+  const attachThemeButtons = () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      if (button.dataset.bound === 'true') {
+        return;
+      }
+
+      button.dataset.bound = 'true';
+      button.addEventListener('click', () => {
+        const nextTheme = button.dataset.nextTheme === 'light' ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        syncThemeButtons();
+      });
+    });
+
+    syncThemeButtons();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachThemeButtons, { once: true });
+  } else {
+    attachThemeButtons();
+  }
+</script> </div> </header> <main class="page-main">  <article class="enterprise-article"> <section class="enterprise-article__hero panel"> <div class="enterprise-article__hero-main"> <a class="text-link" href="/zh/blog/">返回博客</a> <p class="eyebrow">Feishu Folder</p> <h1>Harbor部署</h1> <p class="enterprise-article__description">使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，比如说 image、/data...</p> <div class="enterprise-meta-grid"> <article class="enterprise-meta-grid__item"> <span>发布时间</span> <strong>2026年3月30日</strong> </article><article class="enterprise-meta-grid__item"> <span>最近更新</span> <strong>2026年3月31日</strong> </article><article class="enterprise-meta-grid__item"> <span>预计阅读</span> <strong>4 分钟</strong> </article><article class="enterprise-meta-grid__item"> <span>文章分类</span> <strong>服务搭建</strong> </article> </div> <div class="tag-row tag-row--wrap"> <span class="tag">Feishu</span><span class="tag">Cloud Docs</span> </div> </div> <aside class="enterprise-article__hero-aside surface"> <p class="eyebrow">Article Overview</p> <div class="enterprise-summary-list"> <div class="enterprise-summary-list__item"> <span>路径</span> <strong>/zh/harbor部署/</strong> </div> <div class="enterprise-summary-list__item"> <span>目录数量</span> <strong>18</strong> </div> <div class="enterprise-summary-list__item"> <span>语言版本</span> <strong>当前仅中文</strong> </div> </div> <div class="enterprise-action-stack">  <a class="enterprise-inline-link" href="/zh/search/"> <strong>打开搜索</strong> <span>继续检索相关主题和文章</span> </a> <a class="enterprise-inline-link" href="/zh/blog/"> <strong>回到归档</strong> <span>从归档页按分类或标签继续浏览</span> </a> </div> </aside> </section> <div class="enterprise-article__grid"> <div class="surface article-body article-body--enterprise" data-tilt="off"> <p>使用 Docker-Compose 部署
+⚠️部署前须知⚠️
+文件中所有内容要根据自己的情况修改，比如说 image、/data地址、端口号、networks、硬件资源等；</p>
+<p>环境与系统优化
+目录准备</p>
+<h1 id="创建并切换到项目目录">创建并切换到项目目录</h1>
+<p>mkdir -p /data/workspace/install-redis/data &#x26;&#x26; cd /data/workspace/install-redis</p>
+<p>系统优化</p>
+<h1 id="宿主机内核参数优化-临时生效重启失效">宿主机内核参数优化 (临时生效，重启失效)</h1>
+<h1 id="允许分配所有的物理内存防止-redis-尝试快照时因内存不足被-kill">允许分配所有的物理内存，防止 Redis 尝试快照时因内存不足被 Kill</h1>
+<p>sysctl -w vm.overcommit_memory=1</p>
+<h1 id="增加连接队列长度防止高并发下连接被丢弃">增加连接队列长度，防止高并发下连接被丢弃</h1>
+<p>sysctl -w net.core.somaxconn=1024</p>
+<h1 id="可选-永久生效设置echo-vmovercommit_memory--1--etcsysctlconf">(可选) 永久生效设置echo “vm.overcommit_memory = 1” >> /etc/sysctl.conf</h1>
+<p>echo “net.core.somaxconn = 1024” >> /etc/sysctl.conf
+sysctl -p</p>
+<p>准备 Docker Compose 文件</p>
+<p>root@edis:# tee /data/workspace/install-redis/docker-compose.yaml >> “EOF”</p>
+<h1 id="version-38">version: ‘3.8’</h1>
+<p>services:
+redis:
+# 服务名称
+container_name: redis-standalone
+# 镜像版本
+image: 10.14.0.37/redis/redis-8.4.0:v1  #根据自己镜像仓库设置
+restart: always
+# 端口映射：主机 3759 -> 容器 6379
+ports:
+- “3759:6379”</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span># 环境变量 (仅用于客户端工具的自动认证，不是 Redis 服务端配置)</span></span>
+<span class="line"><span>environment:</span></span>
+<span class="line"><span>  - REDISCLI_AUTH=redis@!QAZxsw2</span></span>
+<span class="line"><span>  - TZ=Asia/Shanghai</span></span></code></pre>
+<h1 id="数据卷挂载">数据卷挂载</h1>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>volumes:</span></span>
+<span class="line"><span>  - /data/workspace/install-redis/data:/data</span></span></code></pre>
+<h1 id="----生产环境系统级限制解锁---">--- 生产环境系统级限制解锁 ---</h1>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span># 增加最大文件打开数，高并发必备</span></span>
+<span class="line"><span>ulimits:</span></span>
+<span class="line"><span>  nofile:</span></span>
+<span class="line"><span>    soft: 65536</span></span>
+<span class="line"><span>    hard: 65536</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span># 容器内的内核参数优化</span></span>
+<span class="line"><span>sysctls:</span></span>
+<span class="line"><span>  # 增加容器内的连接队列长度</span></span>
+<span class="line"><span>  net.core.somaxconn: 1024</span></span></code></pre>
+<h1 id="----redis-核心启动命令-企业级参数配置---">--- Redis 核心启动命令 (企业级参数配置) ---</h1>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>command:</span></span>
+<span class="line"><span>  - "redis-server"</span></span>
+<span class="line"><span>  # 1. 基础认证</span></span>
+<span class="line"><span>  - "--requirepass redis@!QAZxsw2"</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  # 2. 数据持久化策略 (AOF + RDB 混合模式)</span></span>
+<span class="line"><span>  - "--appendonly yes"                # 开启 AOF (数据更安全)</span></span>
+<span class="line"><span>  - "--appendfsync everysec"          # 每秒刷盘一次，平衡性能与安全</span></span>
+<span class="line"><span>  - "--save 900 1"                    # 15分钟内有1个key变动则生成RDB快照</span></span>
+<span class="line"><span>  - "--save 300 10"                   # 5分钟内有10个key变动则生成RDB快照</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  # 3. 内存管理 (非常重要)</span></span>
+<span class="line"><span>  # 限制最大内存，防止把服务器内存撑爆。建议设置为物理内存的 75% 左右</span></span>
+<span class="line"><span>  # 这里写了 2gb 作为示例，请根据你机器实际情况修改，如 4gb, 8gb</span></span>
+<span class="line"><span>  - "--maxmemory 2gb"</span></span>
+<span class="line"><span>  # 内存满了之后的策略：移除最近最少使用的 Key (LRU)</span></span>
+<span class="line"><span>  - "--maxmemory-policy allkeys-lru"</span></span>
+<span class="line"><span>  </span></span>
+<span class="line"><span>  # 4. 连接与超时</span></span>
+<span class="line"><span>  - "--timeout 300"                   # 客户端闲置 300秒(5分钟) 后断开连接</span></span>
+<span class="line"><span>  - "--tcp-keepalive 300"             # TCP 保活探测</span></span>
+<span class="line"><span>  - "--databases 16"                  # 默认数据库数量</span></span>
+<span class="line"><span>  - "--maxclients 10000"              # 最大连接客户端数</span></span></code></pre>
+<h1 id="5-性能优化">5. 性能优化</h1>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>  # 开启多线程 IO (Redis 6.0+ 特性)，加速网络读写</span></span>
+<span class="line"><span>  # 建议设置为 CPU 核心数 - 1，例如 4核机器设为 2 或 3。设为 1 表示禁用。</span></span>
+<span class="line"><span>  # - "--io-threads 1" </span></span>
+<span class="line"><span>  # - "--io-threads-do-reads yes"</span></span></code></pre>
+<h1 id="健康检查-必须带上密码">健康检查 (必须带上密码)</h1>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>healthcheck:</span></span>
+<span class="line"><span>  test: ["CMD", "redis-cli", "-a", "redis@!QAZxsw2", "ping"]</span></span>
+<span class="line"><span>  interval: 10s</span></span>
+<span class="line"><span>  timeout: 5s</span></span>
+<span class="line"><span>  retries: 5</span></span></code></pre>
+<h1 id="networks">networks:</h1>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0" data-language="plaintext"><code><span class="line"><span>#   - default</span></span></code></pre>
+<p>EOF</p>
+<p>启动与验证
+启动 Redis</p>
+<h1 id="进入-docker-composeyaml-目录启动">进入 docker-compose.yaml 目录启动</h1>
+<p>root@edis:/data/workspace/install-redis# docker compose up -d</p>
+<p>验证 Redis</p>
+<h1 id="查看日志-检查是否有报错特别是-warning-警告">查看日志 检查是否有报错（特别是 Warning 警告）</h1>
+<p>docker logs -f redis-standalone</p>
+<h1 id="验证连接与配置进入容器内部测试不需要密码在dockercompose中设置有环境变量">验证连接与配置，进入容器内部测试,不需要密码，在dockercompose中设置有环境变量</h1>
+<p>docker exec -it redis-standalone redis-cli</p>
+<h1 id="在-1270016379-提示符下输入">在 127.0.0.1:6379> 提示符下输入：</h1>
+<h1 id="测试存取">测试存取</h1>
+<p>set hello world
+get hello</p>
+<h1 id="查看当前内存配置是否生效">查看当前内存配置是否生效</h1>
+<p>127.0.0.1:6379> config get maxmemory</p>
+<ol>
+<li>“maxmemory”</li>
+<li>“2147483648”</li>
+</ol> </div> <aside class="enterprise-article__sidebar"> <section class="surface toc" data-tilt="off"> <p class="eyebrow">目录</p> <nav class="toc__nav"> <a href="#创建并切换到项目目录" class="toc__level toc__level--1"> 创建并切换到项目目录 </a><a href="#宿主机内核参数优化-临时生效重启失效" class="toc__level toc__level--1"> 宿主机内核参数优化 (临时生效，重启失效) </a><a href="#允许分配所有的物理内存防止-redis-尝试快照时因内存不足被-kill" class="toc__level toc__level--1"> 允许分配所有的物理内存，防止 Redis 尝试快照时因内存不足被 Kill </a><a href="#增加连接队列长度防止高并发下连接被丢弃" class="toc__level toc__level--1"> 增加连接队列长度，防止高并发下连接被丢弃 </a><a href="#可选-永久生效设置echo-vmovercommit_memory--1--etcsysctlconf" class="toc__level toc__level--1"> (可选) 永久生效设置echo “vm.overcommit_memory = 1” &gt;&gt; /etc/sysctl.conf </a><a href="#version-38" class="toc__level toc__level--1"> version: ‘3.8’ </a><a href="#数据卷挂载" class="toc__level toc__level--1"> 数据卷挂载 </a><a href="#----生产环境系统级限制解锁---" class="toc__level toc__level--1"> --- 生产环境系统级限制解锁 --- </a><a href="#----redis-核心启动命令-企业级参数配置---" class="toc__level toc__level--1"> --- Redis 核心启动命令 (企业级参数配置) --- </a><a href="#5-性能优化" class="toc__level toc__level--1"> 5. 性能优化 </a><a href="#健康检查-必须带上密码" class="toc__level toc__level--1"> 健康检查 (必须带上密码) </a><a href="#networks" class="toc__level toc__level--1"> networks: </a><a href="#进入-docker-composeyaml-目录启动" class="toc__level toc__level--1"> 进入 docker-compose.yaml 目录启动 </a><a href="#查看日志-检查是否有报错特别是-warning-警告" class="toc__level toc__level--1"> 查看日志 检查是否有报错（特别是 Warning 警告） </a><a href="#验证连接与配置进入容器内部测试不需要密码在dockercompose中设置有环境变量" class="toc__level toc__level--1"> 验证连接与配置，进入容器内部测试,不需要密码，在dockercompose中设置有环境变量 </a><a href="#在-1270016379-提示符下输入" class="toc__level toc__level--1"> 在 127.0.0.1:6379&gt; 提示符下输入： </a><a href="#测试存取" class="toc__level toc__level--1"> 测试存取 </a><a href="#查看当前内存配置是否生效" class="toc__level toc__level--1"> 查看当前内存配置是否生效 </a> </nav> </section> <section class="surface enterprise-sidebar-card" data-tilt="off"> <p class="eyebrow">Reading Route</p> <div class="enterprise-action-stack"> <a class="enterprise-inline-link" href="/zh/postgres-集群部署/"> <strong>上一篇</strong> <span>Postgres 集群部署</span> </a> <a class="enterprise-inline-link" href="/zh/signal-over-noise/"> <strong>下一篇</strong> <span>让博客拥有产品级的信噪比</span> </a> </div> </section> </aside> </div> </article> <section class="surface post-pagination post-pagination--enterprise" data-tilt="off"> <a class="post-pagination__link" href="/zh/postgres-集群部署/"> <span class="eyebrow">上一篇</span> <strong>Postgres 集群部署</strong> <span>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，比如说 image、/data...</span> </a> <a class="post-pagination__link post-pagination__link--next" href="/zh/signal-over-noise/"> <span class="eyebrow">下一篇</span> <strong>让博客拥有产品级的信噪比</strong> <span>我不希望博客只是文章堆叠页，而更像一件被认真打磨过的数字产品。</span> </a> </section><section class="comments-panel surface" data-tilt="off"> <div class="section-heading section-heading--tight"> <p class="eyebrow">GitHub Discussions</p> <h2>评论</h2> <p>评论由 GitHub Discussions 提供，登录 GitHub 后即可参与讨论。</p> </div> <div data-giscus-root></div> </section> <script>(() => {
+  const root = document.querySelector('[data-giscus-root]');
+  if (!root || root.dataset.loaded === 'true') {
+    return;
+  }
+
+  const options = {"data-repo":"yangliubin9-cyber/Blogs-Comment","data-repo-id":"R_kgDORi4F6A","data-category":"General","data-category-id":"DIC_kwDORi4F6M4C4Duo","data-mapping":"pathname","data-strict":"0","data-reactions-enabled":"1","data-emit-metadata":"0","data-input-position":"bottom","data-theme":"dark","data-lang":"zh-CN","crossorigin":"anonymous"};
+  options['data-theme'] = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+
+  const script = document.createElement('script');
+  script.src = 'https://giscus.app/client.js';
+  script.async = true;
+
+  Object.entries(options).forEach(([key, value]) => {
+    script.setAttribute(key, String(value));
+  });
+
+  root.dataset.loaded = 'true';
+  root.appendChild(script);
+
+  const syncTheme = (theme) => {
+    const frame = document.querySelector('iframe.giscus-frame');
+    if (!frame?.contentWindow) {
+      return;
+    }
+
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'light' ? 'light' : 'dark' } } },
+      'https://giscus.app'
+    );
+  };
+
+  window.addEventListener('themechange', (event) => syncTheme(event.detail.theme));
+})();</script> <section class="section"> <div class="section-heading"> <p class="eyebrow">Further Reading</p> <h2>继续阅读</h2> <p>继续从同一主题域扩展阅读，保持稳定的阅读路径。</p> </div> <div class="posts-grid"> <article class="post-card" data-accent="cyan"> <span class="post-card__index" aria-hidden="true"></span> <div class="post-card__topline"> <div class="post-card__badges"> <span class="pill">服务搭建</span> <span class="tag tag--locale">简中</span> </div> <time class="post-card__date" datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <a class="post-card__body" href="/zh/harbor部署-1/"> <h3>Harbor部署</h3> <p>部署安装Harbor 下载软件包 安装docker 安装docker compose 下载harbor离线安装包，或者Githu...</p> </a> <div class="post-card__footer"> <div class="tag-row"> <span class="tag">Feishu</span><span class="tag">Cloud Docs</span> </div> <a class="text-link" href="/zh/harbor部署-1/">阅读文章</a> </div> </article><article class="post-card" data-accent="cyan"> <span class="post-card__index" aria-hidden="true"></span> <div class="post-card__topline"> <div class="post-card__badges"> <span class="pill">服务搭建</span> <span class="tag tag--locale">简中</span> </div> <time class="post-card__date" datetime="2026-03-30T00:00:00.000Z">2026年3月30日</time> </div> <a class="post-card__body" href="/zh/es集群-vip搭建/"> <h3>ES集群+VIP搭建</h3> <p>使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da...</p> </a> <div class="post-card__footer"> <div class="tag-row"> <span class="tag">Feishu</span><span class="tag">Cloud Docs</span> </div> <a class="text-link" href="/zh/es集群-vip搭建/">阅读文章</a> </div> </article> </div> </section> </main> <footer class="site-footer"> <div class="site-footer__copy"> <p class="site-footer__title">杨刘彬·言</p> <p class="site-footer__description">探索技术与生活的交叉点。</p> </div> <div class="site-footer__meta"> <span>杨刘彬 (Bin)</span> <a href="https://github.com/yangliubin9-cyber" target="_blank" rel="noreferrer">GitHub</a> <a href="https://github.com/yangliubin9-cyber/Blogs-Comment" target="_blank" rel="noreferrer">Comments</a> <a href="mailto:yangliubin9-cyber@users.noreply.github.com">Email</a> </div> </footer> </div> <script>(() => {
+  const key = 'ylb-locale';
+  try {
+    localStorage.setItem(key, 'zh');
+  } catch {}
+
+  const bind = () => {
+    document.querySelectorAll('[data-locale-choice]').forEach((link) => {
+      if (link.dataset.bound === 'true') {
+        return;
+      }
+
+      link.dataset.bound = 'true';
+      link.addEventListener('click', () => {
+        try {
+          localStorage.setItem(key, link.dataset.localeChoice || 'zh');
+        } catch {}
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
+})();</script> </body> </html>
