@@ -6,7 +6,7 @@ title: "ES集群+VIP搭建"
 excerpt: "使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da..."
 category: "服务搭建"
 publishedAt: "2026-03-30"
-updatedAt: "2026-04-04"
+updatedAt: "2026-04-05"
 featured: false
 tags:
   - "Feishu"
