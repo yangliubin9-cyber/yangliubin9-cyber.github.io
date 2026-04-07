@@ -6,7 +6,7 @@ title: "Rancher部署"
 excerpt: "使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，列主机名、 image、/da..."
 category: "服务搭建"
 publishedAt: "2026-03-30"
-updatedAt: "2026-04-06"
+updatedAt: "2026-04-07"
 featured: false
 tags:
   - "Feishu"
