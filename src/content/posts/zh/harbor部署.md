@@ -6,7 +6,7 @@ title: "Harbor部署"
 excerpt: "使用 Docker Compose 部署 ⚠️部署前须知⚠️ 文件中所有内容要根据自己的情况修改，比如说 image、/data..."
 category: "服务搭建"
 publishedAt: "2026-03-30"
-updatedAt: "2026-04-07"
+updatedAt: "2026-04-08"
 featured: false
 tags:
   - "Feishu"
