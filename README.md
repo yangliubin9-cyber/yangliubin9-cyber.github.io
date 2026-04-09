@@ -21,8 +21,9 @@ What is already in place:
 - Root `/` redirect to `/zh/`
 - Bilingual route structure for home, about, search, article, series, login, and register pages
 - Real bilingual article content stored in Astro content collections
-- Working article pages with Markdown rendering, table of contents, tags, and related post links
-- Search page with instant client-side filtering
+- Home page reduced to brand intro plus curated featured articles
+- Working article pages with Markdown rendering, table of contents, tags, related post links, and series navigation
+- Search page with instant client-side filtering, series chips, result counts, and reset controls
 - GitHub Actions workflow for GitHub Pages deployment
 
 What is not integrated yet:

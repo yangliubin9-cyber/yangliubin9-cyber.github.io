@@ -1,10 +1,15 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPosts, getReadingLabel } from '../../lib/content';
-import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
+import { getSeriesBySlug, getSeriesName, series, siteMeta } from '../../data/site';
 import { localePath } from '../../lib/routing';
 
 const posts = await getPosts('en');
+const seriesOptions = series.map((item) => ({
+  slug: item.slug,
+  label: getSeriesName('en', item),
+  count: posts.filter((post) => post.data.series === item.slug).length
+}));
 ---
 
 <BaseLayout
@@ -16,24 +21,42 @@ const posts = await getPosts('en');
 >
   <section class="hero hero-editorial">
     <span class="kicker">Search</span>
-    <h1 class="title">Find the article first, then decide whether a full-text index is necessary</h1>
+    <h1 class="title">Find the right note quickly before you reach for full-text search infrastructure</h1>
     <p class="lede">
-      This version ships with instant on-page filtering for title, summary, tags, and series. If the archive grows
-      larger, Pagefind can be added later without changing the public route.
+      This version upgrades search with keyword matching, series filters, result counts, and one-click reset. If the
+      archive grows much larger, Pagefind can be layered in later.
     </p>
   </section>
 
   <section class="section search-shell">
     <div class="search-toolbar">
       <label class="search-label" for="post-search-en">Search posts</label>
-      <input
-        id="post-search-en"
-        class="search-input"
-        type="search"
-        placeholder="Try: docker, permissions, deployment"
-        data-search-input
-      />
-      <p class="muted">{posts.length} posts are indexed on this page right now.</p>
+      <div class="search-input-row">
+        <input
+          id="post-search-en"
+          class="search-input"
+          type="search"
+          placeholder="Try: docker, permissions, deployment"
+          data-search-input
+        />
+        <button class="search-clear" type="button" data-search-clear disabled>Clear</button>
+      </div>
+      <div class="search-toolbar-meta">
+        <p class="muted" data-search-count>Showing all {posts.length} posts.</p>
+      </div>
+    </div>
+
+    <div class="search-filters" aria-label="Series filters">
+      <button class="filter-chip is-active" type="button" data-series-filter="">
+        All
+        <span>{posts.length}</span>
+      </button>
+      {seriesOptions.map((item) => (
+        <button class="filter-chip" type="button" data-series-filter={item.slug}>
+          {item.label}
+          <span>{item.count}</span>
+        </button>
+      ))}
     </div>
 
     <div class="grid search-grid" data-search-results>
@@ -44,6 +67,7 @@ const posts = await getPosts('en');
             class="card card-post"
             href={localePath('en', post.data.pathSlug)}
             data-search-item
+            data-search-series={post.data.series}
             data-search-text={`${post.data.title} ${post.data.summary} ${post.data.tags.join(' ')} ${seriesItem ? getSeriesName('en', seriesItem) : ''}`.toLowerCase()}
           >
             {seriesItem && <span class="pill">{getSeriesName('en', seriesItem)}</span>}
@@ -55,31 +79,81 @@ const posts = await getPosts('en');
       })}
     </div>
 
-    <p class="search-empty muted" data-search-empty hidden>No matching posts yet. Try a different keyword.</p>
+    <p class="search-empty muted" data-search-empty hidden>No matching posts yet. Try another keyword or series.</p>
 
     <script is:inline>
       const root = document.currentScript?.closest('.search-shell');
       const input = root?.querySelector('[data-search-input]');
+      const clearButton = root?.querySelector('[data-search-clear]');
+      const count = root?.querySelector('[data-search-count]');
       const items = Array.from(root?.querySelectorAll('[data-search-item]') ?? []);
+      const filters = Array.from(root?.querySelectorAll('[data-series-filter]') ?? []);
       const empty = root?.querySelector('[data-search-empty]');
+      const total = items.length;
+      let activeSeries = '';
+
+      const updateActiveFilter = () => {
+        filters.forEach((filter) => {
+          const value = filter.getAttribute('data-series-filter') ?? '';
+          filter.classList.toggle('is-active', value === activeSeries);
+        });
+      };
+
+      const updateCount = (visible, hasFilter) => {
+        if (!count) return;
+
+        count.textContent = hasFilter
+          ? `Showing ${visible} of ${total} posts.`
+          : `Showing all ${total} posts.`;
+      };
 
       const applyFilter = () => {
         const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+        const hasFilter = Boolean(query || activeSeries);
         let visible = 0;
 
         items.forEach((item) => {
           const text = item.getAttribute('data-search-text') ?? '';
-          const matched = !query || text.includes(query);
+          const itemSeries = item.getAttribute('data-search-series') ?? '';
+          const matched =
+            (!query || text.includes(query)) &&
+            (!activeSeries || itemSeries === activeSeries);
+
           item.toggleAttribute('hidden', !matched);
           if (matched) visible += 1;
         });
 
+        updateCount(visible, hasFilter);
+
         if (empty) {
           empty.toggleAttribute('hidden', visible !== 0);
         }
+
+        if (clearButton instanceof HTMLButtonElement) {
+          clearButton.disabled = !hasFilter;
+        }
       };
 
+      filters.forEach((filter) => {
+        filter.addEventListener('click', () => {
+          activeSeries = filter.getAttribute('data-series-filter') ?? '';
+          updateActiveFilter();
+          applyFilter();
+        });
+      });
+
       input?.addEventListener('input', applyFilter);
+
+      clearButton?.addEventListener('click', () => {
+        if (input instanceof HTMLInputElement) {
+          input.value = '';
+          input.focus();
+        }
+
+        activeSeries = '';
+        updateActiveFilter();
+        applyFilter();
+      });
     </script>
   </section>
 </BaseLayout>

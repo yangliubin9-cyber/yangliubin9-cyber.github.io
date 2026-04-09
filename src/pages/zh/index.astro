@@ -1,11 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getFeaturedPosts, getPosts, getReadingLabel } from '../../lib/content';
-import { getSeriesBySlug, getSeriesDescription, getSeriesName, series, siteMeta } from '../../data/site';
+import { getFeaturedPosts, getReadingLabel } from '../../lib/content';
+import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
 import { localePath } from '../../lib/routing';
 
 const featuredPosts = await getFeaturedPosts('zh');
-const allPosts = await getPosts('zh');
 ---
 
 <BaseLayout
@@ -19,36 +18,22 @@ const allPosts = await getPosts('zh');
     <span class="kicker">Bilingual Field Notes</span>
     <h1 class="title">把 AI 基础设施、容器化交付和云原生实践写成可复用的工程笔记</h1>
     <p class="lede">
-      这里不追求堆概念，而是把 Linux、Docker、Kubernetes 和交付链路拆成一篇篇能直接拿去工作的文章。
-      当前已经切到本地真实内容，后续再接飞书同步。
+      这里不追求把所有功能都堆在首页，而是先把站点定位讲清楚，再用少量精选文章带你进入主线。
+      内容聚焦 Linux、Docker、Kubernetes 和工程交付，写法尽量直接、可复用、可落地。
     </p>
     <div class="hero-actions">
-      <a class="button-link primary" href={localePath('zh', 'series')}>按系列阅读</a>
-      <a class="button-link" href={localePath('zh', 'search')}>搜索文章</a>
-    </div>
-    <div class="hero-facts">
-      <div class="fact-chip">
-        <strong>{allPosts.length}</strong>
-        <span>篇真实文章</span>
-      </div>
-      <div class="fact-chip">
-        <strong>{series.length}</strong>
-        <span>条学习主线</span>
-      </div>
-      <div class="fact-chip">
-        <strong>GitHub</strong>
-        <span>评论已可用</span>
-      </div>
+      <a class="button-link primary" href="#featured-posts">开始阅读</a>
+      <a class="button-link" href={localePath('zh', 'about')}>关于作者</a>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="featured-posts">
     <div class="section-header">
       <div>
         <span class="eyebrow">精选文章</span>
         <h2>先读这些，最快进入站点主线</h2>
       </div>
-      <p class="muted">每篇文章都对应一个稳定路由，评论线程也按文章 slug 单独绑定。</p>
+      <p class="muted">首页只保留少量精选入口，其他功能都放回各自页面里。</p>
     </div>
 
     <div class="grid">
@@ -60,57 +45,6 @@ const allPosts = await getPosts('zh');
             <h3>{post.data.title}</h3>
             <p class="muted">{post.data.summary}</p>
             <strong>{getReadingLabel('zh', post.data.readingMinutes)}</strong>
-          </a>
-        );
-      })}
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-header">
-      <div>
-        <span class="eyebrow">文章目录</span>
-        <h2>按最近发布时间浏览全部内容</h2>
-      </div>
-      <a class="button-link" href={localePath('zh', 'about')}>关于作者</a>
-    </div>
-
-    <ul class="list">
-      {allPosts.map((post) => {
-        const seriesItem = getSeriesBySlug(post.data.series);
-        return (
-          <li>
-            <a class="list-link" href={localePath('zh', post.data.pathSlug)}>
-              <div class="list-head">
-                <strong>{post.data.title}</strong>
-                <span class="list-meta">{getReadingLabel('zh', post.data.readingMinutes)}</span>
-              </div>
-              <p class="muted">{post.data.summary}</p>
-              {seriesItem && <span class="pill">{getSeriesName('zh', seriesItem)}</span>}
-            </a>
-          </li>
-        );
-      })}
-    </ul>
-  </section>
-
-  <section class="section">
-    <div class="section-header">
-      <div>
-        <span class="eyebrow">系列导航</span>
-        <h2>用系列把知识串起来，而不是把文章堆在一起</h2>
-      </div>
-      <p class="muted">当前每篇文章只归属于一个主系列，方便阅读顺序和后续同步维护。</p>
-    </div>
-
-    <div class="grid">
-      {series.map((item) => {
-        const postCount = allPosts.filter((post) => post.data.series === item.slug).length;
-        return (
-          <a class="card card-series" href={localePath('zh', `series/${item.slug}`)}>
-            <span class="pill">{getSeriesName('zh', item)}</span>
-            <p>{getSeriesDescription('zh', item)}</p>
-            <strong>{postCount} 篇文章</strong>
           </a>
         );
       })}

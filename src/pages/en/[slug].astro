@@ -2,30 +2,60 @@
 import { render } from 'astro:content';
 import CommentsSection from '../../components/CommentsSection.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatPublishDate, getPosts, getReadingLabel, type PostEntry } from '../../lib/content';
+import {
+  formatPublishDate,
+  getPosts,
+  getPostsBySeries,
+  getReadingLabel,
+  getSeriesNavigation,
+  type PostEntry
+} from '../../lib/content';
 import { localePath } from '../../lib/routing';
 import { getSeriesBySlug, getSeriesName } from '../../data/site';
 
 export async function getStaticPaths() {
   const posts = await getPosts('en');
-  return posts.map((post) => ({
-    params: { slug: post.data.pathSlug },
-    props: {
-      post,
-      relatedPosts: posts.filter(
-        (item) => item.data.series === post.data.series && item.data.pathSlug !== post.data.pathSlug
-      ).slice(0, 3)
-    }
-  }));
+
+  return Promise.all(
+    posts.map(async (post) => {
+      const seriesPosts = await getPostsBySeries('en', post.data.series, 'asc');
+      const { currentIndex, total, previousPost, nextPost } = getSeriesNavigation(
+        seriesPosts,
+        post.data.pathSlug
+      );
+
+      return {
+        params: { slug: post.data.pathSlug },
+        props: {
+          post,
+          seriesPosts,
+          progressIndex: currentIndex + 1,
+          totalInSeries: total,
+          previousPost,
+          nextPost,
+          relatedPosts: seriesPosts
+            .filter((item) => item.data.pathSlug !== post.data.pathSlug)
+            .slice(0, 3)
+        }
+      };
+    })
+  );
 }
 
-const { post, relatedPosts } = Astro.props as {
-  post: PostEntry;
-  relatedPosts: PostEntry[];
-};
+const { post, seriesPosts, progressIndex, totalInSeries, previousPost, nextPost, relatedPosts } =
+  Astro.props as {
+    post: PostEntry;
+    seriesPosts: PostEntry[];
+    progressIndex: number;
+    totalInSeries: number;
+    previousPost?: PostEntry;
+    nextPost?: PostEntry;
+    relatedPosts: PostEntry[];
+  };
 
 const seriesItem = getSeriesBySlug(post.data.series);
 const { Content, headings } = await render(post);
+const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) * 100}%` : '0%';
 ---
 
 <BaseLayout
@@ -46,12 +76,55 @@ const { Content, headings } = await render(post);
     </div>
   </section>
 
+  {seriesItem && (
+    <section class="section article-overview">
+      <div class="article-overview-copy">
+        <span class="eyebrow">Reading Path</span>
+        <h2>{getSeriesName('en', seriesItem)}</h2>
+        <p class="muted">
+          You are on post {progressIndex} of {totalInSeries}. This series is easier to follow in order.
+        </p>
+      </div>
+      <div class="article-overview-actions">
+        <a class="button-link" href={localePath('en', `series/${seriesItem.slug}`)}>View series</a>
+        <a class="button-link" href={localePath('en')}>Back home</a>
+      </div>
+    </section>
+  )}
+
   <section class="article-layout">
     <article class="article-body article-prose">
       <Content />
     </article>
 
     <aside class="article-sidebar">
+      {seriesItem && (
+        <div class="article-sidecard">
+          <span class="eyebrow">Series Progress</span>
+          <div class="series-progress-head">
+            <strong>{getSeriesName('en', seriesItem)}</strong>
+            <p>Post {progressIndex} of {totalInSeries}</p>
+          </div>
+          <div class="series-progress-bar" aria-hidden="true">
+            <span style={`width:${progressPercent}`}></span>
+          </div>
+          <nav class="series-step-list" aria-label="Series order">
+            {seriesPosts.map((item, index) => (
+              <a
+                class:list={[
+                  'series-step-link',
+                  { current: item.data.pathSlug === post.data.pathSlug }
+                ]}
+                href={localePath('en', item.data.pathSlug)}
+              >
+                <span>{index + 1}</span>
+                <strong>{item.data.title}</strong>
+              </a>
+            ))}
+          </nav>
+        </div>
+      )}
+
       <div class="article-sidecard">
         <span class="eyebrow">Post Info</span>
         <div class="meta-stack">
@@ -96,12 +169,52 @@ const { Content, headings } = await render(post);
     </aside>
   </section>
 
+  <section class="section article-pager">
+    <div class="article-pager-grid">
+      {previousPost ? (
+        <a class="article-pager-card" href={localePath('en', previousPost.data.pathSlug)}>
+          <span class="article-pager-label">Previous</span>
+          <strong>{previousPost.data.title}</strong>
+          <p>{previousPost.data.summary}</p>
+        </a>
+      ) : (
+        <div class="article-pager-card article-pager-card--muted">
+          <span class="article-pager-label">Previous</span>
+          <strong>This is the first post in the series</strong>
+          <p>Continue downward from here to stay on the main track.</p>
+        </div>
+      )}
+
+      {seriesItem && (
+        <a class="article-pager-card article-pager-card--center" href={localePath('en', `series/${seriesItem.slug}`)}>
+          <span class="article-pager-label">Series Overview</span>
+          <strong>{getSeriesName('en', seriesItem)}</strong>
+          <p>Jump back to the series page and view the full sequence in one place.</p>
+        </a>
+      )}
+
+      {nextPost ? (
+        <a class="article-pager-card" href={localePath('en', nextPost.data.pathSlug)}>
+          <span class="article-pager-label">Next</span>
+          <strong>{nextPost.data.title}</strong>
+          <p>{nextPost.data.summary}</p>
+        </a>
+      ) : (
+        <div class="article-pager-card article-pager-card--muted">
+          <span class="article-pager-label">Next</span>
+          <strong>You reached the end of this series</strong>
+          <p>Head to the comments or back to the series index for the next move.</p>
+        </div>
+      )}
+    </div>
+  </section>
+
   {relatedPosts.length > 0 && (
     <section class="section">
       <div class="section-header">
         <div>
           <span class="eyebrow">Keep Reading</span>
-          <h2>More in this series</h2>
+          <h2>More from this series</h2>
         </div>
       </div>
       <div class="grid">

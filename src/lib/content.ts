@@ -2,16 +2,19 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Locale, SeriesSlug } from '../data/site';
 
 export type PostEntry = CollectionEntry<'posts'>;
+export type SortOrder = 'asc' | 'desc';
 
-function sortPosts(entries: PostEntry[]) {
+function sortPosts(entries: PostEntry[], order: SortOrder) {
+  const direction = order === 'asc' ? 1 : -1;
   return [...entries].sort(
-    (left, right) => right.data.publishedAt.getTime() - left.data.publishedAt.getTime()
+    (left, right) =>
+      (left.data.publishedAt.getTime() - right.data.publishedAt.getTime()) * direction
   );
 }
 
-export async function getPosts(locale: Locale) {
+export async function getPosts(locale: Locale, order: SortOrder = 'desc') {
   const posts = await getCollection('posts', ({ data }) => data.locale === locale);
-  return sortPosts(posts);
+  return sortPosts(posts, order);
 }
 
 export async function getFeaturedPosts(locale: Locale) {
@@ -27,17 +30,32 @@ export async function getPostBySlug(locale: Locale, slug: string) {
   return posts[0];
 }
 
-export async function getPostsBySeries(locale: Locale, seriesSlug: SeriesSlug) {
+export async function getPostsBySeries(
+  locale: Locale,
+  seriesSlug: SeriesSlug,
+  order: SortOrder = 'desc'
+) {
   const posts = await getCollection(
     'posts',
     ({ data }) => data.locale === locale && data.series === seriesSlug
   );
-  return sortPosts(posts);
+  return sortPosts(posts, order);
 }
 
 export async function getRelatedPosts(locale: Locale, seriesSlug: SeriesSlug, slug: string) {
   const posts = await getPostsBySeries(locale, seriesSlug);
   return posts.filter((item) => item.data.pathSlug !== slug).slice(0, 3);
+}
+
+export function getSeriesNavigation(posts: PostEntry[], slug: string) {
+  const currentIndex = posts.findIndex((item) => item.data.pathSlug === slug);
+
+  return {
+    currentIndex,
+    total: posts.length,
+    previousPost: currentIndex > 0 ? posts[currentIndex - 1] : undefined,
+    nextPost: currentIndex >= 0 && currentIndex < posts.length - 1 ? posts[currentIndex + 1] : undefined
+  };
 }
 
 export function formatPublishDate(locale: Locale, value: Date) {

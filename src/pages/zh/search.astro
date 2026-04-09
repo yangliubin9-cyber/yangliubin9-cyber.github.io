@@ -1,10 +1,15 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPosts, getReadingLabel } from '../../lib/content';
-import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
+import { getSeriesBySlug, getSeriesName, series, siteMeta } from '../../data/site';
 import { localePath } from '../../lib/routing';
 
 const posts = await getPosts('zh');
+const seriesOptions = series.map((item) => ({
+  slug: item.slug,
+  label: getSeriesName('zh', item),
+  count: posts.filter((post) => post.data.series === item.slug).length
+}));
 ---
 
 <BaseLayout
@@ -16,23 +21,42 @@ const posts = await getPosts('zh');
 >
   <section class="hero hero-editorial">
     <span class="kicker">Search</span>
-    <h1 class="title">先把文章搜出来，再决定后面要不要上全文索引</h1>
+    <h1 class="title">先快速定位文章，再决定要不要继续做全文索引</h1>
     <p class="lede">
-      这一版先提供站内即时筛选，已经可以按标题、摘要、标签和系列快速定位文章。后续如果文章量继续增长，再接 Pagefind。
+      这一版先把站内搜索做顺手：支持关键词筛选、系列过滤、结果计数和一键清空。文章量继续变大后，再接
+      Pagefind 也不晚。
     </p>
   </section>
 
   <section class="section search-shell">
     <div class="search-toolbar">
       <label class="search-label" for="post-search-zh">输入关键词</label>
-      <input
-        id="post-search-zh"
-        class="search-input"
-        type="search"
-        placeholder="例如：docker、权限、deployment"
-        data-search-input
-      />
-      <p class="muted">当前可搜索 {posts.length} 篇文章，默认展示全部内容。</p>
+      <div class="search-input-row">
+        <input
+          id="post-search-zh"
+          class="search-input"
+          type="search"
+          placeholder="例如：docker、权限、deployment"
+          data-search-input
+        />
+        <button class="search-clear" type="button" data-search-clear disabled>清空</button>
+      </div>
+      <div class="search-toolbar-meta">
+        <p class="muted" data-search-count>当前展示全部 {posts.length} 篇文章。</p>
+      </div>
+    </div>
+
+    <div class="search-filters" aria-label="系列筛选">
+      <button class="filter-chip is-active" type="button" data-series-filter="">
+        全部
+        <span>{posts.length}</span>
+      </button>
+      {seriesOptions.map((item) => (
+        <button class="filter-chip" type="button" data-series-filter={item.slug}>
+          {item.label}
+          <span>{item.count}</span>
+        </button>
+      ))}
     </div>
 
     <div class="grid search-grid" data-search-results>
@@ -43,6 +67,7 @@ const posts = await getPosts('zh');
             class="card card-post"
             href={localePath('zh', post.data.pathSlug)}
             data-search-item
+            data-search-series={post.data.series}
             data-search-text={`${post.data.title} ${post.data.summary} ${post.data.tags.join(' ')} ${seriesItem ? getSeriesName('zh', seriesItem) : ''}`.toLowerCase()}
           >
             {seriesItem && <span class="pill">{getSeriesName('zh', seriesItem)}</span>}
@@ -54,31 +79,81 @@ const posts = await getPosts('zh');
       })}
     </div>
 
-    <p class="search-empty muted" data-search-empty hidden>没有匹配文章，试试换一个关键词。</p>
+    <p class="search-empty muted" data-search-empty hidden>没有匹配文章，试试换一个关键词或切换系列。</p>
 
     <script is:inline>
       const root = document.currentScript?.closest('.search-shell');
       const input = root?.querySelector('[data-search-input]');
+      const clearButton = root?.querySelector('[data-search-clear]');
+      const count = root?.querySelector('[data-search-count]');
       const items = Array.from(root?.querySelectorAll('[data-search-item]') ?? []);
+      const filters = Array.from(root?.querySelectorAll('[data-series-filter]') ?? []);
       const empty = root?.querySelector('[data-search-empty]');
+      const total = items.length;
+      let activeSeries = '';
+
+      const updateActiveFilter = () => {
+        filters.forEach((filter) => {
+          const value = filter.getAttribute('data-series-filter') ?? '';
+          filter.classList.toggle('is-active', value === activeSeries);
+        });
+      };
+
+      const updateCount = (visible, hasFilter) => {
+        if (!count) return;
+
+        count.textContent = hasFilter
+          ? `筛选结果：${visible} / ${total} 篇文章。`
+          : `当前展示全部 ${total} 篇文章。`;
+      };
 
       const applyFilter = () => {
         const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+        const hasFilter = Boolean(query || activeSeries);
         let visible = 0;
 
         items.forEach((item) => {
           const text = item.getAttribute('data-search-text') ?? '';
-          const matched = !query || text.includes(query);
+          const itemSeries = item.getAttribute('data-search-series') ?? '';
+          const matched =
+            (!query || text.includes(query)) &&
+            (!activeSeries || itemSeries === activeSeries);
+
           item.toggleAttribute('hidden', !matched);
           if (matched) visible += 1;
         });
 
+        updateCount(visible, hasFilter);
+
         if (empty) {
           empty.toggleAttribute('hidden', visible !== 0);
         }
+
+        if (clearButton instanceof HTMLButtonElement) {
+          clearButton.disabled = !hasFilter;
+        }
       };
 
+      filters.forEach((filter) => {
+        filter.addEventListener('click', () => {
+          activeSeries = filter.getAttribute('data-series-filter') ?? '';
+          updateActiveFilter();
+          applyFilter();
+        });
+      });
+
       input?.addEventListener('input', applyFilter);
+
+      clearButton?.addEventListener('click', () => {
+        if (input instanceof HTMLInputElement) {
+          input.value = '';
+          input.focus();
+        }
+
+        activeSeries = '';
+        updateActiveFilter();
+        applyFilter();
+      });
     </script>
   </section>
 </BaseLayout>

@@ -1,11 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getFeaturedPosts, getPosts, getReadingLabel } from '../../lib/content';
-import { getSeriesBySlug, getSeriesDescription, getSeriesName, series, siteMeta } from '../../data/site';
+import { getFeaturedPosts, getReadingLabel } from '../../lib/content';
+import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
 import { localePath } from '../../lib/routing';
 
 const featuredPosts = await getFeaturedPosts('en');
-const allPosts = await getPosts('en');
 ---
 
 <BaseLayout
@@ -19,36 +18,22 @@ const allPosts = await getPosts('en');
     <span class="kicker">Bilingual Field Notes</span>
     <h1 class="title">A practical engineering blog about infrastructure that has to survive real delivery</h1>
     <p class="lede">
-      This site turns Linux, Docker, Kubernetes, and shipping workflows into reusable notes instead of vague
-      concept dumps. The local content layer is now live, with Feishu sync reserved for a later phase.
+      The home page stays focused on brand and reading direction rather than turning into a feature dashboard.
+      The goal is to introduce the voice of the site first, then point readers to a small set of strong entry posts.
     </p>
     <div class="hero-actions">
-      <a class="button-link primary" href={localePath('en', 'series')}>Browse by series</a>
-      <a class="button-link" href={localePath('en', 'search')}>Search posts</a>
-    </div>
-    <div class="hero-facts">
-      <div class="fact-chip">
-        <strong>{allPosts.length}</strong>
-        <span>published notes</span>
-      </div>
-      <div class="fact-chip">
-        <strong>{series.length}</strong>
-        <span>learning tracks</span>
-      </div>
-      <div class="fact-chip">
-        <strong>GitHub</strong>
-        <span>comments are live</span>
-      </div>
+      <a class="button-link primary" href="#featured-posts">Start reading</a>
+      <a class="button-link" href={localePath('en', 'about')}>About the author</a>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="featured-posts">
     <div class="section-header">
       <div>
         <span class="eyebrow">Featured posts</span>
         <h2>Start with the notes that define the main tracks</h2>
       </div>
-      <p class="muted">Each post keeps a stable route, and its discussion thread is mapped to the article slug.</p>
+      <p class="muted">The home page keeps only a small curated entry set. Everything else lives in its own page.</p>
     </div>
 
     <div class="grid">
@@ -60,57 +45,6 @@ const allPosts = await getPosts('en');
             <h3>{post.data.title}</h3>
             <p class="muted">{post.data.summary}</p>
             <strong>{getReadingLabel('en', post.data.readingMinutes)}</strong>
-          </a>
-        );
-      })}
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-header">
-      <div>
-        <span class="eyebrow">Post index</span>
-        <h2>Browse the full set of published notes</h2>
-      </div>
-      <a class="button-link" href={localePath('en', 'about')}>About the author</a>
-    </div>
-
-    <ul class="list">
-      {allPosts.map((post) => {
-        const seriesItem = getSeriesBySlug(post.data.series);
-        return (
-          <li>
-            <a class="list-link" href={localePath('en', post.data.pathSlug)}>
-              <div class="list-head">
-                <strong>{post.data.title}</strong>
-                <span class="list-meta">{getReadingLabel('en', post.data.readingMinutes)}</span>
-              </div>
-              <p class="muted">{post.data.summary}</p>
-              {seriesItem && <span class="pill">{getSeriesName('en', seriesItem)}</span>}
-            </a>
-          </li>
-        );
-      })}
-    </ul>
-  </section>
-
-  <section class="section">
-    <div class="section-header">
-      <div>
-        <span class="eyebrow">Series map</span>
-        <h2>Organize learning around tracks instead of isolated articles</h2>
-      </div>
-      <p class="muted">Each post belongs to one primary series, which keeps ordering and future sync rules simple.</p>
-    </div>
-
-    <div class="grid">
-      {series.map((item) => {
-        const postCount = allPosts.filter((post) => post.data.series === item.slug).length;
-        return (
-          <a class="card card-series" href={localePath('en', `series/${item.slug}`)}>
-            <span class="pill">{getSeriesName('en', item)}</span>
-            <p>{getSeriesDescription('en', item)}</p>
-            <strong>{postCount} posts</strong>
           </a>
         );
       })}

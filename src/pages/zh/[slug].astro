@@ -2,30 +2,60 @@
 import { render } from 'astro:content';
 import CommentsSection from '../../components/CommentsSection.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatPublishDate, getPosts, getReadingLabel, type PostEntry } from '../../lib/content';
+import {
+  formatPublishDate,
+  getPosts,
+  getPostsBySeries,
+  getReadingLabel,
+  getSeriesNavigation,
+  type PostEntry
+} from '../../lib/content';
 import { localePath } from '../../lib/routing';
 import { getSeriesBySlug, getSeriesName } from '../../data/site';
 
 export async function getStaticPaths() {
   const posts = await getPosts('zh');
-  return posts.map((post) => ({
-    params: { slug: post.data.pathSlug },
-    props: {
-      post,
-      relatedPosts: posts.filter(
-        (item) => item.data.series === post.data.series && item.data.pathSlug !== post.data.pathSlug
-      ).slice(0, 3)
-    }
-  }));
+
+  return Promise.all(
+    posts.map(async (post) => {
+      const seriesPosts = await getPostsBySeries('zh', post.data.series, 'asc');
+      const { currentIndex, total, previousPost, nextPost } = getSeriesNavigation(
+        seriesPosts,
+        post.data.pathSlug
+      );
+
+      return {
+        params: { slug: post.data.pathSlug },
+        props: {
+          post,
+          seriesPosts,
+          progressIndex: currentIndex + 1,
+          totalInSeries: total,
+          previousPost,
+          nextPost,
+          relatedPosts: seriesPosts
+            .filter((item) => item.data.pathSlug !== post.data.pathSlug)
+            .slice(0, 3)
+        }
+      };
+    })
+  );
 }
 
-const { post, relatedPosts } = Astro.props as {
-  post: PostEntry;
-  relatedPosts: PostEntry[];
-};
+const { post, seriesPosts, progressIndex, totalInSeries, previousPost, nextPost, relatedPosts } =
+  Astro.props as {
+    post: PostEntry;
+    seriesPosts: PostEntry[];
+    progressIndex: number;
+    totalInSeries: number;
+    previousPost?: PostEntry;
+    nextPost?: PostEntry;
+    relatedPosts: PostEntry[];
+  };
 
 const seriesItem = getSeriesBySlug(post.data.series);
 const { Content, headings } = await render(post);
+const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) * 100}%` : '0%';
 ---
 
 <BaseLayout
@@ -46,12 +76,53 @@ const { Content, headings } = await render(post);
     </div>
   </section>
 
+  {seriesItem && (
+    <section class="section article-overview">
+      <div class="article-overview-copy">
+        <span class="eyebrow">阅读路径</span>
+        <h2>{getSeriesName('zh', seriesItem)}</h2>
+        <p class="muted">当前是本系列第 {progressIndex} 篇，共 {totalInSeries} 篇。建议按顺序读完这一条主线。</p>
+      </div>
+      <div class="article-overview-actions">
+        <a class="button-link" href={localePath('zh', `series/${seriesItem.slug}`)}>查看系列</a>
+        <a class="button-link" href={localePath('zh')}>回到首页</a>
+      </div>
+    </section>
+  )}
+
   <section class="article-layout">
     <article class="article-body article-prose">
       <Content />
     </article>
 
     <aside class="article-sidebar">
+      {seriesItem && (
+        <div class="article-sidecard">
+          <span class="eyebrow">系列进度</span>
+          <div class="series-progress-head">
+            <strong>{getSeriesName('zh', seriesItem)}</strong>
+            <p>第 {progressIndex} / {totalInSeries} 篇</p>
+          </div>
+          <div class="series-progress-bar" aria-hidden="true">
+            <span style={`width:${progressPercent}`}></span>
+          </div>
+          <nav class="series-step-list" aria-label="系列文章顺序">
+            {seriesPosts.map((item, index) => (
+              <a
+                class:list={[
+                  'series-step-link',
+                  { current: item.data.pathSlug === post.data.pathSlug }
+                ]}
+                href={localePath('zh', item.data.pathSlug)}
+              >
+                <span>{index + 1}</span>
+                <strong>{item.data.title}</strong>
+              </a>
+            ))}
+          </nav>
+        </div>
+      )}
+
       <div class="article-sidecard">
         <span class="eyebrow">文章信息</span>
         <div class="meta-stack">
@@ -96,12 +167,52 @@ const { Content, headings } = await render(post);
     </aside>
   </section>
 
+  <section class="section article-pager">
+    <div class="article-pager-grid">
+      {previousPost ? (
+        <a class="article-pager-card" href={localePath('zh', previousPost.data.pathSlug)}>
+          <span class="article-pager-label">上一篇</span>
+          <strong>{previousPost.data.title}</strong>
+          <p>{previousPost.data.summary}</p>
+        </a>
+      ) : (
+        <div class="article-pager-card article-pager-card--muted">
+          <span class="article-pager-label">上一篇</span>
+          <strong>已经是系列起点</strong>
+          <p>从这里开始继续往后读就可以。</p>
+        </div>
+      )}
+
+      {seriesItem && (
+        <a class="article-pager-card article-pager-card--center" href={localePath('zh', `series/${seriesItem.slug}`)}>
+          <span class="article-pager-label">系列总览</span>
+          <strong>{getSeriesName('zh', seriesItem)}</strong>
+          <p>回到系列页，按顺序查看这一条主线里的所有文章。</p>
+        </a>
+      )}
+
+      {nextPost ? (
+        <a class="article-pager-card" href={localePath('zh', nextPost.data.pathSlug)}>
+          <span class="article-pager-label">下一篇</span>
+          <strong>{nextPost.data.title}</strong>
+          <p>{nextPost.data.summary}</p>
+        </a>
+      ) : (
+        <div class="article-pager-card article-pager-card--muted">
+          <span class="article-pager-label">下一篇</span>
+          <strong>已经读到系列末尾</strong>
+          <p>可以回到系列页，或者直接去评论区补充你的经验。</p>
+        </div>
+      )}
+    </div>
+  </section>
+
   {relatedPosts.length > 0 && (
     <section class="section">
       <div class="section-header">
         <div>
           <span class="eyebrow">继续阅读</span>
-          <h2>同系列文章</h2>
+          <h2>同系列更多文章</h2>
         </div>
       </div>
       <div class="grid">
