@@ -383,8 +383,8 @@ select {
 
 .title {
   margin: 16px 0 12px;
-  font-size: clamp(2rem, 4vw, 4rem);
-  line-height: 1.05;
+  font-size: clamp(1.9rem, 3.4vw, 3.3rem);
+  line-height: 1.08;
   font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
   letter-spacing: -0.02em;
 }
