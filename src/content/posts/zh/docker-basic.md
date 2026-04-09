@@ -1,5 +1,6 @@
 ---
 locale: zh
+translationKey: docker-basic
 pathSlug: docker-basic
 title: Docker 入门：安装、镜像与容器基础
 summary: 理解镜像与容器的边界，建立本地开发到交付的容器化基础。
@@ -7,6 +8,7 @@ publishedAt: 2026-04-02
 updatedAt: 2026-04-09
 readingMinutes: 10
 series: docker
+seriesOrder: 1
 featured: true
 tags:
   - docker

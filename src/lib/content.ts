@@ -4,7 +4,9 @@ import type { Locale, SeriesSlug } from '../data/site';
 export type PostEntry = CollectionEntry<'posts'>;
 export type SortOrder = 'asc' | 'desc';
 
-function sortPosts(entries: PostEntry[], order: SortOrder) {
+let contentValidated = false;
+
+function sortPostsByPublishDate(entries: PostEntry[], order: SortOrder) {
   const direction = order === 'asc' ? 1 : -1;
   return [...entries].sort(
     (left, right) =>
@@ -12,9 +14,85 @@ function sortPosts(entries: PostEntry[], order: SortOrder) {
   );
 }
 
+function sortPostsBySeriesOrder(entries: PostEntry[], order: SortOrder) {
+  const direction = order === 'asc' ? 1 : -1;
+  return [...entries].sort((left, right) => {
+    const orderDifference = left.data.seriesOrder - right.data.seriesOrder;
+
+    if (orderDifference !== 0) {
+      return orderDifference * direction;
+    }
+
+    return (left.data.publishedAt.getTime() - right.data.publishedAt.getTime()) * direction;
+  });
+}
+
+async function validateContentCollection() {
+  if (contentValidated) {
+    return;
+  }
+
+  const posts = await getCollection('posts');
+  const seenLocaleSlug = new Set<string>();
+  const seenLocaleTranslationKey = new Set<string>();
+  const translations = new Map<string, PostEntry[]>();
+
+  for (const post of posts) {
+    const slugKey = `${post.data.locale}:${post.data.pathSlug}`;
+    const translationLocaleKey = `${post.data.locale}:${post.data.translationKey}`;
+
+    if (seenLocaleSlug.has(slugKey)) {
+      throw new Error(`Duplicate post slug detected: ${slugKey}`);
+    }
+
+    if (seenLocaleTranslationKey.has(translationLocaleKey)) {
+      throw new Error(`Duplicate translation key detected: ${translationLocaleKey}`);
+    }
+
+    seenLocaleSlug.add(slugKey);
+    seenLocaleTranslationKey.add(translationLocaleKey);
+
+    const entries = translations.get(post.data.translationKey) ?? [];
+    entries.push(post);
+    translations.set(post.data.translationKey, entries);
+  }
+
+  for (const [translationKey, entries] of translations.entries()) {
+    const zhPost = entries.find((item) => item.data.locale === 'zh');
+    const enPost = entries.find((item) => item.data.locale === 'en');
+
+    if (!zhPost || !enPost || entries.length !== 2) {
+      throw new Error(
+        `Translation pair "${translationKey}" must contain exactly one zh post and one en post.`
+      );
+    }
+
+    if (zhPost.data.pathSlug !== enPost.data.pathSlug) {
+      throw new Error(
+        `Translation pair "${translationKey}" must use the same pathSlug in zh and en.`
+      );
+    }
+
+    if (zhPost.data.series !== enPost.data.series) {
+      throw new Error(
+        `Translation pair "${translationKey}" must stay in the same series in zh and en.`
+      );
+    }
+
+    if (zhPost.data.seriesOrder !== enPost.data.seriesOrder) {
+      throw new Error(
+        `Translation pair "${translationKey}" must use the same seriesOrder in zh and en.`
+      );
+    }
+  }
+
+  contentValidated = true;
+}
+
 export async function getPosts(locale: Locale, order: SortOrder = 'desc') {
+  await validateContentCollection();
   const posts = await getCollection('posts', ({ data }) => data.locale === locale);
-  return sortPosts(posts, order);
+  return sortPostsByPublishDate(posts, order);
 }
 
 export async function getFeaturedPosts(locale: Locale) {
@@ -23,6 +101,7 @@ export async function getFeaturedPosts(locale: Locale) {
 }
 
 export async function getPostBySlug(locale: Locale, slug: string) {
+  await validateContentCollection();
   const posts = await getCollection(
     'posts',
     ({ data }) => data.locale === locale && data.pathSlug === slug
@@ -35,11 +114,12 @@ export async function getPostsBySeries(
   seriesSlug: SeriesSlug,
   order: SortOrder = 'desc'
 ) {
+  await validateContentCollection();
   const posts = await getCollection(
     'posts',
     ({ data }) => data.locale === locale && data.series === seriesSlug
   );
-  return sortPosts(posts, order);
+  return sortPostsBySeriesOrder(posts, order);
 }
 
 export async function getRelatedPosts(locale: Locale, seriesSlug: SeriesSlug, slug: string) {

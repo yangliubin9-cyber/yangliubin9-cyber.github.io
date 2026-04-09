@@ -1,5 +1,6 @@
 ---
 locale: en
+translationKey: linux-basic
 pathSlug: linux-basic
 title: "Linux Basics: Files, Directories, and Common Commands"
 summary: Build a practical mental model for Linux by mastering paths, directories, and daily commands first.
@@ -7,6 +8,7 @@ publishedAt: 2026-04-01
 updatedAt: 2026-04-09
 readingMinutes: 8
 series: linux
+seriesOrder: 1
 featured: true
 tags:
   - shell

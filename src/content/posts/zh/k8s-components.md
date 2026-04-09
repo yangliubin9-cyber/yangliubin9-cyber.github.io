@@ -1,5 +1,6 @@
 ---
 locale: zh
+translationKey: k8s-components
 pathSlug: k8s-components
 title: Kubernetes 核心组件与工作机制
 summary: 把 apiserver、scheduler、controller-manager 和 kubelet 放回各自职责里理解。
@@ -7,6 +8,7 @@ publishedAt: 2026-04-05
 updatedAt: 2026-04-09
 readingMinutes: 9
 series: k8s
+seriesOrder: 2
 featured: false
 tags:
   - kubernetes

@@ -1,5 +1,6 @@
 ---
 locale: en
+translationKey: docker-basic
 pathSlug: docker-basic
 title: "Docker Basics: Installation, Images, and Containers"
 summary: Understand the boundary between images and containers to support real delivery work.
@@ -7,6 +8,7 @@ publishedAt: 2026-04-02
 updatedAt: 2026-04-09
 readingMinutes: 10
 series: docker
+seriesOrder: 1
 featured: true
 tags:
   - docker

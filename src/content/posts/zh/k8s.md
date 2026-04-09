@@ -1,5 +1,6 @@
 ---
 locale: zh
+translationKey: k8s
 pathSlug: k8s
 title: Kubernetes 集群部署入门
 summary: 从控制面、节点和网络出发，建立对 Kubernetes 集群的整体认识。
@@ -7,6 +8,7 @@ publishedAt: 2026-04-04
 updatedAt: 2026-04-09
 readingMinutes: 11
 series: k8s
+seriesOrder: 1
 featured: true
 tags:
   - kubernetes

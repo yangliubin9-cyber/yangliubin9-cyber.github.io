@@ -1,5 +1,6 @@
 ---
 locale: en
+translationKey: docker-deploy
 pathSlug: docker-deploy
 title: "Docker Deployment Practice: From Local Run to Service Release"
 summary: Connect local runtime, image publishing, and service startup into one release path.
@@ -7,6 +8,7 @@ publishedAt: 2026-04-03
 updatedAt: 2026-04-09
 readingMinutes: 12
 series: docker
+seriesOrder: 2
 featured: false
 tags:
   - docker

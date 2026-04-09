@@ -1,5 +1,6 @@
 ---
 locale: en
+translationKey: k8s
 pathSlug: k8s
 title: Getting Started with Kubernetes Cluster Deployment
 summary: Understand Kubernetes clusters by starting from the control plane, nodes, and networking.
@@ -7,6 +8,7 @@ publishedAt: 2026-04-04
 updatedAt: 2026-04-09
 readingMinutes: 11
 series: k8s
+seriesOrder: 1
 featured: true
 tags:
   - kubernetes

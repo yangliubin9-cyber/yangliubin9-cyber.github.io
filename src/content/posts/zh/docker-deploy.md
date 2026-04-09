@@ -1,5 +1,6 @@
 ---
 locale: zh
+translationKey: docker-deploy
 pathSlug: docker-deploy
 title: Docker 部署实战：从本地运行到服务发布
 summary: 把本地运行、镜像发布与服务启动串成一条完整的部署链路。
@@ -7,6 +8,7 @@ publishedAt: 2026-04-03
 updatedAt: 2026-04-09
 readingMinutes: 12
 series: docker
+seriesOrder: 2
 featured: false
 tags:
   - docker

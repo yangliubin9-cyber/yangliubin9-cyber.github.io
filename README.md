@@ -51,6 +51,32 @@ Current content source:
 - `src/content/posts/zh/*.md`
 - `src/content/posts/en/*.md`
 - `src/content.config.ts`
+- `src/content/templates/*.md`
+- `CONTENT_GUIDE.md`
+
+## Content Workflow
+
+The site now uses an explicit bilingual content model.
+
+Required post fields now include:
+
+- `translationKey`: the zh/en pairing key
+- `pathSlug`: the public route slug
+- `seriesOrder`: the explicit order inside a series
+
+Current publishing rules:
+
+- every published post must exist in both `zh` and `en`
+- both locale files must share the same `translationKey`
+- both locale files must share the same `pathSlug`
+- both locale files must stay in the same `series`
+- both locale files must use the same `seriesOrder`
+
+Use these authoring references before adding new posts:
+
+- [`CONTENT_GUIDE.md`](./CONTENT_GUIDE.md)
+- [`src/content/templates/post.zh.template.md`](./src/content/templates/post.zh.template.md)
+- [`src/content/templates/post.en.template.md`](./src/content/templates/post.en.template.md)
 
 ## Tech Stack
 

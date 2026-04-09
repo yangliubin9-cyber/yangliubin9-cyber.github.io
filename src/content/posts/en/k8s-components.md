@@ -1,5 +1,6 @@
 ---
 locale: en
+translationKey: k8s-components
 pathSlug: k8s-components
 title: Kubernetes Core Components and How They Work
 summary: See how the apiserver, scheduler, controller manager, and kubelet fit together.
@@ -7,6 +8,7 @@ publishedAt: 2026-04-05
 updatedAt: 2026-04-09
 readingMinutes: 9
 series: k8s
+seriesOrder: 2
 featured: false
 tags:
   - kubernetes

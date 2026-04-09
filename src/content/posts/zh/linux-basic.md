@@ -1,5 +1,6 @@
 ---
 locale: zh
+translationKey: linux-basic
 pathSlug: linux-basic
 title: Linux 新手入门：文件、目录与常用命令
 summary: 用最短路径建立 Linux 基础心智模型，先把目录、路径和常用命令跑通。
@@ -7,6 +8,7 @@ publishedAt: 2026-04-01
 updatedAt: 2026-04-09
 readingMinutes: 8
 series: linux
+seriesOrder: 1
 featured: true
 tags:
   - shell
