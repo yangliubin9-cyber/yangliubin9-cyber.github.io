@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { articles, getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
+import { getPosts } from '../../../lib/content';
+import { getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
 import { localePath } from '../../../lib/routing';
+
+const posts = await getPosts('zh');
 ---
 
 <BaseLayout
@@ -11,21 +14,27 @@ import { localePath } from '../../../lib/routing';
   switchHref={localePath('en', 'series')}
   switchLabel="English"
 >
-  <section class="hero">
+  <section class="hero hero-editorial">
     <span class="kicker">Series</span>
-    <h1 class="title">先用系列建立阅读路径，再逐步扩充文章密度</h1>
-    <p class="lede">V1 采用“一篇文章只属于一个主系列”的结构，方便排序、导航和后续同步。</p>
+    <h1 class="title">先有学习主线，再扩展内容密度</h1>
+    <p class="lede">
+      当前内容按 Linux、Docker、Kubernetes 三条主线组织。每篇文章只归属一个系列，方便阅读顺序、维护和后续同步。
+    </p>
   </section>
 
   <section class="section">
     <div class="grid">
-      {series.map((item) => (
-        <a class="card" href={localePath('zh', `series/${item.slug}`)}>
-          <span class="pill">{getSeriesName('zh', item)}</span>
-          <p>{getSeriesDescription('zh', item)}</p>
-          <strong>{articles.filter((article) => article.seriesSlug === item.slug).length} 篇文章</strong>
-        </a>
-      ))}
+      {series.map((item) => {
+        const seriesPosts = posts.filter((post) => post.data.series === item.slug);
+        return (
+          <a class="card card-series" href={localePath('zh', `series/${item.slug}`)}>
+            <span class="pill">{getSeriesName('zh', item)}</span>
+            <h3>{getSeriesName('zh', item)}</h3>
+            <p>{getSeriesDescription('zh', item)}</p>
+            <strong>{seriesPosts.length} 篇文章</strong>
+          </a>
+        );
+      })}
     </div>
   </section>
 </BaseLayout>

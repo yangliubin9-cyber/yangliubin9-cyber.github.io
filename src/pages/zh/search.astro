@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, getReadingLabel } from '../../lib/content';
+import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
 import { localePath } from '../../lib/routing';
-import { siteMeta } from '../../data/site';
+
+const posts = await getPosts('zh');
 ---
 
 <BaseLayout
@@ -11,15 +14,71 @@ import { siteMeta } from '../../data/site';
   switchHref={localePath('en', 'search')}
   switchLabel="English"
 >
-  <section class="hero">
+  <section class="hero hero-editorial">
     <span class="kicker">Search</span>
-    <h1 class="title">搜索页已经预留，索引能力会在后续阶段接入</h1>
-    <p class="lede">这里会在后续接入 Pagefind，并支持标题、摘要、正文、标签与系列过滤。</p>
+    <h1 class="title">先把文章搜出来，再决定后面要不要上全文索引</h1>
+    <p class="lede">
+      这一版先提供站内即时筛选，已经可以按标题、摘要、标签和系列快速定位文章。后续如果文章量继续增长，再接 Pagefind。
+    </p>
   </section>
 
-  <section class="placeholder-box">
-    <p class="muted">
-      当前是部署可验证骨架，所以搜索页先以占位形式存在。页面路由已经就位，后续补内容索引不会改动公开 URL。
-    </p>
+  <section class="section search-shell">
+    <div class="search-toolbar">
+      <label class="search-label" for="post-search-zh">输入关键词</label>
+      <input
+        id="post-search-zh"
+        class="search-input"
+        type="search"
+        placeholder="例如：docker、权限、deployment"
+        data-search-input
+      />
+      <p class="muted">当前可搜索 {posts.length} 篇文章，默认展示全部内容。</p>
+    </div>
+
+    <div class="grid search-grid" data-search-results>
+      {posts.map((post) => {
+        const seriesItem = getSeriesBySlug(post.data.series);
+        return (
+          <a
+            class="card card-post"
+            href={localePath('zh', post.data.pathSlug)}
+            data-search-item
+            data-search-text={`${post.data.title} ${post.data.summary} ${post.data.tags.join(' ')} ${seriesItem ? getSeriesName('zh', seriesItem) : ''}`.toLowerCase()}
+          >
+            {seriesItem && <span class="pill">{getSeriesName('zh', seriesItem)}</span>}
+            <h3>{post.data.title}</h3>
+            <p class="muted">{post.data.summary}</p>
+            <strong>{getReadingLabel('zh', post.data.readingMinutes)}</strong>
+          </a>
+        );
+      })}
+    </div>
+
+    <p class="search-empty muted" data-search-empty hidden>没有匹配文章，试试换一个关键词。</p>
+
+    <script is:inline>
+      const root = document.currentScript?.closest('.search-shell');
+      const input = root?.querySelector('[data-search-input]');
+      const items = Array.from(root?.querySelectorAll('[data-search-item]') ?? []);
+      const empty = root?.querySelector('[data-search-empty]');
+
+      const applyFilter = () => {
+        const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+        let visible = 0;
+
+        items.forEach((item) => {
+          const text = item.getAttribute('data-search-text') ?? '';
+          const matched = !query || text.includes(query);
+          item.toggleAttribute('hidden', !matched);
+          if (matched) visible += 1;
+        });
+
+        if (empty) {
+          empty.toggleAttribute('hidden', visible !== 0);
+        }
+      };
+
+      input?.addEventListener('input', applyFilter);
+    </script>
   </section>
 </BaseLayout>

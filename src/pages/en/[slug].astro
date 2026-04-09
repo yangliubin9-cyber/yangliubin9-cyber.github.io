@@ -1,56 +1,120 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import { render } from 'astro:content';
 import CommentsSection from '../../components/CommentsSection.astro';
-import {
-  articles,
-  getArticleSummary,
-  getArticleTitle,
-  getSeriesBySlug,
-  getSeriesName,
-  siteMeta,
-  type Article
-} from '../../data/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatPublishDate, getPosts, getReadingLabel, type PostEntry } from '../../lib/content';
 import { localePath } from '../../lib/routing';
+import { getSeriesBySlug, getSeriesName } from '../../data/site';
 
-export function getStaticPaths() {
-  return articles.map((item) => ({
-    params: { slug: item.slug },
-    props: { article: item }
+export async function getStaticPaths() {
+  const posts = await getPosts('en');
+  return posts.map((post) => ({
+    params: { slug: post.data.pathSlug },
+    props: {
+      post,
+      relatedPosts: posts.filter(
+        (item) => item.data.series === post.data.series && item.data.pathSlug !== post.data.pathSlug
+      ).slice(0, 3)
+    }
   }));
 }
 
-const { article } = Astro.props as { article: Article };
-const seriesItem = getSeriesBySlug(article.seriesSlug);
+const { post, relatedPosts } = Astro.props as {
+  post: PostEntry;
+  relatedPosts: PostEntry[];
+};
+
+const seriesItem = getSeriesBySlug(post.data.series);
+const { Content, headings } = await render(post);
 ---
 
 <BaseLayout
-  title={`${getArticleTitle('en', article)} | MUZI`}
-  description={siteMeta.description.en}
+  title={`${post.data.title} | MUZI`}
+  description={post.data.summary}
   locale="en"
-  switchHref={localePath('zh', article.slug)}
+  switchHref={localePath('zh', post.data.pathSlug)}
   switchLabel="中文"
 >
-  <section class="hero">
-    <span class="kicker">Article</span>
-    <h1 class="title">{getArticleTitle('en', article)}</h1>
-    <p class="lede">{getArticleSummary('en', article)}</p>
+  <section class="hero article-hero">
+    <span class="kicker">Field Note</span>
+    <h1 class="title">{post.data.title}</h1>
+    <p class="lede">{post.data.summary}</p>
     <div class="hero-actions">
       {seriesItem && <span class="pill">{getSeriesName('en', seriesItem)}</span>}
-      <span class="pill">{article.readingMinutes} min read</span>
+      <span class="pill">{formatPublishDate('en', post.data.publishedAt)}</span>
+      <span class="pill">{getReadingLabel('en', post.data.readingMinutes)}</span>
     </div>
   </section>
 
-  <section class="article-body">
-    <p>
-      This is a placeholder article page rendered from planning-stage seed data. The next content
-      phase will replace this text with Feishu Docs content while Feishu Bitable controls slug,
-      series, status, and SEO metadata.
-    </p>
-    <p>
-      Stable URLs, bilingual routes, and series relationships are already reserved, so the public
-      address does not need to change when real synced content lands.
-    </p>
-    <p class="article-meta">Published: {article.publishedAt}</p>
+  <section class="article-layout">
+    <article class="article-body article-prose">
+      <Content />
+    </article>
+
+    <aside class="article-sidebar">
+      <div class="article-sidecard">
+        <span class="eyebrow">Post Info</span>
+        <div class="meta-stack">
+          <div>
+            <strong>Published</strong>
+            <p>{formatPublishDate('en', post.data.publishedAt)}</p>
+          </div>
+          <div>
+            <strong>Reading time</strong>
+            <p>{getReadingLabel('en', post.data.readingMinutes)}</p>
+          </div>
+          {seriesItem && (
+            <div>
+              <strong>Series</strong>
+              <p>{getSeriesName('en', seriesItem)}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {headings.length > 0 && (
+        <div class="article-sidecard">
+          <span class="eyebrow">On This Page</span>
+          <nav class="toc-list" aria-label="Table of contents">
+            {headings.filter((item) => item.depth <= 3).map((item) => (
+              <a href={`#${item.slug}`}>{item.text}</a>
+            ))}
+          </nav>
+        </div>
+      )}
+
+      {post.data.tags.length > 0 && (
+        <div class="article-sidecard">
+          <span class="eyebrow">Tags</span>
+          <div class="tag-list">
+            {post.data.tags.map((tag) => (
+              <span class="pill">#{tag}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </aside>
   </section>
-  <CommentsSection locale="en" threadId={article.slug} />
+
+  {relatedPosts.length > 0 && (
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">Keep Reading</span>
+          <h2>More in this series</h2>
+        </div>
+      </div>
+      <div class="grid">
+        {relatedPosts.map((item) => (
+          <a class="card card-post" href={localePath('en', item.data.pathSlug)}>
+            <span class="pill">{getReadingLabel('en', item.data.readingMinutes)}</span>
+            <h3>{item.data.title}</h3>
+            <p class="muted">{item.data.summary}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <CommentsSection locale="en" threadId={post.data.pathSlug} />
 </BaseLayout>

@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, getReadingLabel } from '../../lib/content';
+import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
 import { localePath } from '../../lib/routing';
-import { siteMeta } from '../../data/site';
+
+const posts = await getPosts('en');
 ---
 
 <BaseLayout
@@ -11,15 +14,72 @@ import { siteMeta } from '../../data/site';
   switchHref={localePath('zh', 'search')}
   switchLabel="中文"
 >
-  <section class="hero">
+  <section class="hero hero-editorial">
     <span class="kicker">Search</span>
-    <h1 class="title">The search page is reserved and ready for a later index step</h1>
-    <p class="lede">Pagefind will be added later for title, summary, body, tag, and series search.</p>
+    <h1 class="title">Find the article first, then decide whether a full-text index is necessary</h1>
+    <p class="lede">
+      This version ships with instant on-page filtering for title, summary, tags, and series. If the archive grows
+      larger, Pagefind can be added later without changing the public route.
+    </p>
   </section>
 
-  <section class="placeholder-box">
-    <p class="muted">
-      This page exists now so the public route is stable before the search index layer is wired in.
-    </p>
+  <section class="section search-shell">
+    <div class="search-toolbar">
+      <label class="search-label" for="post-search-en">Search posts</label>
+      <input
+        id="post-search-en"
+        class="search-input"
+        type="search"
+        placeholder="Try: docker, permissions, deployment"
+        data-search-input
+      />
+      <p class="muted">{posts.length} posts are indexed on this page right now.</p>
+    </div>
+
+    <div class="grid search-grid" data-search-results>
+      {posts.map((post) => {
+        const seriesItem = getSeriesBySlug(post.data.series);
+        return (
+          <a
+            class="card card-post"
+            href={localePath('en', post.data.pathSlug)}
+            data-search-item
+            data-search-text={`${post.data.title} ${post.data.summary} ${post.data.tags.join(' ')} ${seriesItem ? getSeriesName('en', seriesItem) : ''}`.toLowerCase()}
+          >
+            {seriesItem && <span class="pill">{getSeriesName('en', seriesItem)}</span>}
+            <h3>{post.data.title}</h3>
+            <p class="muted">{post.data.summary}</p>
+            <strong>{getReadingLabel('en', post.data.readingMinutes)}</strong>
+          </a>
+        );
+      })}
+    </div>
+
+    <p class="search-empty muted" data-search-empty hidden>No matching posts yet. Try a different keyword.</p>
+
+    <script is:inline>
+      const root = document.currentScript?.closest('.search-shell');
+      const input = root?.querySelector('[data-search-input]');
+      const items = Array.from(root?.querySelectorAll('[data-search-item]') ?? []);
+      const empty = root?.querySelector('[data-search-empty]');
+
+      const applyFilter = () => {
+        const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+        let visible = 0;
+
+        items.forEach((item) => {
+          const text = item.getAttribute('data-search-text') ?? '';
+          const matched = !query || text.includes(query);
+          item.toggleAttribute('hidden', !matched);
+          if (matched) visible += 1;
+        });
+
+        if (empty) {
+          empty.toggleAttribute('hidden', visible !== 0);
+        }
+      };
+
+      input?.addEventListener('input', applyFilter);
+    </script>
   </section>
 </BaseLayout>

@@ -1,54 +1,120 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import { render } from 'astro:content';
 import CommentsSection from '../../components/CommentsSection.astro';
-import {
-  articles,
-  getArticleSummary,
-  getArticleTitle,
-  getSeriesBySlug,
-  getSeriesName,
-  siteMeta,
-  type Article
-} from '../../data/site';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatPublishDate, getPosts, getReadingLabel, type PostEntry } from '../../lib/content';
 import { localePath } from '../../lib/routing';
+import { getSeriesBySlug, getSeriesName } from '../../data/site';
 
-export function getStaticPaths() {
-  return articles.map((item) => ({
-    params: { slug: item.slug },
-    props: { article: item }
+export async function getStaticPaths() {
+  const posts = await getPosts('zh');
+  return posts.map((post) => ({
+    params: { slug: post.data.pathSlug },
+    props: {
+      post,
+      relatedPosts: posts.filter(
+        (item) => item.data.series === post.data.series && item.data.pathSlug !== post.data.pathSlug
+      ).slice(0, 3)
+    }
   }));
 }
 
-const { article } = Astro.props as { article: Article };
-const seriesItem = getSeriesBySlug(article.seriesSlug);
+const { post, relatedPosts } = Astro.props as {
+  post: PostEntry;
+  relatedPosts: PostEntry[];
+};
+
+const seriesItem = getSeriesBySlug(post.data.series);
+const { Content, headings } = await render(post);
 ---
 
 <BaseLayout
-  title={`${getArticleTitle('zh', article)} | MUZI`}
-  description={siteMeta.description.zh}
+  title={`${post.data.title} | MUZI`}
+  description={post.data.summary}
   locale="zh"
-  switchHref={localePath('en', article.slug)}
+  switchHref={localePath('en', post.data.pathSlug)}
   switchLabel="English"
 >
-  <section class="hero">
-    <span class="kicker">Article</span>
-    <h1 class="title">{getArticleTitle('zh', article)}</h1>
-    <p class="lede">{getArticleSummary('zh', article)}</p>
+  <section class="hero article-hero">
+    <span class="kicker">Field Note</span>
+    <h1 class="title">{post.data.title}</h1>
+    <p class="lede">{post.data.summary}</p>
     <div class="hero-actions">
       {seriesItem && <span class="pill">{getSeriesName('zh', seriesItem)}</span>}
-      <span class="pill">{article.readingMinutes} 分钟阅读</span>
+      <span class="pill">{formatPublishDate('zh', post.data.publishedAt)}</span>
+      <span class="pill">{getReadingLabel('zh', post.data.readingMinutes)}</span>
     </div>
   </section>
 
-  <section class="article-body">
-    <p>
-      这是文章页骨架，当前使用规划阶段的种子数据渲染。后续会由 Feishu Docs 提供正文，
-      Feishu Bitable 提供 slug、系列、状态和 SEO 元信息。
-    </p>
-    <p>
-      当前保留了稳定 URL、双语路径和系列归属，所以即使后面换成真实同步内容，这一层公开地址也不会变。
-    </p>
-    <p class="article-meta">发布日期：{article.publishedAt}</p>
+  <section class="article-layout">
+    <article class="article-body article-prose">
+      <Content />
+    </article>
+
+    <aside class="article-sidebar">
+      <div class="article-sidecard">
+        <span class="eyebrow">文章信息</span>
+        <div class="meta-stack">
+          <div>
+            <strong>发布时间</strong>
+            <p>{formatPublishDate('zh', post.data.publishedAt)}</p>
+          </div>
+          <div>
+            <strong>阅读时间</strong>
+            <p>{getReadingLabel('zh', post.data.readingMinutes)}</p>
+          </div>
+          {seriesItem && (
+            <div>
+              <strong>所属系列</strong>
+              <p>{getSeriesName('zh', seriesItem)}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {headings.length > 0 && (
+        <div class="article-sidecard">
+          <span class="eyebrow">目录</span>
+          <nav class="toc-list" aria-label="文章目录">
+            {headings.filter((item) => item.depth <= 3).map((item) => (
+              <a href={`#${item.slug}`}>{item.text}</a>
+            ))}
+          </nav>
+        </div>
+      )}
+
+      {post.data.tags.length > 0 && (
+        <div class="article-sidecard">
+          <span class="eyebrow">标签</span>
+          <div class="tag-list">
+            {post.data.tags.map((tag) => (
+              <span class="pill">#{tag}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </aside>
   </section>
-  <CommentsSection locale="zh" threadId={article.slug} />
+
+  {relatedPosts.length > 0 && (
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">继续阅读</span>
+          <h2>同系列文章</h2>
+        </div>
+      </div>
+      <div class="grid">
+        {relatedPosts.map((item) => (
+          <a class="card card-post" href={localePath('zh', item.data.pathSlug)}>
+            <span class="pill">{getReadingLabel('zh', item.data.readingMinutes)}</span>
+            <h3>{item.data.title}</h3>
+            <p class="muted">{item.data.summary}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <CommentsSection locale="zh" threadId={post.data.pathSlug} />
 </BaseLayout>

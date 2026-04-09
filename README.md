@@ -8,8 +8,8 @@ Current focus:
 
 - Chinese-first bilingual routing, `zh` and `en`
 - Static pages deployed with GitHub Pages
-- Seed content for AI infrastructure, MLOps, Kubernetes, Docker, and engineering practice
-- A clean blog skeleton that is easy to extend before wiring in external systems
+- Local Markdown content collections for AI infrastructure, MLOps, Kubernetes, Docker, and engineering practice
+- A practical blog shell with real article pages, series pages, and in-page search
 
 ## Current Status
 
@@ -20,13 +20,14 @@ What is already in place:
 - Astro static site scaffold
 - Root `/` redirect to `/zh/`
 - Bilingual route structure for home, about, search, article, series, login, and register pages
-- Seed article and series data in the codebase
+- Real bilingual article content stored in Astro content collections
+- Working article pages with Markdown rendering, table of contents, tags, and related post links
+- Search page with instant client-side filtering
 - GitHub Actions workflow for GitHub Pages deployment
 
 What is not integrated yet:
 
 - Feishu content sync
-- Real search indexing
 - User authentication backend
 
 What is already wired in for comments:
@@ -40,11 +41,18 @@ Comment posting currently requires a GitHub account.
 
 Feishu sync stays for later, after the blog shell and comment path are stable.
 
+Current content source:
+
+- `src/content/posts/zh/*.md`
+- `src/content/posts/en/*.md`
+- `src/content.config.ts`
+
 ## Tech Stack
 
 - Astro 6
 - TypeScript
 - `@astrojs/sitemap`
+- Astro content collections
 - GitHub Pages
 
 ## Route Structure
@@ -155,6 +163,8 @@ If the comment box appears but posting fails:
 .
 |-- public/
 |-- src/
+|   |-- content/
+|   |-- content.config.ts
 |   |-- data/
 |   |-- layouts/
 |   |-- lib/
@@ -166,7 +176,10 @@ If the comment box appears but posting fails:
 
 Key files:
 
-- [`src/data/site.ts`](./src/data/site.ts): site metadata, seed series, and seed articles
+- [`src/content.config.ts`](./src/content.config.ts): content collection schema
+- [`src/content/posts`](./src/content/posts): bilingual Markdown article source
+- [`src/data/site.ts`](./src/data/site.ts): site metadata and series definitions
+- [`src/lib/content.ts`](./src/lib/content.ts): content query helpers for pages
 - [`src/pages`](./src/pages): bilingual route pages
 - [`astro.config.mjs`](./astro.config.mjs): Astro site and base-path config
 - [`PLAN.md`](./PLAN.md): the longer product and architecture plan
@@ -175,12 +188,12 @@ Key files:
 
 Near-term:
 
-1. Replace seed article data with a real content source
-2. Add real search
-3. Refine the comment UX and moderation path
+1. Expand the article catalog and polish article navigation
+2. Upgrade the current instant search to Pagefind if the archive grows
+3. Add Feishu manual sync without breaking the local content fallback
 
 Later:
 
-1. Add Feishu manual sync
-2. Introduce publishing workflow and content transformation
-3. Replace GitHub-backed comments with a deeper custom auth and moderation flow if needed
+1. Introduce publishing workflow and content transformation
+2. Replace GitHub-backed comments with a deeper custom auth and moderation flow if needed
+3. Decide whether the reserved auth routes should become real account pages or stay out of scope

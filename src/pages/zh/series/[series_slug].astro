@@ -1,60 +1,61 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import {
-  getArticleSummary,
-  getArticleTitle,
-  getArticlesBySeries,
-  getSeriesDescription,
-  getSeriesName,
-  series,
-  siteMeta,
-  type Article,
-  type Series
-} from '../../../data/site';
+import { formatPublishDate, getPosts, getReadingLabel, type PostEntry } from '../../../lib/content';
 import { localePath } from '../../../lib/routing';
+import { getSeriesDescription, getSeriesName, series, type Series } from '../../../data/site';
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const posts = await getPosts('zh');
   return series.map((item) => ({
     params: { series_slug: item.slug },
     props: {
       seriesItem: item,
-      seriesArticles: getArticlesBySeries(item.slug)
+      seriesPosts: posts.filter((post) => post.data.series === item.slug)
     }
   }));
 }
 
-const { seriesItem, seriesArticles } = Astro.props as {
+const { seriesItem, seriesPosts } = Astro.props as {
   seriesItem: Series;
-  seriesArticles: Article[];
+  seriesPosts: PostEntry[];
 };
 ---
 
 <BaseLayout
   title={`${getSeriesName('zh', seriesItem)} | 系列`}
-  description={siteMeta.description.zh}
+  description={getSeriesDescription('zh', seriesItem)}
   locale="zh"
   switchHref={localePath('en', `series/${seriesItem.slug}`)}
   switchLabel="English"
 >
-  <section class="hero">
+  <section class="hero hero-editorial">
     <span class="kicker">Series Detail</span>
     <h1 class="title">{getSeriesName('zh', seriesItem)}</h1>
     <p class="lede">{getSeriesDescription('zh', seriesItem)}</p>
+    <div class="hero-facts">
+      <div class="fact-chip">
+        <strong>{seriesPosts.length}</strong>
+        <span>篇文章</span>
+      </div>
+      {seriesPosts[0] && (
+        <div class="fact-chip">
+          <strong>{formatPublishDate('zh', seriesPosts[0].data.publishedAt)}</strong>
+          <span>最近发布时间</span>
+        </div>
+      )}
+    </div>
   </section>
 
   <section class="section">
-    <div class="section-header">
-      <div>
-        <span class="eyebrow">已收录文章</span>
-        <h2>{seriesArticles.length} 篇种子内容</h2>
-      </div>
-    </div>
     <ul class="list">
-      {seriesArticles.map((item) => (
+      {seriesPosts.map((post) => (
         <li>
-          <a href={localePath('zh', item.slug)}>
-            <strong>{getArticleTitle('zh', item)}</strong>
-            <p class="muted">{getArticleSummary('zh', item)}</p>
+          <a class="list-link" href={localePath('zh', post.data.pathSlug)}>
+            <div class="list-head">
+              <strong>{post.data.title}</strong>
+              <span class="list-meta">{getReadingLabel('zh', post.data.readingMinutes)}</span>
+            </div>
+            <p class="muted">{post.data.summary}</p>
           </a>
         </li>
       ))}

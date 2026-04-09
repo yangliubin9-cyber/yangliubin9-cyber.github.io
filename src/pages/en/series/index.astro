@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { articles, getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
+import { getPosts } from '../../../lib/content';
+import { getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
 import { localePath } from '../../../lib/routing';
+
+const posts = await getPosts('en');
 ---
 
 <BaseLayout
@@ -11,21 +14,28 @@ import { localePath } from '../../../lib/routing';
   switchHref={localePath('zh', 'series')}
   switchLabel="中文"
 >
-  <section class="hero">
+  <section class="hero hero-editorial">
     <span class="kicker">Series</span>
-    <h1 class="title">Use series as the backbone of the reading journey</h1>
-    <p class="lede">V1 keeps one primary series per post to make ordering, navigation, and syncing simple.</p>
+    <h1 class="title">Use learning tracks to structure the archive</h1>
+    <p class="lede">
+      The current archive is organized around Linux, Docker, and Kubernetes. Each post belongs to one primary series,
+      which keeps navigation and future sync rules much simpler.
+    </p>
   </section>
 
   <section class="section">
     <div class="grid">
-      {series.map((item) => (
-        <a class="card" href={localePath('en', `series/${item.slug}`)}>
-          <span class="pill">{getSeriesName('en', item)}</span>
-          <p>{getSeriesDescription('en', item)}</p>
-          <strong>{articles.filter((article) => article.seriesSlug === item.slug).length} posts</strong>
-        </a>
-      ))}
+      {series.map((item) => {
+        const seriesPosts = posts.filter((post) => post.data.series === item.slug);
+        return (
+          <a class="card card-series" href={localePath('en', `series/${item.slug}`)}>
+            <span class="pill">{getSeriesName('en', item)}</span>
+            <h3>{getSeriesName('en', item)}</h3>
+            <p>{getSeriesDescription('en', item)}</p>
+            <strong>{seriesPosts.length} posts</strong>
+          </a>
+        );
+      })}
     </div>
   </section>
 </BaseLayout>
