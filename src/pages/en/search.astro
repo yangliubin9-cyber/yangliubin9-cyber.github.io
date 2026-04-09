@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { localePath } from '../../lib/routing';
+import { siteMeta } from '../../data/site';
+---
+
+<BaseLayout
+  title="Search"
+  description={siteMeta.description.en}
+  locale="en"
+  switchHref={localePath('zh', 'search')}
+  switchLabel="中文"
+>
+  <section class="hero">
+    <span class="kicker">Search</span>
+    <h1 class="title">The search page is reserved and ready for a later index step</h1>
+    <p class="lede">Pagefind will be added later for title, summary, body, tag, and series search.</p>
+  </section>
+
+  <section class="placeholder-box">
+    <p class="muted">
+      This page exists now so the public route is stable before the search index layer is wired in.
+    </p>
+  </section>
+</BaseLayout>

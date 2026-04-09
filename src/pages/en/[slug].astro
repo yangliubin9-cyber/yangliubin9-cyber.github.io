@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  articles,
+  getArticleSummary,
+  getArticleTitle,
+  getSeriesBySlug,
+  getSeriesName,
+  siteMeta,
+  type Article
+} from '../../data/site';
+import { localePath } from '../../lib/routing';
+
+export function getStaticPaths() {
+  return articles.map((item) => ({
+    params: { slug: item.slug },
+    props: { article: item }
+  }));
+}
+
+const { article } = Astro.props as { article: Article };
+const seriesItem = getSeriesBySlug(article.seriesSlug);
+---
+
+<BaseLayout
+  title={`${getArticleTitle('en', article)} | MUZI`}
+  description={siteMeta.description.en}
+  locale="en"
+  switchHref={localePath('zh', article.slug)}
+  switchLabel="中文"
+>
+  <section class="hero">
+    <span class="kicker">Article</span>
+    <h1 class="title">{getArticleTitle('en', article)}</h1>
+    <p class="lede">{getArticleSummary('en', article)}</p>
+    <div class="hero-actions">
+      {seriesItem && <span class="pill">{getSeriesName('en', seriesItem)}</span>}
+      <span class="pill">{article.readingMinutes} min read</span>
+    </div>
+  </section>
+
+  <section class="article-body">
+    <p>
+      This is a placeholder article page rendered from planning-stage seed data. The next content
+      phase will replace this text with Feishu Docs content while Feishu Bitable controls slug,
+      series, status, and SEO metadata.
+    </p>
+    <p>
+      Stable URLs, bilingual routes, and series relationships are already reserved, so the public
+      address does not need to change when real synced content lands.
+    </p>
+    <p class="article-meta">Published: {article.publishedAt}</p>
+  </section>
+</BaseLayout>

@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  articles,
+  series,
+  getArticleSummary,
+  getArticleTitle,
+  getSeriesDescription,
+  getSeriesName,
+  siteMeta
+} from '../../data/site';
+import { localePath } from '../../lib/routing';
+
+const featuredArticles = articles.filter((item) => item.featured);
+---
+
+<BaseLayout
+  title="MUZI | AI 基础设施与工程实践"
+  description={siteMeta.description.zh}
+  locale="zh"
+  switchHref={localePath('en')}
+  switchLabel="English"
+>
+  <section class="hero">
+    <span class="kicker">Bilingual Tech Notes</span>
+    <h1 class="title">用博客沉淀 AI 基础设施与工程落地经验</h1>
+    <p class="lede">
+      这里是 Yang 的双语技术博客骨架版。当前已经完成 Astro 站点初始化、双语路由占位和 GitHub Pages
+      部署路径预埋，下一步会接入 Feishu 文档同步与 Supabase 评论能力。
+    </p>
+    <div class="hero-actions">
+      <a class="button-link primary" href={localePath('zh', 'series')}>查看系列</a>
+      <a class="button-link" href={localePath('zh', 'about')}>了解作者</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">精选文章</span>
+        <h2>先从最能代表方向的几篇开始</h2>
+      </div>
+      <p class="muted">当前内容由计划种子数据驱动，后续会由 Feishu 手动同步替换。</p>
+    </div>
+
+    <div class="grid">
+      {featuredArticles.map((item) => (
+        <a class="card" href={localePath('zh', item.slug)}>
+          <span class="pill">{item.publishedAt}</span>
+          <h3>{getArticleTitle('zh', item)}</h3>
+          <p class="muted">{getArticleSummary('zh', item)}</p>
+          <strong>阅读约 {item.readingMinutes} 分钟</strong>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">系列导航</span>
+        <h2>围绕主题而不是零散文章来组织内容</h2>
+      </div>
+      <a class="button-link" href={localePath('zh', 'search')}>搜索预留页</a>
+    </div>
+
+    <div class="grid">
+      {series.map((item) => (
+        <a class="card" href={localePath('zh', `series/${item.slug}`)}>
+          <span class="pill">{getSeriesName('zh', item)}</span>
+          <p>{getSeriesDescription('zh', item)}</p>
+          <strong>
+            {articles.filter((article) => article.seriesSlug === item.slug).length} 篇种子文章
+          </strong>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,40 +1,20 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getLanguagePaths } from '../lib/site';
+import { rootPath } from '../lib/routing';
 
-const paths = getLanguagePaths();
-const redirectScript = `(() => {
-  const key = 'ylb-locale';
-  try {
-    const saved = localStorage.getItem(key);
-    const browser = navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
-    const target = saved === 'zh' || saved === 'en' ? saved : browser;
-    window.location.replace(target === 'en' ? '${paths.en}' : '${paths.zh}');
-  } catch {
-    window.location.replace('${paths.zh}');
-  }
-})();`;
+const redirectTarget = rootPath();
 ---
 
-<BaseLayout
-  locale="zh"
-  currentNav="home"
-  pagePath="/"
-  paths={paths}
-  title="Yang’s Log"
-  description="A bilingual personal blog about technology, design, cloud operations, and life."
-  showHeader={false}
-  showFooter={false}
->
-  <script slot="head" is:inline set:html={redirectScript}></script>
-
-  <section class="chooser panel">
-    <p class="eyebrow">YANG’S LOG</p>
-    <h1>Choose your language.</h1>
-    <p class="page-intro__description">The site remembers your language preference and redirects automatically next time.</p>
-    <div class="hero__actions">
-      <a class="button" href={paths.zh} data-locale-choice="zh">简体中文</a>
-      <a class="button button--ghost" href={paths.en} data-locale-choice="en">English</a>
-    </div>
-  </section>
-</BaseLayout>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${redirectTarget}`} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <p>
+      Redirecting to <a href={redirectTarget}>{redirectTarget}</a>
+    </p>
+  </body>
+</html>

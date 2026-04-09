@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { localePath } from '../../lib/routing';
+import { siteMeta } from '../../data/site';
+---
+
+<BaseLayout
+  title="搜索"
+  description={siteMeta.description.zh}
+  locale="zh"
+  switchHref={localePath('en', 'search')}
+  switchLabel="English"
+>
+  <section class="hero">
+    <span class="kicker">Search</span>
+    <h1 class="title">搜索页已经预留，索引能力会在后续阶段接入</h1>
+    <p class="lede">这里会在后续接入 Pagefind，并支持标题、摘要、正文、标签与系列过滤。</p>
+  </section>
+
+  <section class="placeholder-box">
+    <p class="muted">
+      当前是部署可验证骨架，所以搜索页先以占位形式存在。页面路由已经就位，后续补内容索引不会改动公开 URL。
+    </p>
+  </section>
+</BaseLayout>

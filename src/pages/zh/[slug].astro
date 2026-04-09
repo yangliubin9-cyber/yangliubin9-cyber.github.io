@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  articles,
+  getArticleSummary,
+  getArticleTitle,
+  getSeriesBySlug,
+  getSeriesName,
+  siteMeta,
+  type Article
+} from '../../data/site';
+import { localePath } from '../../lib/routing';
+
+export function getStaticPaths() {
+  return articles.map((item) => ({
+    params: { slug: item.slug },
+    props: { article: item }
+  }));
+}
+
+const { article } = Astro.props as { article: Article };
+const seriesItem = getSeriesBySlug(article.seriesSlug);
+---
+
+<BaseLayout
+  title={`${getArticleTitle('zh', article)} | MUZI`}
+  description={siteMeta.description.zh}
+  locale="zh"
+  switchHref={localePath('en', article.slug)}
+  switchLabel="English"
+>
+  <section class="hero">
+    <span class="kicker">Article</span>
+    <h1 class="title">{getArticleTitle('zh', article)}</h1>
+    <p class="lede">{getArticleSummary('zh', article)}</p>
+    <div class="hero-actions">
+      {seriesItem && <span class="pill">{getSeriesName('zh', seriesItem)}</span>}
+      <span class="pill">{article.readingMinutes} 分钟阅读</span>
+    </div>
+  </section>
+
+  <section class="article-body">
+    <p>
+      这是文章页骨架，当前使用规划阶段的种子数据渲染。后续会由 Feishu Docs 提供正文，
+      Feishu Bitable 提供 slug、系列、状态和 SEO 元信息。
+    </p>
+    <p>
+      当前保留了稳定 URL、双语路径和系列归属，所以即使后面换成真实同步内容，这一层公开地址也不会变。
+    </p>
+    <p class="article-meta">发布日期：{article.publishedAt}</p>
+  </section>
+</BaseLayout>

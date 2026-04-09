@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  getArticleSummary,
+  getArticleTitle,
+  getArticlesBySeries,
+  getSeriesDescription,
+  getSeriesName,
+  series,
+  siteMeta,
+  type Article,
+  type Series
+} from '../../../data/site';
+import { localePath } from '../../../lib/routing';
+
+export function getStaticPaths() {
+  return series.map((item) => ({
+    params: { series_slug: item.slug },
+    props: {
+      seriesItem: item,
+      seriesArticles: getArticlesBySeries(item.slug)
+    }
+  }));
+}
+
+const { seriesItem, seriesArticles } = Astro.props as {
+  seriesItem: Series;
+  seriesArticles: Article[];
+};
+---
+
+<BaseLayout
+  title={`${getSeriesName('zh', seriesItem)} | 系列`}
+  description={siteMeta.description.zh}
+  locale="zh"
+  switchHref={localePath('en', `series/${seriesItem.slug}`)}
+  switchLabel="English"
+>
+  <section class="hero">
+    <span class="kicker">Series Detail</span>
+    <h1 class="title">{getSeriesName('zh', seriesItem)}</h1>
+    <p class="lede">{getSeriesDescription('zh', seriesItem)}</p>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">已收录文章</span>
+        <h2>{seriesArticles.length} 篇种子内容</h2>
+      </div>
+    </div>
+    <ul class="list">
+      {seriesArticles.map((item) => (
+        <li>
+          <a href={localePath('zh', item.slug)}>
+            <strong>{getArticleTitle('zh', item)}</strong>
+            <p class="muted">{getArticleSummary('zh', item)}</p>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>

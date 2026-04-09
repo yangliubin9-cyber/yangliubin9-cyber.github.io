@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  articles,
+  series,
+  getArticleSummary,
+  getArticleTitle,
+  getSeriesDescription,
+  getSeriesName,
+  siteMeta
+} from '../../data/site';
+import { localePath } from '../../lib/routing';
+
+const featuredArticles = articles.filter((item) => item.featured);
+---
+
+<BaseLayout
+  title="MUZI | AI Infrastructure and Engineering Practice"
+  description={siteMeta.description.en}
+  locale="en"
+  switchHref={localePath('zh')}
+  switchLabel="中文"
+>
+  <section class="hero">
+    <span class="kicker">Bilingual Tech Notes</span>
+    <h1 class="title">A bilingual engineering blog about systems that actually ship</h1>
+    <p class="lede">
+      This is the first Astro skeleton for Yang&apos;s blog. The project now has bilingual routes,
+      seed-driven content placeholders, and a GitHub Pages deployment path ready for the next
+      content sync phase.
+    </p>
+    <div class="hero-actions">
+      <a class="button-link primary" href={localePath('en', 'series')}>Browse series</a>
+      <a class="button-link" href={localePath('en', 'about')}>About the author</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">Featured posts</span>
+        <h2>Start with the posts that define the direction</h2>
+      </div>
+      <p class="muted">Seed data stands in for Feishu content until the manual sync layer is added.</p>
+    </div>
+
+    <div class="grid">
+      {featuredArticles.map((item) => (
+        <a class="card" href={localePath('en', item.slug)}>
+          <span class="pill">{item.publishedAt}</span>
+          <h3>{getArticleTitle('en', item)}</h3>
+          <p class="muted">{getArticleSummary('en', item)}</p>
+          <strong>{item.readingMinutes} min read</strong>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">Series map</span>
+        <h2>Organize knowledge around tracks, not isolated posts</h2>
+      </div>
+      <a class="button-link" href={localePath('en', 'search')}>Search placeholder</a>
+    </div>
+
+    <div class="grid">
+      {series.map((item) => (
+        <a class="card" href={localePath('en', `series/${item.slug}`)}>
+          <span class="pill">{getSeriesName('en', item)}</span>
+          <p>{getSeriesDescription('en', item)}</p>
+          <strong>
+            {articles.filter((article) => article.seriesSlug === item.slug).length} seeded posts
+          </strong>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { articles, getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
+import { localePath } from '../../../lib/routing';
+---
+
+<BaseLayout
+  title="Series"
+  description={siteMeta.description.en}
+  locale="en"
+  switchHref={localePath('zh', 'series')}
+  switchLabel="中文"
+>
+  <section class="hero">
+    <span class="kicker">Series</span>
+    <h1 class="title">Use series as the backbone of the reading journey</h1>
+    <p class="lede">V1 keeps one primary series per post to make ordering, navigation, and syncing simple.</p>
+  </section>
+
+  <section class="section">
+    <div class="grid">
+      {series.map((item) => (
+        <a class="card" href={localePath('en', `series/${item.slug}`)}>
+          <span class="pill">{getSeriesName('en', item)}</span>
+          <p>{getSeriesDescription('en', item)}</p>
+          <strong>{articles.filter((article) => article.seriesSlug === item.slug).length} posts</strong>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

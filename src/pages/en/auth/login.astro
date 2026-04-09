@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { localePath } from '../../../lib/routing';
+import { siteMeta } from '../../../data/site';
+---
+
+<BaseLayout
+  title="Login"
+  description={siteMeta.description.en}
+  locale="en"
+  switchHref={localePath('zh', 'auth/login')}
+  switchLabel="中文"
+>
+  <section class="hero">
+    <span class="kicker">Auth</span>
+    <h1 class="title">The login route is reserved for a later Supabase Auth step</h1>
+    <p class="lede">V1 comments will require registration and verified email before public participation.</p>
+  </section>
+</BaseLayout>

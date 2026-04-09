@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { articles, getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
+import { localePath } from '../../../lib/routing';
+---
+
+<BaseLayout
+  title="文章系列"
+  description={siteMeta.description.zh}
+  locale="zh"
+  switchHref={localePath('en', 'series')}
+  switchLabel="English"
+>
+  <section class="hero">
+    <span class="kicker">Series</span>
+    <h1 class="title">先用系列建立阅读路径，再逐步扩充文章密度</h1>
+    <p class="lede">V1 采用“一篇文章只属于一个主系列”的结构，方便排序、导航和后续同步。</p>
+  </section>
+
+  <section class="section">
+    <div class="grid">
+      {series.map((item) => (
+        <a class="card" href={localePath('zh', `series/${item.slug}`)}>
+          <span class="pill">{getSeriesName('zh', item)}</span>
+          <p>{getSeriesDescription('zh', item)}</p>
+          <strong>{articles.filter((article) => article.seriesSlug === item.slug).length} 篇文章</strong>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

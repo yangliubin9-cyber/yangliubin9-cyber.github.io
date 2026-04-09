@@ -1,108 +1,73 @@
 ---
-import SiteFooter from '../components/SiteFooter.astro';
-import SiteHeader from '../components/SiteHeader.astro';
-import { SITE, getDictionary, type Locale, type NavKey } from '../lib/site';
 import '../styles/global.css';
+import { localePath, withBase } from '../lib/routing';
+import type { Locale } from '../data/site';
 
 interface Props {
+  title: string;
+  description: string;
   locale: Locale;
-  currentNav: NavKey;
-  pagePath: string;
-  paths: Record<Locale, string>;
-  title?: string;
-  description?: string;
-  ogImage?: string;
-  showHeader?: boolean;
-  showFooter?: boolean;
+  switchHref: string;
+  switchLabel: string;
 }
 
-const {
-  locale,
-  currentNav,
-  pagePath,
-  paths,
-  title = `${getDictionary(locale).branding.title} | ${getDictionary(locale).branding.subtitle}`,
-  description = getDictionary(locale).home.heroDescription,
-  ogImage = SITE.defaultOgImage,
-  showHeader = true,
-  showFooter = true
-} = Astro.props as Props;
+const { title, description, locale, switchHref, switchLabel } = Astro.props;
 
-const canonical = new URL(pagePath, SITE.origin).toString();
-const ogImageUrl = new URL(ogImage, SITE.origin).toString();
-const themeBootstrap = `(() => {
-  const key = 'ylb-theme';
-  try {
-    const saved = localStorage.getItem(key);
-    const theme = saved === 'dark' || saved === 'light' ? saved : 'light';
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-  } catch {
-    document.documentElement.dataset.theme = 'light';
-    document.documentElement.style.colorScheme = 'light';
-  }
-})();`;
-const localeScript = `(() => {
-  const key = 'ylb-locale';
-  try {
-    localStorage.setItem(key, '${locale}');
-  } catch {}
-
-  const bind = () => {
-    document.querySelectorAll('[data-locale-choice]').forEach((link) => {
-      if (link.dataset.bound === 'true') {
-        return;
-      }
-
-      link.dataset.bound = 'true';
-      link.addEventListener('click', () => {
-        try {
-          localStorage.setItem(key, link.dataset.localeChoice || '${locale}');
-        } catch {}
-      });
-    });
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind, { once: true });
-  } else {
-    bind();
-  }
-})();`;
+const nav = locale === 'zh'
+  ? [
+      { label: '首页', href: localePath('zh') },
+      { label: '系列', href: localePath('zh', 'series') },
+      { label: '搜索', href: localePath('zh', 'search') },
+      { label: '关于', href: localePath('zh', 'about') }
+    ]
+  : [
+      { label: 'Home', href: localePath('en') },
+      { label: 'Series', href: localePath('en', 'series') },
+      { label: 'Search', href: localePath('en', 'search') },
+      { label: 'About', href: localePath('en', 'about') }
+    ];
 ---
 
-<html lang={locale} data-theme="light">
+<!doctype html>
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
-    <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#f8fafc" />
-    <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImageUrl} />
-    <meta property="og:site_name" content={getDictionary(locale).branding.title} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
     <title>{title}</title>
-    <script is:inline set:html={themeBootstrap}></script>
-    <slot name="head" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
   </head>
   <body>
-    <div class="page-shell">
-      {showHeader && <SiteHeader locale={locale} currentNav={currentNav} paths={paths} />}
-      <main class="page-main">
+    <div class="shell">
+      <header class="site-header">
+        <a class="brand" href={localePath(locale)}>
+          <span class="brand-mark">M</span>
+          <span>
+            <strong>MUZI</strong>
+            <small>Yang's Blogs</small>
+          </span>
+        </a>
+
+        <nav class="site-nav" aria-label={locale === 'zh' ? '主导航' : 'Primary'}>
+          {nav.map((item) => (
+            <a href={item.href}>{item.label}</a>
+          ))}
+        </nav>
+
+        <a class="switch-link" href={switchHref}>{switchLabel}</a>
+      </header>
+
+      <main class="page">
         <slot />
       </main>
-      {showFooter && <SiteFooter locale={locale} />}
-    </div>
 
-    <script is:inline set:html={localeScript}></script>
+      <footer class="site-footer">
+        <p>
+          {locale === 'zh'
+            ? 'V1 骨架已经建立，下一步是接入 Feishu 内容同步与 Supabase 评论链路。'
+            : 'The V1 skeleton is now in place. Next comes Feishu content sync and the Supabase comment flow.'}
+        </p>
+      </footer>
+    </div>
   </body>
 </html>
