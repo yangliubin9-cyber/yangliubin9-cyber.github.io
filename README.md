@@ -113,6 +113,42 @@ Behavior:
 - GitHub Actions builds the Astro site
 - GitHub Pages publishes the result automatically
 
+## Comment Verification
+
+Use this page as a quick production test:
+
+- [https://yangliubin9-cyber.github.io/zh/linux-basic/](https://yangliubin9-cyber.github.io/zh/linux-basic/)
+
+Expected behavior:
+
+1. Open an article page and scroll to the bottom
+2. The comment section should render under the article body
+3. Sign in with GitHub if prompted
+4. Post a comment
+5. The first comment for a new article should create a matching GitHub issue in `Blogs-Comment`
+
+The issue term is based on the article slug, for example:
+
+- `blog-post:linux-basic`
+- `blog-post:docker-basic`
+- `blog-post:k8s`
+
+## Comment Troubleshooting
+
+If the comment box does not appear:
+
+1. Confirm the page is an article page, not the home page or series page
+2. Hard refresh the browser to clear cached HTML and scripts
+3. Confirm `Blogs-Comment` is public
+4. Confirm `Blogs-Comment` has Issues enabled
+5. Confirm the `utterances` GitHub App is installed for `Blogs-Comment`
+
+If the comment box appears but posting fails:
+
+1. Confirm you are signed in to GitHub
+2. Confirm GitHub did not block the authorization popup
+3. Open the `Blogs-Comment` Issues tab and check whether the issue thread was created
+
 ## Project Structure
 
 ```text
