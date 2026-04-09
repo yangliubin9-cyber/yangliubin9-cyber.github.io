@@ -19,7 +19,7 @@ What is already in place:
 
 - Astro static site scaffold
 - Root `/` redirect to `/zh/`
-- Bilingual route structure for home, about, search, article, series, login, and register pages
+- Bilingual route structure for home, about, search, article, and series pages
 - Real bilingual article content stored in Astro content collections
 - Home page reduced to brand intro plus curated featured articles
 - Working article pages with Markdown rendering, table of contents, tags, related post links, and series navigation
@@ -30,6 +30,8 @@ What is not integrated yet:
 
 - Feishu content sync
 - User authentication backend
+
+Legacy auth URLs are kept only as silent redirect routes back to the locale home page. They are not public product pages.
 
 What is already wired in for comments:
 
@@ -67,8 +69,11 @@ Current route layout:
 - `/zh/series/` and `/en/series/`
 - `/zh/series/[series_slug]/` and `/en/series/[series_slug]/`
 - `/zh/[slug]/` and `/en/[slug]/`
-- `/zh/auth/login/` and `/en/auth/login/`
-- `/zh/auth/register/` and `/en/auth/register/`
+
+Legacy redirect-only routes:
+
+- `/zh/auth/login/` and `/en/auth/login/` -> locale home
+- `/zh/auth/register/` and `/en/auth/register/` -> locale home
 
 ## Local Development
 
@@ -197,4 +202,4 @@ Later:
 
 1. Introduce publishing workflow and content transformation
 2. Replace GitHub-backed comments with a deeper custom auth and moderation flow if needed
-3. Decide whether the reserved auth routes should become real account pages or stay out of scope
+3. Decide whether a real account system is worth adding later, instead of keeping auth out of scope

@@ -1,19 +1,13 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import RouteRedirectPage from '../../../components/RouteRedirectPage.astro';
 import { localePath } from '../../../lib/routing';
-import { siteMeta } from '../../../data/site';
+
+const redirectTarget = localePath('en');
 ---
 
-<BaseLayout
-  title="Register"
-  description={siteMeta.description.en}
-  locale="en"
-  switchHref={localePath('zh', 'auth/register')}
-  switchLabel="中文"
->
-  <section class="hero">
-    <span class="kicker">Auth</span>
-    <h1 class="title">The register route is ready for a later email verification flow</h1>
-    <p class="lede">The current step focuses on structure and deployability before real auth is added.</p>
-  </section>
-</BaseLayout>
+<RouteRedirectPage
+  lang="en"
+  title="Returning Home"
+  redirectTarget={redirectTarget}
+  message="This page is unavailable. Returning to the homepage:"
+/>

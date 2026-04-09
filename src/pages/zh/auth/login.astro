@@ -1,19 +1,13 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import RouteRedirectPage from '../../../components/RouteRedirectPage.astro';
 import { localePath } from '../../../lib/routing';
-import { siteMeta } from '../../../data/site';
+
+const redirectTarget = localePath('zh');
 ---
 
-<BaseLayout
-  title="登录"
-  description={siteMeta.description.zh}
-  locale="zh"
-  switchHref={localePath('en', 'auth/login')}
-  switchLabel="English"
->
-  <section class="hero">
-    <span class="kicker">Auth</span>
-    <h1 class="title">登录页已预留，后续接入 Supabase Auth</h1>
-    <p class="lede">V1 目标是注册、邮箱验证后才能发表评论，当前先把公开路由稳定下来。</p>
-  </section>
-</BaseLayout>
+<RouteRedirectPage
+  lang="zh-CN"
+  title="返回首页"
+  redirectTarget={redirectTarget}
+  message="当前页面不可用，正在返回首页："
+/>

@@ -15,5 +15,9 @@ export default defineConfig({
   site,
   ...(base !== '/' ? { base } : {}),
   trailingSlash: 'always',
-  integrations: [sitemap()]
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/auth/login/') && !page.includes('/auth/register/')
+    })
+  ]
 });

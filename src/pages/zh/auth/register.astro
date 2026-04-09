@@ -1,19 +1,13 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import RouteRedirectPage from '../../../components/RouteRedirectPage.astro';
 import { localePath } from '../../../lib/routing';
-import { siteMeta } from '../../../data/site';
+
+const redirectTarget = localePath('zh');
 ---
 
-<BaseLayout
-  title="注册"
-  description={siteMeta.description.zh}
-  locale="zh"
-  switchHref={localePath('en', 'auth/register')}
-  switchLabel="English"
->
-  <section class="hero">
-    <span class="kicker">Auth</span>
-    <h1 class="title">注册页路由已预留，后续补邮箱验证流程</h1>
-    <p class="lede">现在先把站点结构和部署链路打通，再接入真实认证与评论审核能力。</p>
-  </section>
-</BaseLayout>
+<RouteRedirectPage
+  lang="zh-CN"
+  title="返回首页"
+  redirectTarget={redirectTarget}
+  message="当前页面不可用，正在返回首页："
+/>
