@@ -15,10 +15,10 @@ const { title, description, locale, switchHref, switchLabel } = Astro.props;
 
 const nav = locale === 'zh'
   ? [
-      { label: '首页', href: localePath('zh') },
-      { label: '系列', href: localePath('zh', 'series') },
-      { label: '搜索', href: localePath('zh', 'search') },
-      { label: '关于', href: localePath('zh', 'about') }
+      { label: '\u9996\u9875', href: localePath('zh') },
+      { label: '\u7cfb\u5217', href: localePath('zh', 'series') },
+      { label: '\u641c\u7d22', href: localePath('zh', 'search') },
+      { label: '\u5173\u4e8e', href: localePath('zh', 'about') }
     ]
   : [
       { label: 'Home', href: localePath('en') },
@@ -48,7 +48,7 @@ const nav = locale === 'zh'
           </span>
         </a>
 
-        <nav class="site-nav" aria-label={locale === 'zh' ? '主导航' : 'Primary'}>
+        <nav class="site-nav" aria-label={locale === 'zh' ? '\u4e3b\u5bfc\u822a' : 'Primary'}>
           {nav.map((item) => (
             <a href={item.href}>{item.label}</a>
           ))}
@@ -64,8 +64,8 @@ const nav = locale === 'zh'
       <footer class="site-footer">
         <p>
           {locale === 'zh'
-            ? 'V1 骨架已经建立，下一步是接入 Feishu 内容同步与 Supabase 评论链路。'
-            : 'The V1 skeleton is now in place. Next comes Feishu content sync and the Supabase comment flow.'}
+            ? '\u7b2c\u4e00\u7248\u9aa8\u67b6\u548c GitHub \u8bc4\u8bba\u5df2\u7ecf\u63a5\u597d\uff0c\u4e0b\u4e00\u6b65\u4f1a\u7ee7\u7eed\u63a5 Feishu \u5185\u5bb9\u540c\u6b65\u3002'
+            : 'The first release now includes the blog skeleton and GitHub-backed comments. Next comes Feishu content sync.'}
         </p>
       </footer>
     </div>
