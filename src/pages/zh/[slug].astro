@@ -94,12 +94,14 @@ const articleStructuredData = {
 >
   <section class="hero article-hero">
     <span class="kicker">{articleUi.kicker}</span>
-    <h1 class="title">{post.data.title}</h1>
-    <p class="lede">{post.data.summary}</p>
-    <div class="hero-actions">
-      {seriesItem && <span class="pill">{getSeriesName('zh', seriesItem)}</span>}
-      <span class="pill">{formatPublishDate('zh', post.data.publishedAt)}</span>
-      <span class="pill">{getReadingLabel('zh', post.data.readingMinutes)}</span>
+    <h1 class="title article-title">{post.data.title}</h1>
+    <p class="lede article-deck">{post.data.summary}</p>
+    <div class="article-hero-meta" aria-label="文章信息">
+      {seriesItem && (
+        <span class="article-hero-meta-item">{getSeriesName('zh', seriesItem)}</span>
+      )}
+      <span class="article-hero-meta-item">{formatPublishDate('zh', post.data.publishedAt)}</span>
+      <span class="article-hero-meta-item">{getReadingLabel('zh', post.data.readingMinutes)}</span>
     </div>
   </section>
 
