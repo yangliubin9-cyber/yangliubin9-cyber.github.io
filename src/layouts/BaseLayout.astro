@@ -137,10 +137,29 @@ const structuredDataItems = [
         });
       };
 
+      const setPreferencesMenuState = (menu, open) => {
+        if (!(menu instanceof HTMLElement)) {
+          return;
+        }
+
+        const toggle = menu.querySelector('[data-preferences-toggle]');
+        const panel = menu.querySelector('[data-preferences-panel]');
+
+        menu.dataset.open = String(open);
+
+        if (toggle instanceof HTMLButtonElement) {
+          toggle.setAttribute('aria-expanded', String(open));
+        }
+
+        if (panel instanceof HTMLElement) {
+          panel.hidden = !open;
+        }
+      };
+
       const closePreferencesMenus = () => {
         document.querySelectorAll('[data-preferences-menu]').forEach((menu) => {
-          if (menu instanceof HTMLDetailsElement) {
-            menu.open = false;
+          if (menu instanceof HTMLElement) {
+            setPreferencesMenuState(menu, false);
           }
         });
       };
@@ -174,10 +193,22 @@ const structuredDataItems = [
 
       document.addEventListener('DOMContentLoaded', () => {
         updateThemeButtons(getActiveTheme());
+        closePreferencesMenus();
       });
 
       document.addEventListener('click', (event) => {
         if (!(event.target instanceof Element)) {
+          return;
+        }
+
+        const toggle = event.target.closest('[data-preferences-toggle]');
+        if (toggle instanceof HTMLButtonElement) {
+          const menu = toggle.closest('[data-preferences-menu]');
+          if (menu instanceof HTMLElement) {
+            const isOpen = menu.dataset.open === 'true';
+            closePreferencesMenus();
+            setPreferencesMenuState(menu, !isOpen);
+          }
           return;
         }
 
@@ -191,15 +222,15 @@ const structuredDataItems = [
 
           applyTheme(theme, true);
           const menu = button.closest('[data-preferences-menu]');
-          if (menu instanceof HTMLDetailsElement) {
-            menu.open = false;
+          if (menu instanceof HTMLElement) {
+            setPreferencesMenuState(menu, false);
           }
           return;
         }
 
         document.querySelectorAll('[data-preferences-menu]').forEach((menu) => {
-          if (menu instanceof HTMLDetailsElement && menu.open && !menu.contains(event.target)) {
-            menu.open = false;
+          if (menu instanceof HTMLElement && menu.dataset.open === 'true' && !menu.contains(event.target)) {
+            setPreferencesMenuState(menu, false);
           }
         });
       });
@@ -237,14 +268,21 @@ const structuredDataItems = [
         </nav>
 
         <div class="site-tools">
-          <details class="preferences-menu" data-preferences-menu>
-            <summary class="preferences-toggle" aria-label={preferencesAria}>
+          <div class="preferences-menu" data-preferences-menu data-open="false">
+            <button
+              class="preferences-toggle"
+              type="button"
+              aria-label={preferencesAria}
+              aria-haspopup="true"
+              aria-expanded="false"
+              data-preferences-toggle
+            >
               <span class="preferences-current">{locale.toUpperCase()}</span>
               <span class="preferences-theme-icon" aria-hidden="true"></span>
               <span class="preferences-chevron" aria-hidden="true"></span>
-            </summary>
+            </button>
 
-            <div class="preferences-panel">
+            <div class="preferences-panel" data-preferences-panel hidden>
               <div class="preferences-section">
                 <span class="preferences-label">{ui.layout.languageLabel}</span>
                 <div class="segmented-control" aria-label={ui.layout.languageLabel}>
@@ -278,7 +316,7 @@ const structuredDataItems = [
                 </div>
               </div>
             </div>
-          </details>
+          </div>
         </div>
       </header>
 

@@ -210,14 +210,7 @@ select {
 
 .preferences-menu {
   position: relative;
-}
-
-.preferences-menu summary {
-  list-style: none;
-}
-
-.preferences-menu summary::-webkit-details-marker {
-  display: none;
+  z-index: 30;
 }
 
 .preferences-toggle {
@@ -225,6 +218,7 @@ select {
   align-items: center;
   gap: 10px;
   min-height: 44px;
+  width: 100%;
   padding: 8px 12px 8px 14px;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -244,7 +238,7 @@ select {
   outline-offset: 2px;
 }
 
-.preferences-menu[open] .preferences-toggle {
+.preferences-menu[data-open='true'] .preferences-toggle {
   border-color: var(--border-strong);
   background: var(--surface-card);
 }
@@ -283,7 +277,7 @@ select {
   transition: transform 140ms ease;
 }
 
-.preferences-menu[open] .preferences-chevron {
+.preferences-menu[data-open='true'] .preferences-chevron {
   transform: rotate(225deg) translateY(-1px);
 }
 
@@ -301,6 +295,11 @@ select {
   background: var(--panel);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
+  pointer-events: auto;
+}
+
+.preferences-panel[hidden] {
+  display: none;
 }
 
 .preferences-section {
@@ -1192,7 +1191,6 @@ select {
   }
 
   .preferences-toggle {
-    width: 100%;
     justify-content: space-between;
   }
 
