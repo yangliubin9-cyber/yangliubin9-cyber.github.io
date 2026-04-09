@@ -7,6 +7,12 @@ export const siteMeta = {
   }
 };
 
+export const commentsConfig = {
+  provider: 'utterances',
+  repo: 'yangliubin9-cyber/Blogs-Comment',
+  issueTermPrefix: 'blog-post'
+} as const;
+
 export const defaultLocale = 'zh';
 export const locales = ['zh', 'en'] as const;
 export type Locale = (typeof locales)[number];

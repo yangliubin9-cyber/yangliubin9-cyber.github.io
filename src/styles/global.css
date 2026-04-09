@@ -240,6 +240,23 @@ a {
   margin-bottom: 0;
 }
 
+.comments-section {
+  gap: 18px;
+}
+
+.comments-hint {
+  margin: 0;
+  color: var(--muted);
+}
+
+.comments-frame {
+  min-height: 220px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: rgba(255, 252, 247, 0.92);
+}
+
 .site-footer {
   margin-top: 10px;
   padding: 0 6px;

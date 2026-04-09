@@ -25,14 +25,18 @@ What is already in place:
 
 What is not integrated yet:
 
-- Comment system
 - Feishu content sync
 - Real search indexing
 - User authentication backend
 
-The next planned integration is the comment system:
+What is already wired in for comments:
 
 - Comment repo: [Blogs-Comment](https://github.com/yangliubin9-cyber/Blogs-Comment)
+- Comment provider: `utterances`
+- Comment storage: GitHub Issues in the comment repo
+- Current scope: article pages only
+
+Comment posting currently requires a GitHub account.
 
 Feishu sync stays for later, after the blog shell and comment path are stable.
 
@@ -135,12 +139,12 @@ Key files:
 
 Near-term:
 
-1. Connect the external comment system repo
-2. Replace seed article data with a real content source
-3. Add real search
+1. Replace seed article data with a real content source
+2. Add real search
+3. Refine the comment UX and moderation path
 
 Later:
 
 1. Add Feishu manual sync
 2. Introduce publishing workflow and content transformation
-3. Add authenticated commenting and moderation flow
+3. Replace GitHub-backed comments with a deeper custom auth and moderation flow if needed

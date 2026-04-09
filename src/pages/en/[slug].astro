@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import CommentsSection from '../../components/CommentsSection.astro';
 import {
   articles,
   getArticleSummary,
@@ -51,4 +52,5 @@ const seriesItem = getSeriesBySlug(article.seriesSlug);
     </p>
     <p class="article-meta">Published: {article.publishedAt}</p>
   </section>
+  <CommentsSection locale="en" threadId={article.slug} />
 </BaseLayout>

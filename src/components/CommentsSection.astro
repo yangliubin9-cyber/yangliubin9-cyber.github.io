@@ -1,0 +1,49 @@
+---
+import { commentsConfig, type Locale } from '../data/site';
+
+interface Props {
+  locale: Locale;
+  threadId: string;
+}
+
+const { locale, threadId } = Astro.props;
+
+const eyebrow = 'Community';
+const title = locale === 'zh' ? '\u8bc4\u8bba' : 'Comments';
+const description = locale === 'zh'
+  ? '\u5f53\u524d\u4f7f\u7528 GitHub Issues \u627f\u8f7d\u8bc4\u8bba\uff0c\u53d1\u8868\u8bc4\u8bba\u9700\u8981 GitHub \u8d26\u53f7\u3002'
+  : 'Comments are currently powered by GitHub Issues, so posting requires a GitHub account.';
+const hint = locale === 'zh'
+  ? '\u5982\u679c\u8bc4\u8bba\u6846\u6ca1\u6709\u51fa\u73b0\uff0c\u8bf7\u786e\u8ba4 Blogs-Comment \u4ed3\u5e93\u5df2\u5f00\u542f Issues\uff0c\u5e76\u5b89\u88c5 utterances app\u3002'
+  : 'If the comment box does not appear, make sure Issues are enabled on Blogs-Comment and the utterances app is installed for that repo.';
+const issueTerm = `${commentsConfig.issueTermPrefix}:${threadId}`;
+---
+
+<section class="section comments-section">
+  <div class="section-header">
+    <div>
+      <span class="eyebrow">{eyebrow}</span>
+      <h2>{title}</h2>
+    </div>
+    <p class="muted">{description}</p>
+  </div>
+
+  <p class="comments-hint">{hint}</p>
+
+  <div class="comments-frame">
+    <script is:inline define:vars={{ repo: commentsConfig.repo, issueTerm }}>
+      const mount = document.currentScript?.parentElement;
+      if (mount && !mount.dataset.loaded) {
+        mount.dataset.loaded = 'true';
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        script.setAttribute('repo', repo);
+        script.setAttribute('issue-term', issueTerm);
+        script.setAttribute('theme', 'github-light');
+        mount.appendChild(script);
+      }
+    </script>
+  </div>
+</section>
