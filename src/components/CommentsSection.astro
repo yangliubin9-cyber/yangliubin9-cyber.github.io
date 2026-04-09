@@ -1,5 +1,7 @@
 ---
 import { commentsConfig, type Locale } from '../data/site';
+import { getUiText } from '../data/ui';
+import { utterancesThemeMap } from '../lib/theme';
 
 interface Props {
   locale: Locale;
@@ -7,35 +9,7 @@ interface Props {
 }
 
 const { locale, threadId } = Astro.props;
-
-const eyebrow = 'Community';
-const title = locale === 'zh' ? '\u8bc4\u8bba\u533a' : 'Join the discussion';
-const description = locale === 'zh'
-  ? '\u8fd9\u91cc\u7684\u8ba8\u8bba\u7531 GitHub Issues \u627f\u8f7d\uff0c\u9002\u5408\u8bb0\u5f55\u95ee\u9898\u3001\u8865\u5145\u5b9e\u8df5\u7ecf\u9a8c\u3001\u6216\u8005\u76f4\u63a5\u7ea0\u9519\u3002'
-  : 'This discussion area is backed by GitHub Issues, which makes it easy to leave corrections, field notes, and follow-up questions in public.';
-const guideTitle = locale === 'zh' ? '\u53c2\u4e0e\u65b9\u5f0f' : 'How to participate';
-const repoLabel = locale === 'zh' ? '\u8bc4\u8bba\u4ed3\u5e93' : 'Comment repo';
-const threadLabel = locale === 'zh' ? '\u8ba8\u8bba\u6807\u8bc6' : 'Thread key';
-const primaryActionLabel = locale === 'zh' ? '\u6253\u5f00\u8bc4\u8bba\u8bdd\u9898' : 'Open issue threads';
-const secondaryActionLabel = locale === 'zh' ? '\u67e5\u770b\u4ed3\u5e93' : 'View repository';
-const loadingLabel = locale === 'zh' ? '\u6b63\u5728\u52a0\u8f7d\u8bc4\u8bba\u7ec4\u4ef6...' : 'Loading the comment widget...';
-const errorLabel = locale === 'zh'
-  ? '\u8bc4\u8bba\u7ec4\u4ef6\u52a0\u8f7d\u5931\u8d25\uff0c\u53ef\u4ee5\u5148\u6253\u5f00 GitHub Issues \u76f4\u63a5\u53c2\u4e0e\u8ba8\u8bba\u3002'
-  : 'The comment widget could not be loaded. You can still join the discussion directly in GitHub Issues.';
-const hint = locale === 'zh'
-  ? '\u5982\u679c\u8bc4\u8bba\u6846\u6ca1\u6709\u51fa\u73b0\uff0c\u53ef\u4ee5\u5148\u68c0\u67e5 Blogs-Comment \u4ed3\u5e93\u7684 Issues \u662f\u5426\u5df2\u542f\u7528\uff0c\u4e14 utterances app \u662f\u5426\u5df2\u7ecf\u5b89\u88c5\u5230\u8be5\u4ed3\u5e93\u3002'
-  : 'If the comment frame does not appear, first verify that Issues are enabled on Blogs-Comment and that the utterances app is installed for that repository.';
-const steps = locale === 'zh'
-  ? [
-      '\u5148\u7528 GitHub \u8d26\u53f7\u767b\u5f55\uff0c\u8fd9\u6837\u624d\u80fd\u5728\u6587\u7ae0\u4e0b\u7559\u8a00\u3002',
-      '\u9996\u6b21\u7559\u8a00\u65f6\uff0c\u7cfb\u7edf\u4f1a\u628a\u8fd9\u7bc7\u6587\u7ae0\u7ed1\u5b9a\u5230\u5bf9\u5e94\u7684 Issue \u8bdd\u9898\u3002',
-      '\u5982\u679c\u60f3\u76f4\u63a5\u5728 GitHub \u91cc\u7ba1\u7406\u8ba8\u8bba\uff0c\u53ef\u4ee5\u4ece\u4e0b\u9762\u7684\u4ed3\u5e93\u5165\u53e3\u8df3\u8f6c\u3002'
-    ]
-  : [
-      'Sign in with your GitHub account before posting a comment.',
-      'The first message on a post will be attached to a dedicated issue thread for this article.',
-      'If you prefer managing the discussion on GitHub directly, use the repository links below.'
-    ];
+const commentsUi = getUiText(locale).comments;
 const issueTerm = `${commentsConfig.issueTermPrefix}:${threadId}`;
 const repoUrl = `https://github.com/${commentsConfig.repo}`;
 const issuesUrl = `${repoUrl}/issues`;
@@ -44,25 +18,25 @@ const issuesUrl = `${repoUrl}/issues`;
 <section class="section comments-section">
   <div class="comments-intro">
     <div class="comments-copy">
-      <span class="eyebrow">{eyebrow}</span>
-      <h2>{title}</h2>
-      <p class="comments-description">{description}</p>
+      <span class="eyebrow">{commentsUi.eyebrow}</span>
+      <h2>{commentsUi.title}</h2>
+      <p class="comments-description">{commentsUi.description}</p>
     </div>
     <div class="comments-actions">
       <a class="button-link primary" href={issuesUrl} target="_blank" rel="noreferrer">
-        {primaryActionLabel}
+        {commentsUi.primaryActionLabel}
       </a>
       <a class="button-link" href={repoUrl} target="_blank" rel="noreferrer">
-        {secondaryActionLabel}
+        {commentsUi.secondaryActionLabel}
       </a>
     </div>
   </div>
 
   <div class="comments-guide">
     <article class="comments-guide-card">
-      <span class="comments-guide-kicker">{guideTitle}</span>
+      <span class="comments-guide-kicker">{commentsUi.guideTitle}</span>
       <ol class="comments-steps">
-        {steps.map((item) => (
+        {commentsUi.steps.map((item) => (
           <li>{item}</li>
         ))}
       </ol>
@@ -70,25 +44,32 @@ const issuesUrl = `${repoUrl}/issues`;
 
     <aside class="comments-meta-card">
       <div class="comments-meta-row">
-        <span>{repoLabel}</span>
+        <span>{commentsUi.repoLabel}</span>
         <code>{commentsConfig.repo}</code>
       </div>
       <div class="comments-meta-row">
-        <span>{threadLabel}</span>
+        <span>{commentsUi.threadLabel}</span>
         <code>{issueTerm}</code>
       </div>
-      <p class="comments-hint">{hint}</p>
+      <p class="comments-hint">{commentsUi.hint}</p>
     </aside>
   </div>
 
   <div class="comments-frame">
     <div class="comments-loading" data-comments-loading>
       <span class="comments-loading-dot" aria-hidden="true"></span>
-      <p>{loadingLabel}</p>
+      <p>{commentsUi.loadingLabel}</p>
     </div>
 
-    <script is:inline define:vars={{ repo: commentsConfig.repo, issueTerm, errorLabel }}>
+    <script
+      is:inline
+      define:vars={{ repo: commentsConfig.repo, issueTerm, errorLabel: commentsUi.errorLabel, utterancesThemeMap }}
+    >
       const mount = document.currentScript?.parentElement;
+
+      const resolveTheme = () =>
+        document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+
       if (mount && !mount.dataset.utterancesMounted) {
         mount.dataset.utterancesMounted = 'true';
         const loading = mount.querySelector('[data-comments-loading]');
@@ -98,7 +79,7 @@ const issuesUrl = `${repoUrl}/issues`;
         script.crossOrigin = 'anonymous';
         script.setAttribute('repo', repo);
         script.setAttribute('issue-term', issueTerm);
-        script.setAttribute('theme', 'github-light');
+        script.setAttribute('theme', utterancesThemeMap[resolveTheme()] ?? utterancesThemeMap.light);
         script.addEventListener('load', () => {
           loading?.remove();
         });

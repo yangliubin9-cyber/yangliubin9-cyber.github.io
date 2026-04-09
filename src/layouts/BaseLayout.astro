@@ -1,41 +1,134 @@
 ---
 import '../styles/global.css';
-import { localePath, withBase } from '../lib/routing';
 import type { Locale } from '../data/site';
+import { getUiText, languageCodes } from '../data/ui';
+import { localePath, withBase } from '../lib/routing';
+import { themeModes } from '../lib/theme';
 
 interface Props {
   title: string;
   description: string;
   locale: Locale;
   switchHref: string;
-  switchLabel: string;
+  switchLabel?: string;
 }
 
-const { title, description, locale, switchHref, switchLabel } = Astro.props;
-
-const nav = locale === 'zh'
-  ? [
-      { label: '\u9996\u9875', href: localePath('zh') },
-      { label: '\u7cfb\u5217', href: localePath('zh', 'series') },
-      { label: '\u641c\u7d22', href: localePath('zh', 'search') },
-      { label: '\u5173\u4e8e', href: localePath('zh', 'about') }
-    ]
-  : [
-      { label: 'Home', href: localePath('en') },
-      { label: 'Series', href: localePath('en', 'series') },
-      { label: 'Search', href: localePath('en', 'search') },
-      { label: 'About', href: localePath('en', 'about') }
-    ];
+const { title, description, locale, switchHref } = Astro.props;
+const ui = getUiText(locale);
+const nav = [
+  { label: ui.layout.nav.home, href: localePath(locale) },
+  { label: ui.layout.nav.series, href: localePath(locale, 'series') },
+  { label: ui.layout.nav.search, href: localePath(locale, 'search') },
+  { label: ui.layout.nav.about, href: localePath(locale, 'about') }
+];
+const languageOptions = [
+  {
+    code: languageCodes.zh,
+    href: locale === 'zh' ? localePath('zh') : switchHref,
+    active: locale === 'zh'
+  },
+  {
+    code: languageCodes.en,
+    href: locale === 'en' ? localePath('en') : switchHref,
+    active: locale === 'en'
+  }
+];
+const themeOptions = themeModes.map((mode) => ({
+  mode,
+  label: ui.layout.themeNames[mode]
+}));
+const lang = locale === 'zh' ? 'zh-CN' : 'en';
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <script is:inline>
+      const storageKey = 'muzi-theme';
+      const utterancesTheme = {
+        light: 'github-light',
+        dark: 'github-dark'
+      };
+      const root = document.documentElement;
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+      const getStoredTheme = () => {
+        const storedTheme = localStorage.getItem(storageKey);
+        return storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : null;
+      };
+
+      const getActiveTheme = () => (root.dataset.theme === 'dark' ? 'dark' : 'light');
+
+      const updateThemeButtons = (theme) => {
+        document.querySelectorAll('[data-theme-option]').forEach((button) => {
+          const isActive = button.getAttribute('data-theme-option') === theme;
+          button.classList.toggle('is-active', isActive);
+          button.setAttribute('aria-pressed', String(isActive));
+        });
+      };
+
+      const syncUtterancesTheme = (theme) => {
+        const frame = document.querySelector('.utterances-frame');
+        frame?.contentWindow?.postMessage(
+          {
+            type: 'set-theme',
+            theme: utterancesTheme[theme] ?? utterancesTheme.light
+          },
+          'https://utteranc.es'
+        );
+      };
+
+      const applyTheme = (theme, persist = true) => {
+        root.dataset.theme = theme;
+        root.style.colorScheme = theme;
+
+        if (persist) {
+          localStorage.setItem(storageKey, theme);
+        }
+
+        updateThemeButtons(theme);
+        syncUtterancesTheme(theme);
+        window.dispatchEvent(new CustomEvent('muzi:theme-change', { detail: { theme } }));
+      };
+
+      const resolveTheme = () => getStoredTheme() ?? (mediaQuery.matches ? 'dark' : 'light');
+      applyTheme(resolveTheme(), false);
+
+      document.addEventListener('DOMContentLoaded', () => {
+        updateThemeButtons(getActiveTheme());
+      });
+
+      document.addEventListener('click', (event) => {
+        const button =
+          event.target instanceof Element
+            ? event.target.closest('[data-theme-option]')
+            : null;
+
+        if (!(button instanceof HTMLButtonElement)) {
+          return;
+        }
+
+        const theme = button.getAttribute('data-theme-option');
+        if (theme !== 'light' && theme !== 'dark') {
+          return;
+        }
+
+        applyTheme(theme, true);
+      });
+
+      if (typeof mediaQuery.addEventListener === 'function') {
+        mediaQuery.addEventListener('change', (event) => {
+          if (!getStoredTheme()) {
+            applyTheme(event.matches ? 'dark' : 'light', false);
+          }
+        });
+      }
+    </script>
   </head>
   <body>
     <div class="shell">
@@ -48,13 +141,46 @@ const nav = locale === 'zh'
           </span>
         </a>
 
-        <nav class="site-nav" aria-label={locale === 'zh' ? '\u4e3b\u5bfc\u822a' : 'Primary'}>
+        <nav class="site-nav" aria-label={ui.layout.navAria}>
           {nav.map((item) => (
             <a href={item.href}>{item.label}</a>
           ))}
         </nav>
 
-        <a class="switch-link" href={switchHref}>{switchLabel}</a>
+        <div class="site-tools">
+          <div class="control-group">
+            <span class="control-label">{ui.layout.languageLabel}</span>
+            <div class="segmented-control" aria-label={ui.layout.languageLabel}>
+              {languageOptions.map((item) =>
+                item.active ? (
+                  <span class="segmented-option is-active" aria-current="page">
+                    {item.code}
+                  </span>
+                ) : (
+                  <a class="segmented-option" href={item.href}>
+                    {item.code}
+                  </a>
+                )
+              )}
+            </div>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">{ui.layout.themeLabel}</span>
+            <div class="segmented-control" aria-label={ui.layout.themeLabel}>
+              {themeOptions.map((item) => (
+                <button
+                  class="segmented-option"
+                  type="button"
+                  data-theme-option={item.mode}
+                  aria-pressed="false"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </header>
 
       <main class="page">
@@ -62,11 +188,7 @@ const nav = locale === 'zh'
       </main>
 
       <footer class="site-footer">
-        <p>
-          {locale === 'zh'
-            ? '\u672c\u5730\u5185\u5bb9\u5c42\u548c GitHub \u8bc4\u8bba\u5df2\u7ecf\u63a5\u597d\uff0c\u4e0b\u4e00\u6b65\u4f1a\u7ee7\u7eed\u8865\u641c\u7d22\u548c Feishu \u540c\u6b65\u3002'
-            : 'The local content layer and GitHub-backed comments are now live. Next comes deeper search and Feishu sync.'}
-        </p>
+        <p>{ui.layout.footer}</p>
       </footer>
     </div>
   </body>

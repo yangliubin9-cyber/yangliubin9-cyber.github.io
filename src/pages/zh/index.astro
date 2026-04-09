@@ -1,10 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getFeaturedPosts, getReadingLabel } from '../../lib/content';
-import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
 import { localePath } from '../../lib/routing';
+import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
+import { getUiText } from '../../data/ui';
 
 const featuredPosts = await getFeaturedPosts('zh');
+const homeUi = getUiText('zh').home;
 ---
 
 <BaseLayout
@@ -12,28 +14,24 @@ const featuredPosts = await getFeaturedPosts('zh');
   description={siteMeta.description.zh}
   locale="zh"
   switchHref={localePath('en')}
-  switchLabel="English"
 >
   <section class="hero hero-editorial">
-    <span class="kicker">Bilingual Field Notes</span>
-    <h1 class="title">把 AI 基础设施、容器化交付和云原生实践写成可复用的工程笔记</h1>
-    <p class="lede">
-      这里不追求把所有功能都堆在首页，而是先把站点定位讲清楚，再用少量精选文章带你进入主线。
-      内容聚焦 Linux、Docker、Kubernetes 和工程交付，写法尽量直接、可复用、可落地。
-    </p>
+    <span class="kicker">{homeUi.kicker}</span>
+    <h1 class="title">{homeUi.title}</h1>
+    <p class="lede">{homeUi.lede}</p>
     <div class="hero-actions">
-      <a class="button-link primary" href="#featured-posts">开始阅读</a>
-      <a class="button-link" href={localePath('zh', 'about')}>关于作者</a>
+      <a class="button-link primary" href="#featured-posts">{homeUi.primaryAction}</a>
+      <a class="button-link" href={localePath('zh', 'about')}>{homeUi.secondaryAction}</a>
     </div>
   </section>
 
   <section class="section" id="featured-posts">
     <div class="section-header">
       <div>
-        <span class="eyebrow">精选文章</span>
-        <h2>先读这些，最快进入站点主线</h2>
+        <span class="eyebrow">{homeUi.featuredEyebrow}</span>
+        <h2>{homeUi.featuredTitle}</h2>
       </div>
-      <p class="muted">首页只保留少量精选入口，其他功能都放回各自页面里。</p>
+      <p class="muted">{homeUi.featuredSummary}</p>
     </div>
 
     <div class="grid">
@@ -41,7 +39,9 @@ const featuredPosts = await getFeaturedPosts('zh');
         const seriesItem = getSeriesBySlug(post.data.series);
         return (
           <a class="card card-post" href={localePath('zh', post.data.pathSlug)}>
-            <span class="pill">{seriesItem ? getSeriesName('zh', seriesItem) : 'Article'}</span>
+            <span class="pill">
+              {seriesItem ? getSeriesName('zh', seriesItem) : homeUi.fallbackBadge}
+            </span>
             <h3>{post.data.title}</h3>
             <p class="muted">{post.data.summary}</p>
             <strong>{getReadingLabel('zh', post.data.readingMinutes)}</strong>

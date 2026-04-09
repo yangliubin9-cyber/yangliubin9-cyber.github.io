@@ -1,13 +1,15 @@
 ---
 import RouteRedirectPage from '../../../components/RouteRedirectPage.astro';
+import { getUiText } from '../../../data/ui';
 import { localePath } from '../../../lib/routing';
 
+const redirectUi = getUiText('en').redirect;
 const redirectTarget = localePath('en');
 ---
 
 <RouteRedirectPage
   lang="en"
-  title="Returning Home"
+  title={redirectUi.title}
   redirectTarget={redirectTarget}
-  message="This page is unavailable. Returning to the homepage:"
+  message={redirectUi.message}
 />

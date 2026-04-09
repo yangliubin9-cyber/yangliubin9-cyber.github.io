@@ -1,13 +1,15 @@
 ---
 import RouteRedirectPage from '../../../components/RouteRedirectPage.astro';
+import { getUiText } from '../../../data/ui';
 import { localePath } from '../../../lib/routing';
 
+const redirectUi = getUiText('zh').redirect;
 const redirectTarget = localePath('zh');
 ---
 
 <RouteRedirectPage
   lang="zh-CN"
-  title="返回首页"
+  title={redirectUi.title}
   redirectTarget={redirectTarget}
-  message="当前页面不可用，正在返回首页："
+  message={redirectUi.message}
 />

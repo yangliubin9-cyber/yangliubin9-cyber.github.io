@@ -1,10 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPosts, getReadingLabel } from '../../lib/content';
-import { getSeriesBySlug, getSeriesName, series, siteMeta } from '../../data/site';
 import { localePath } from '../../lib/routing';
+import { getSeriesBySlug, getSeriesName, series, siteMeta } from '../../data/site';
+import { getUiText } from '../../data/ui';
 
 const posts = await getPosts('zh');
+const searchUi = getUiText('zh').search;
 const seriesOptions = series.map((item) => ({
   slug: item.slug,
   label: getSeriesName('zh', item),
@@ -17,38 +19,34 @@ const seriesOptions = series.map((item) => ({
   description={siteMeta.description.zh}
   locale="zh"
   switchHref={localePath('en', 'search')}
-  switchLabel="English"
 >
   <section class="hero hero-editorial">
-    <span class="kicker">Search</span>
-    <h1 class="title">先快速定位文章，再决定要不要继续做全文索引</h1>
-    <p class="lede">
-      这一版先把站内搜索做顺手：支持关键词筛选、系列过滤、结果计数和一键清空。文章量继续变大后，再接
-      Pagefind 也不晚。
-    </p>
+    <span class="kicker">{searchUi.kicker}</span>
+    <h1 class="title">{searchUi.title}</h1>
+    <p class="lede">{searchUi.lede}</p>
   </section>
 
   <section class="section search-shell">
     <div class="search-toolbar">
-      <label class="search-label" for="post-search-zh">输入关键词</label>
+      <label class="search-label" for="post-search-zh">{searchUi.label}</label>
       <div class="search-input-row">
         <input
           id="post-search-zh"
           class="search-input"
           type="search"
-          placeholder="例如：docker、权限、deployment"
+          placeholder={searchUi.placeholder}
           data-search-input
         />
-        <button class="search-clear" type="button" data-search-clear disabled>清空</button>
+        <button class="search-clear" type="button" data-search-clear disabled>{searchUi.clear}</button>
       </div>
       <div class="search-toolbar-meta">
-        <p class="muted" data-search-count>当前展示全部 {posts.length} 篇文章。</p>
+        <p class="muted" data-search-count>{searchUi.allCount(posts.length)}</p>
       </div>
     </div>
 
-    <div class="search-filters" aria-label="系列筛选">
+    <div class="search-filters" aria-label={searchUi.filtersAria}>
       <button class="filter-chip is-active" type="button" data-series-filter="">
-        全部
+        {searchUi.allFilter}
         <span>{posts.length}</span>
       </button>
       {seriesOptions.map((item) => (
@@ -79,7 +77,7 @@ const seriesOptions = series.map((item) => ({
       })}
     </div>
 
-    <p class="search-empty muted" data-search-empty hidden>没有匹配文章，试试换一个关键词或切换系列。</p>
+    <p class="search-empty muted" data-search-empty hidden>{searchUi.empty}</p>
 
     <script is:inline>
       const root = document.currentScript?.closest('.search-shell');

@@ -2,6 +2,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { localePath } from '../../lib/routing';
 import { siteMeta } from '../../data/site';
+import { getUiText } from '../../data/ui';
+
+const aboutUi = getUiText('zh').about;
 ---
 
 <BaseLayout
@@ -9,24 +12,16 @@ import { siteMeta } from '../../data/site';
   description={siteMeta.description.zh}
   locale="zh"
   switchHref={localePath('en', 'about')}
-  switchLabel="English"
 >
   <section class="hero">
-    <span class="kicker">About</span>
-    <h1 class="title">站在 AI、平台与运维交汇处写工程博客</h1>
-    <p class="lede">
-      我关注的不是“某一个技术点会不会用”，而是模型训练、推理部署、平台稳定性与工程交付之间怎么真正连起来。
-    </p>
+    <span class="kicker">{aboutUi.kicker}</span>
+    <h1 class="title">{aboutUi.title}</h1>
+    <p class="lede">{aboutUi.lede}</p>
   </section>
 
   <section class="article-body">
-    <p>
-      我是 MUZI，一名专注于 AI 基础设施与开发运维一体化的工程师。这里会记录我在
-      Kubernetes、Docker、MLOps、CI/CD、GPU 调度和云原生系统中的实践、踩坑和判断。
-    </p>
-    <p>
-      这个博客会从双语信息架构开始，把内容来源、发布控制、评论审核和搜索能力拆开处理，
-      先把静态内容骨架和可验证的发布链路跑通，再逐步接入动态能力。
-    </p>
+    {aboutUi.paragraphs.map((item) => (
+      <p>{item}</p>
+    ))}
   </section>
 </BaseLayout>

@@ -1,10 +1,12 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getPosts } from '../../../lib/content';
-import { getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
 import { localePath } from '../../../lib/routing';
+import { getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
+import { getUiText } from '../../../data/ui';
 
 const posts = await getPosts('en');
+const seriesUi = getUiText('en').seriesIndex;
 ---
 
 <BaseLayout
@@ -12,15 +14,11 @@ const posts = await getPosts('en');
   description={siteMeta.description.en}
   locale="en"
   switchHref={localePath('zh', 'series')}
-  switchLabel="中文"
 >
   <section class="hero hero-editorial">
-    <span class="kicker">Series</span>
-    <h1 class="title">Use learning tracks to structure the archive</h1>
-    <p class="lede">
-      The current archive is organized around Linux, Docker, and Kubernetes. Each post belongs to one primary series,
-      which keeps navigation and future sync rules much simpler.
-    </p>
+    <span class="kicker">{seriesUi.kicker}</span>
+    <h1 class="title">{seriesUi.title}</h1>
+    <p class="lede">{seriesUi.lede}</p>
   </section>
 
   <section class="section">
@@ -32,7 +30,7 @@ const posts = await getPosts('en');
             <span class="pill">{getSeriesName('en', item)}</span>
             <h3>{getSeriesName('en', item)}</h3>
             <p>{getSeriesDescription('en', item)}</p>
-            <strong>{seriesPosts.length} posts</strong>
+            <strong>{seriesUi.count(seriesPosts.length)}</strong>
           </a>
         );
       })}

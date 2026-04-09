@@ -1,10 +1,12 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getPosts } from '../../../lib/content';
-import { getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
 import { localePath } from '../../../lib/routing';
+import { getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
+import { getUiText } from '../../../data/ui';
 
 const posts = await getPosts('zh');
+const seriesUi = getUiText('zh').seriesIndex;
 ---
 
 <BaseLayout
@@ -12,14 +14,11 @@ const posts = await getPosts('zh');
   description={siteMeta.description.zh}
   locale="zh"
   switchHref={localePath('en', 'series')}
-  switchLabel="English"
 >
   <section class="hero hero-editorial">
-    <span class="kicker">Series</span>
-    <h1 class="title">先有学习主线，再扩展内容密度</h1>
-    <p class="lede">
-      当前内容按 Linux、Docker、Kubernetes 三条主线组织。每篇文章只归属一个系列，方便阅读顺序、维护和后续同步。
-    </p>
+    <span class="kicker">{seriesUi.kicker}</span>
+    <h1 class="title">{seriesUi.title}</h1>
+    <p class="lede">{seriesUi.lede}</p>
   </section>
 
   <section class="section">
@@ -31,7 +30,7 @@ const posts = await getPosts('zh');
             <span class="pill">{getSeriesName('zh', item)}</span>
             <h3>{getSeriesName('zh', item)}</h3>
             <p>{getSeriesDescription('zh', item)}</p>
-            <strong>{seriesPosts.length} 篇文章</strong>
+            <strong>{seriesUi.count(seriesPosts.length)}</strong>
           </a>
         );
       })}

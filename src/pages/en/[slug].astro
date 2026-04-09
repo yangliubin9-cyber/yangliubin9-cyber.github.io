@@ -12,6 +12,7 @@ import {
 } from '../../lib/content';
 import { localePath } from '../../lib/routing';
 import { getSeriesBySlug, getSeriesName } from '../../data/site';
+import { getUiText } from '../../data/ui';
 
 export async function getStaticPaths() {
   const posts = await getPosts('en');
@@ -54,6 +55,7 @@ const { post, seriesPosts, progressIndex, totalInSeries, previousPost, nextPost,
   };
 
 const seriesItem = getSeriesBySlug(post.data.series);
+const articleUi = getUiText('en').article;
 const { Content, headings } = await render(post);
 const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) * 100}%` : '0%';
 ---
@@ -63,10 +65,9 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
   description={post.data.summary}
   locale="en"
   switchHref={localePath('zh', post.data.pathSlug)}
-  switchLabel="中文"
 >
   <section class="hero article-hero">
-    <span class="kicker">Field Note</span>
+    <span class="kicker">{articleUi.kicker}</span>
     <h1 class="title">{post.data.title}</h1>
     <p class="lede">{post.data.summary}</p>
     <div class="hero-actions">
@@ -79,15 +80,15 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
   {seriesItem && (
     <section class="section article-overview">
       <div class="article-overview-copy">
-        <span class="eyebrow">Reading Path</span>
+        <span class="eyebrow">{articleUi.overviewEyebrow}</span>
         <h2>{getSeriesName('en', seriesItem)}</h2>
-        <p class="muted">
-          You are on post {progressIndex} of {totalInSeries}. This series is easier to follow in order.
-        </p>
+        <p class="muted">{articleUi.overviewProgress(progressIndex, totalInSeries)}</p>
       </div>
       <div class="article-overview-actions">
-        <a class="button-link" href={localePath('en', `series/${seriesItem.slug}`)}>View series</a>
-        <a class="button-link" href={localePath('en')}>Back home</a>
+        <a class="button-link" href={localePath('en', `series/${seriesItem.slug}`)}>
+          {articleUi.overviewSeriesAction}
+        </a>
+        <a class="button-link" href={localePath('en')}>{articleUi.overviewBackHomeAction}</a>
       </div>
     </section>
   )}
@@ -100,15 +101,15 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
     <aside class="article-sidebar">
       {seriesItem && (
         <div class="article-sidecard">
-          <span class="eyebrow">Series Progress</span>
+          <span class="eyebrow">{articleUi.progressEyebrow}</span>
           <div class="series-progress-head">
             <strong>{getSeriesName('en', seriesItem)}</strong>
-            <p>Post {progressIndex} of {totalInSeries}</p>
+            <p>{articleUi.progressCount(progressIndex, totalInSeries)}</p>
           </div>
           <div class="series-progress-bar" aria-hidden="true">
             <span style={`width:${progressPercent}`}></span>
           </div>
-          <nav class="series-step-list" aria-label="Series order">
+          <nav class="series-step-list" aria-label={articleUi.progressAria}>
             {seriesPosts.map((item, index) => (
               <a
                 class:list={[
@@ -126,19 +127,19 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
       )}
 
       <div class="article-sidecard">
-        <span class="eyebrow">Post Info</span>
+        <span class="eyebrow">{articleUi.infoEyebrow}</span>
         <div class="meta-stack">
           <div>
-            <strong>Published</strong>
+            <strong>{articleUi.publishedLabel}</strong>
             <p>{formatPublishDate('en', post.data.publishedAt)}</p>
           </div>
           <div>
-            <strong>Reading time</strong>
+            <strong>{articleUi.readingTimeLabel}</strong>
             <p>{getReadingLabel('en', post.data.readingMinutes)}</p>
           </div>
           {seriesItem && (
             <div>
-              <strong>Series</strong>
+              <strong>{articleUi.seriesLabel}</strong>
               <p>{getSeriesName('en', seriesItem)}</p>
             </div>
           )}
@@ -147,8 +148,8 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
 
       {headings.length > 0 && (
         <div class="article-sidecard">
-          <span class="eyebrow">On This Page</span>
-          <nav class="toc-list" aria-label="Table of contents">
+          <span class="eyebrow">{articleUi.tocEyebrow}</span>
+          <nav class="toc-list" aria-label={articleUi.tocAria}>
             {headings.filter((item) => item.depth <= 3).map((item) => (
               <a href={`#${item.slug}`}>{item.text}</a>
             ))}
@@ -158,7 +159,7 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
 
       {post.data.tags.length > 0 && (
         <div class="article-sidecard">
-          <span class="eyebrow">Tags</span>
+          <span class="eyebrow">{articleUi.tagsEyebrow}</span>
           <div class="tag-list">
             {post.data.tags.map((tag) => (
               <span class="pill">#{tag}</span>
@@ -173,37 +174,37 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
     <div class="article-pager-grid">
       {previousPost ? (
         <a class="article-pager-card" href={localePath('en', previousPost.data.pathSlug)}>
-          <span class="article-pager-label">Previous</span>
+          <span class="article-pager-label">{articleUi.previousLabel}</span>
           <strong>{previousPost.data.title}</strong>
           <p>{previousPost.data.summary}</p>
         </a>
       ) : (
         <div class="article-pager-card article-pager-card--muted">
-          <span class="article-pager-label">Previous</span>
-          <strong>This is the first post in the series</strong>
-          <p>Continue downward from here to stay on the main track.</p>
+          <span class="article-pager-label">{articleUi.previousLabel}</span>
+          <strong>{articleUi.previousEmptyTitle}</strong>
+          <p>{articleUi.previousEmptyDescription}</p>
         </div>
       )}
 
       {seriesItem && (
         <a class="article-pager-card article-pager-card--center" href={localePath('en', `series/${seriesItem.slug}`)}>
-          <span class="article-pager-label">Series Overview</span>
+          <span class="article-pager-label">{articleUi.seriesOverviewLabel}</span>
           <strong>{getSeriesName('en', seriesItem)}</strong>
-          <p>Jump back to the series page and view the full sequence in one place.</p>
+          <p>{articleUi.seriesOverviewDescription}</p>
         </a>
       )}
 
       {nextPost ? (
         <a class="article-pager-card" href={localePath('en', nextPost.data.pathSlug)}>
-          <span class="article-pager-label">Next</span>
+          <span class="article-pager-label">{articleUi.nextLabel}</span>
           <strong>{nextPost.data.title}</strong>
           <p>{nextPost.data.summary}</p>
         </a>
       ) : (
         <div class="article-pager-card article-pager-card--muted">
-          <span class="article-pager-label">Next</span>
-          <strong>You reached the end of this series</strong>
-          <p>Head to the comments or back to the series index for the next move.</p>
+          <span class="article-pager-label">{articleUi.nextLabel}</span>
+          <strong>{articleUi.nextEmptyTitle}</strong>
+          <p>{articleUi.nextEmptyDescription}</p>
         </div>
       )}
     </div>
@@ -213,8 +214,8 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
     <section class="section">
       <div class="section-header">
         <div>
-          <span class="eyebrow">Keep Reading</span>
-          <h2>More from this series</h2>
+          <span class="eyebrow">{articleUi.keepReadingEyebrow}</span>
+          <h2>{articleUi.keepReadingTitle}</h2>
         </div>
       </div>
       <div class="grid">

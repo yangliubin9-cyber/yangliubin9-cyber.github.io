@@ -2,6 +2,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { localePath } from '../../lib/routing';
 import { siteMeta } from '../../data/site';
+import { getUiText } from '../../data/ui';
+
+const aboutUi = getUiText('en').about;
 ---
 
 <BaseLayout
@@ -9,27 +12,16 @@ import { siteMeta } from '../../data/site';
   description={siteMeta.description.en}
   locale="en"
   switchHref={localePath('zh', 'about')}
-  switchLabel="中文"
 >
   <section class="hero">
-    <span class="kicker">About</span>
-    <h1 class="title">Writing at the boundary of AI systems, platforms, and operations</h1>
-    <p class="lede">
-      The focus here is not isolated tools. It is how training, inference, platform stability, and
-      engineering delivery connect in real systems.
-    </p>
+    <span class="kicker">{aboutUi.kicker}</span>
+    <h1 class="title">{aboutUi.title}</h1>
+    <p class="lede">{aboutUi.lede}</p>
   </section>
 
   <section class="article-body">
-    <p>
-      I am MUZI, an engineer focused on AI infrastructure and DevOps-oriented delivery. This blog
-      will collect practical notes on Kubernetes, Docker, MLOps, CI/CD, GPU scheduling, and cloud
-      native systems.
-    </p>
-    <p>
-      The site starts with a bilingual information architecture, a static publishing path, and room
-      for Feishu sync and moderated comments later. The goal is to validate the content model before
-      layering on dynamic features.
-    </p>
+    {aboutUi.paragraphs.map((item) => (
+      <p>{item}</p>
+    ))}
   </section>
 </BaseLayout>

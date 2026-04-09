@@ -12,6 +12,7 @@ import {
 } from '../../lib/content';
 import { localePath } from '../../lib/routing';
 import { getSeriesBySlug, getSeriesName } from '../../data/site';
+import { getUiText } from '../../data/ui';
 
 export async function getStaticPaths() {
   const posts = await getPosts('zh');
@@ -54,6 +55,7 @@ const { post, seriesPosts, progressIndex, totalInSeries, previousPost, nextPost,
   };
 
 const seriesItem = getSeriesBySlug(post.data.series);
+const articleUi = getUiText('zh').article;
 const { Content, headings } = await render(post);
 const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) * 100}%` : '0%';
 ---
@@ -63,10 +65,9 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
   description={post.data.summary}
   locale="zh"
   switchHref={localePath('en', post.data.pathSlug)}
-  switchLabel="English"
 >
   <section class="hero article-hero">
-    <span class="kicker">Field Note</span>
+    <span class="kicker">{articleUi.kicker}</span>
     <h1 class="title">{post.data.title}</h1>
     <p class="lede">{post.data.summary}</p>
     <div class="hero-actions">
@@ -79,13 +80,15 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
   {seriesItem && (
     <section class="section article-overview">
       <div class="article-overview-copy">
-        <span class="eyebrow">阅读路径</span>
+        <span class="eyebrow">{articleUi.overviewEyebrow}</span>
         <h2>{getSeriesName('zh', seriesItem)}</h2>
-        <p class="muted">当前是本系列第 {progressIndex} 篇，共 {totalInSeries} 篇。建议按顺序读完这一条主线。</p>
+        <p class="muted">{articleUi.overviewProgress(progressIndex, totalInSeries)}</p>
       </div>
       <div class="article-overview-actions">
-        <a class="button-link" href={localePath('zh', `series/${seriesItem.slug}`)}>查看系列</a>
-        <a class="button-link" href={localePath('zh')}>回到首页</a>
+        <a class="button-link" href={localePath('zh', `series/${seriesItem.slug}`)}>
+          {articleUi.overviewSeriesAction}
+        </a>
+        <a class="button-link" href={localePath('zh')}>{articleUi.overviewBackHomeAction}</a>
       </div>
     </section>
   )}
@@ -98,15 +101,15 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
     <aside class="article-sidebar">
       {seriesItem && (
         <div class="article-sidecard">
-          <span class="eyebrow">系列进度</span>
+          <span class="eyebrow">{articleUi.progressEyebrow}</span>
           <div class="series-progress-head">
             <strong>{getSeriesName('zh', seriesItem)}</strong>
-            <p>第 {progressIndex} / {totalInSeries} 篇</p>
+            <p>{articleUi.progressCount(progressIndex, totalInSeries)}</p>
           </div>
           <div class="series-progress-bar" aria-hidden="true">
             <span style={`width:${progressPercent}`}></span>
           </div>
-          <nav class="series-step-list" aria-label="系列文章顺序">
+          <nav class="series-step-list" aria-label={articleUi.progressAria}>
             {seriesPosts.map((item, index) => (
               <a
                 class:list={[
@@ -124,19 +127,19 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
       )}
 
       <div class="article-sidecard">
-        <span class="eyebrow">文章信息</span>
+        <span class="eyebrow">{articleUi.infoEyebrow}</span>
         <div class="meta-stack">
           <div>
-            <strong>发布时间</strong>
+            <strong>{articleUi.publishedLabel}</strong>
             <p>{formatPublishDate('zh', post.data.publishedAt)}</p>
           </div>
           <div>
-            <strong>阅读时间</strong>
+            <strong>{articleUi.readingTimeLabel}</strong>
             <p>{getReadingLabel('zh', post.data.readingMinutes)}</p>
           </div>
           {seriesItem && (
             <div>
-              <strong>所属系列</strong>
+              <strong>{articleUi.seriesLabel}</strong>
               <p>{getSeriesName('zh', seriesItem)}</p>
             </div>
           )}
@@ -145,8 +148,8 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
 
       {headings.length > 0 && (
         <div class="article-sidecard">
-          <span class="eyebrow">目录</span>
-          <nav class="toc-list" aria-label="文章目录">
+          <span class="eyebrow">{articleUi.tocEyebrow}</span>
+          <nav class="toc-list" aria-label={articleUi.tocAria}>
             {headings.filter((item) => item.depth <= 3).map((item) => (
               <a href={`#${item.slug}`}>{item.text}</a>
             ))}
@@ -156,7 +159,7 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
 
       {post.data.tags.length > 0 && (
         <div class="article-sidecard">
-          <span class="eyebrow">标签</span>
+          <span class="eyebrow">{articleUi.tagsEyebrow}</span>
           <div class="tag-list">
             {post.data.tags.map((tag) => (
               <span class="pill">#{tag}</span>
@@ -171,37 +174,37 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
     <div class="article-pager-grid">
       {previousPost ? (
         <a class="article-pager-card" href={localePath('zh', previousPost.data.pathSlug)}>
-          <span class="article-pager-label">上一篇</span>
+          <span class="article-pager-label">{articleUi.previousLabel}</span>
           <strong>{previousPost.data.title}</strong>
           <p>{previousPost.data.summary}</p>
         </a>
       ) : (
         <div class="article-pager-card article-pager-card--muted">
-          <span class="article-pager-label">上一篇</span>
-          <strong>已经是系列起点</strong>
-          <p>从这里开始继续往后读就可以。</p>
+          <span class="article-pager-label">{articleUi.previousLabel}</span>
+          <strong>{articleUi.previousEmptyTitle}</strong>
+          <p>{articleUi.previousEmptyDescription}</p>
         </div>
       )}
 
       {seriesItem && (
         <a class="article-pager-card article-pager-card--center" href={localePath('zh', `series/${seriesItem.slug}`)}>
-          <span class="article-pager-label">系列总览</span>
+          <span class="article-pager-label">{articleUi.seriesOverviewLabel}</span>
           <strong>{getSeriesName('zh', seriesItem)}</strong>
-          <p>回到系列页，按顺序查看这一条主线里的所有文章。</p>
+          <p>{articleUi.seriesOverviewDescription}</p>
         </a>
       )}
 
       {nextPost ? (
         <a class="article-pager-card" href={localePath('zh', nextPost.data.pathSlug)}>
-          <span class="article-pager-label">下一篇</span>
+          <span class="article-pager-label">{articleUi.nextLabel}</span>
           <strong>{nextPost.data.title}</strong>
           <p>{nextPost.data.summary}</p>
         </a>
       ) : (
         <div class="article-pager-card article-pager-card--muted">
-          <span class="article-pager-label">下一篇</span>
-          <strong>已经读到系列末尾</strong>
-          <p>可以回到系列页，或者直接去评论区补充你的经验。</p>
+          <span class="article-pager-label">{articleUi.nextLabel}</span>
+          <strong>{articleUi.nextEmptyTitle}</strong>
+          <p>{articleUi.nextEmptyDescription}</p>
         </div>
       )}
     </div>
@@ -211,8 +214,8 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
     <section class="section">
       <div class="section-header">
         <div>
-          <span class="eyebrow">继续阅读</span>
-          <h2>同系列更多文章</h2>
+          <span class="eyebrow">{articleUi.keepReadingEyebrow}</span>
+          <h2>{articleUi.keepReadingTitle}</h2>
         </div>
       </div>
       <div class="grid">

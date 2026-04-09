@@ -3,6 +3,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { formatPublishDate, getPosts, getReadingLabel, type PostEntry } from '../../../lib/content';
 import { localePath } from '../../../lib/routing';
 import { getSeriesDescription, getSeriesName, series, type Series } from '../../../data/site';
+import { getUiText } from '../../../data/ui';
 
 export async function getStaticPaths() {
   const posts = await getPosts('zh');
@@ -19,6 +20,8 @@ const { seriesItem, seriesPosts } = Astro.props as {
   seriesItem: Series;
   seriesPosts: PostEntry[];
 };
+
+const seriesDetailUi = getUiText('zh').seriesDetail;
 ---
 
 <BaseLayout
@@ -26,21 +29,20 @@ const { seriesItem, seriesPosts } = Astro.props as {
   description={getSeriesDescription('zh', seriesItem)}
   locale="zh"
   switchHref={localePath('en', `series/${seriesItem.slug}`)}
-  switchLabel="English"
 >
   <section class="hero hero-editorial">
-    <span class="kicker">Series Detail</span>
+    <span class="kicker">{seriesDetailUi.kicker}</span>
     <h1 class="title">{getSeriesName('zh', seriesItem)}</h1>
     <p class="lede">{getSeriesDescription('zh', seriesItem)}</p>
     <div class="hero-facts">
       <div class="fact-chip">
         <strong>{seriesPosts.length}</strong>
-        <span>篇文章</span>
+        <span>{seriesDetailUi.countLabel}</span>
       </div>
       {seriesPosts[0] && (
         <div class="fact-chip">
           <strong>{formatPublishDate('zh', seriesPosts[0].data.publishedAt)}</strong>
-          <span>最近发布时间</span>
+          <span>{seriesDetailUi.latestPublishLabel}</span>
         </div>
       )}
     </div>

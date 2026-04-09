@@ -9,7 +9,7 @@ Current focus:
 - Chinese-first bilingual routing, `zh` and `en`
 - Static pages deployed with GitHub Pages
 - Local Markdown content collections for AI infrastructure, MLOps, Kubernetes, Docker, and engineering practice
-- A practical blog shell with real article pages, series pages, and in-page search
+- A practical blog shell with real article pages, series pages, in-page search, and site-wide language/theme controls
 
 ## Current Status
 
@@ -20,6 +20,8 @@ What is already in place:
 - Astro static site scaffold
 - Root `/` redirect to `/zh/`
 - Bilingual route structure for home, about, search, article, and series pages
+- Site-wide `ZH/EN` language switch in the header
+- Persistent light and dark theme toggle across public pages
 - Real bilingual article content stored in Astro content collections
 - Home page reduced to brand intro plus curated featured articles
 - Working article pages with Markdown rendering, table of contents, tags, related post links, and series navigation
