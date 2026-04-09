@@ -38,6 +38,7 @@ const themeOptions = themeModes.map((mode) => ({
   label: ui.layout.themeNames[mode]
 }));
 const lang = locale === 'zh' ? 'zh-CN' : 'en';
+const preferencesAria = `${ui.layout.languageLabel} / ${ui.layout.themeLabel}`;
 ---
 
 <!doctype html>
@@ -69,6 +70,14 @@ const lang = locale === 'zh' ? 'zh-CN' : 'en';
           const isActive = button.getAttribute('data-theme-option') === theme;
           button.classList.toggle('is-active', isActive);
           button.setAttribute('aria-pressed', String(isActive));
+        });
+      };
+
+      const closePreferencesMenus = () => {
+        document.querySelectorAll('[data-preferences-menu]').forEach((menu) => {
+          if (menu instanceof HTMLDetailsElement) {
+            menu.open = false;
+          }
         });
       };
 
@@ -104,21 +113,37 @@ const lang = locale === 'zh' ? 'zh-CN' : 'en';
       });
 
       document.addEventListener('click', (event) => {
-        const button =
-          event.target instanceof Element
-            ? event.target.closest('[data-theme-option]')
-            : null;
-
-        if (!(button instanceof HTMLButtonElement)) {
+        if (!(event.target instanceof Element)) {
           return;
         }
 
-        const theme = button.getAttribute('data-theme-option');
-        if (theme !== 'light' && theme !== 'dark') {
+        const button = event.target.closest('[data-theme-option]');
+
+        if (button instanceof HTMLButtonElement) {
+          const theme = button.getAttribute('data-theme-option');
+          if (theme !== 'light' && theme !== 'dark') {
+            return;
+          }
+
+          applyTheme(theme, true);
+          const menu = button.closest('[data-preferences-menu]');
+          if (menu instanceof HTMLDetailsElement) {
+            menu.open = false;
+          }
           return;
         }
 
-        applyTheme(theme, true);
+        document.querySelectorAll('[data-preferences-menu]').forEach((menu) => {
+          if (menu instanceof HTMLDetailsElement && menu.open && !menu.contains(event.target)) {
+            menu.open = false;
+          }
+        });
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closePreferencesMenus();
+        }
       });
 
       if (typeof mediaQuery.addEventListener === 'function') {
@@ -148,38 +173,48 @@ const lang = locale === 'zh' ? 'zh-CN' : 'en';
         </nav>
 
         <div class="site-tools">
-          <div class="control-group">
-            <span class="control-label">{ui.layout.languageLabel}</span>
-            <div class="segmented-control" aria-label={ui.layout.languageLabel}>
-              {languageOptions.map((item) =>
-                item.active ? (
-                  <span class="segmented-option is-active" aria-current="page">
-                    {item.code}
-                  </span>
-                ) : (
-                  <a class="segmented-option" href={item.href}>
-                    {item.code}
-                  </a>
-                )
-              )}
-            </div>
-          </div>
+          <details class="preferences-menu" data-preferences-menu>
+            <summary class="preferences-toggle" aria-label={preferencesAria}>
+              <span class="preferences-current">{locale.toUpperCase()}</span>
+              <span class="preferences-theme-icon" aria-hidden="true"></span>
+              <span class="preferences-chevron" aria-hidden="true"></span>
+            </summary>
 
-          <div class="control-group">
-            <span class="control-label">{ui.layout.themeLabel}</span>
-            <div class="segmented-control" aria-label={ui.layout.themeLabel}>
-              {themeOptions.map((item) => (
-                <button
-                  class="segmented-option"
-                  type="button"
-                  data-theme-option={item.mode}
-                  aria-pressed="false"
-                >
-                  {item.label}
-                </button>
-              ))}
+            <div class="preferences-panel">
+              <div class="preferences-section">
+                <span class="preferences-label">{ui.layout.languageLabel}</span>
+                <div class="segmented-control" aria-label={ui.layout.languageLabel}>
+                  {languageOptions.map((item) =>
+                    item.active ? (
+                      <span class="segmented-option is-active" aria-current="page">
+                        {item.code}
+                      </span>
+                    ) : (
+                      <a class="segmented-option" href={item.href}>
+                        {item.code}
+                      </a>
+                    )
+                  )}
+                </div>
+              </div>
+
+              <div class="preferences-section">
+                <span class="preferences-label">{ui.layout.themeLabel}</span>
+                <div class="segmented-control" aria-label={ui.layout.themeLabel}>
+                  {themeOptions.map((item) => (
+                    <button
+                      class="segmented-option"
+                      type="button"
+                      data-theme-option={item.mode}
+                      aria-pressed="false"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          </details>
         </div>
       </header>
 
