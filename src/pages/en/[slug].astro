@@ -11,7 +11,7 @@ import {
   type PostEntry
 } from '../../lib/content';
 import { localePath } from '../../lib/routing';
-import { getSeriesBySlug, getSeriesName } from '../../data/site';
+import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
 import { getUiText } from '../../data/ui';
 
 export async function getStaticPaths() {
@@ -58,6 +58,28 @@ const seriesItem = getSeriesBySlug(post.data.series);
 const articleUi = getUiText('en').article;
 const { Content, headings } = await render(post);
 const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) * 100}%` : '0%';
+const articleKeywords = [...post.data.tags, ...(seriesItem ? [getSeriesName('en', seriesItem)] : [])];
+const articleStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: post.data.title,
+  description: post.data.summary,
+  datePublished: post.data.publishedAt.toISOString(),
+  dateModified: post.data.publishedAt.toISOString(),
+  inLanguage: 'en-US',
+  mainEntityOfPage: new URL(localePath('en', post.data.pathSlug), siteMeta.url).toString(),
+  author: {
+    '@type': 'Person',
+    name: siteMeta.author.name,
+    url: siteMeta.author.github
+  },
+  publisher: {
+    '@type': 'Person',
+    name: siteMeta.author.name,
+    url: siteMeta.author.github
+  },
+  keywords: articleKeywords.join(', ')
+};
 ---
 
 <BaseLayout
@@ -65,6 +87,10 @@ const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) *
   description={post.data.summary}
   locale="en"
   switchHref={localePath('zh', post.data.pathSlug)}
+  ogType="article"
+  publishedTime={post.data.publishedAt.toISOString()}
+  keywords={articleKeywords}
+  structuredData={articleStructuredData}
 >
   <section class="hero article-hero">
     <span class="kicker">{articleUi.kicker}</span>

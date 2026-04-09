@@ -5,6 +5,19 @@ import { siteMeta } from '../../data/site';
 import { getUiText } from '../../data/ui';
 
 const aboutUi = getUiText('en').about;
+const aboutStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'About MUZI',
+  description: siteMeta.description.en,
+  url: new URL(localePath('en', 'about'), siteMeta.url).toString(),
+  inLanguage: 'en-US',
+  mainEntity: {
+    '@type': 'Person',
+    name: siteMeta.author.name,
+    url: siteMeta.author.github
+  }
+};
 ---
 
 <BaseLayout
@@ -12,6 +25,8 @@ const aboutUi = getUiText('en').about;
   description={siteMeta.description.en}
   locale="en"
   switchHref={localePath('zh', 'about')}
+  keywords={['about the author', 'AI infrastructure', 'cloud native', 'engineering blog']}
+  structuredData={aboutStructuredData}
 >
   <section class="hero">
     <span class="kicker">{aboutUi.kicker}</span>

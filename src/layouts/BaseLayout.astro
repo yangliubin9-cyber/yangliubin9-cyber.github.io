@@ -1,9 +1,11 @@
 ---
 import '../styles/global.css';
-import type { Locale } from '../data/site';
+import { siteMeta, type Locale } from '../data/site';
 import { getUiText, languageCodes } from '../data/ui';
 import { localePath, withBase } from '../lib/routing';
 import { themeModes } from '../lib/theme';
+
+type StructuredData = Record<string, unknown>;
 
 interface Props {
   title: string;
@@ -11,9 +13,26 @@ interface Props {
   locale: Locale;
   switchHref: string;
   switchLabel?: string;
+  ogType?: 'website' | 'article';
+  imagePath?: string;
+  noIndex?: boolean;
+  publishedTime?: string;
+  keywords?: string[];
+  structuredData?: StructuredData | StructuredData[];
 }
 
-const { title, description, locale, switchHref } = Astro.props;
+const {
+  title,
+  description,
+  locale,
+  switchHref,
+  ogType = 'website',
+  imagePath = siteMeta.socialImage,
+  noIndex = false,
+  publishedTime,
+  keywords = [],
+  structuredData
+} = Astro.props;
 const ui = getUiText(locale);
 const nav = [
   { label: ui.layout.nav.home, href: localePath(locale) },
@@ -39,6 +58,29 @@ const themeOptions = themeModes.map((mode) => ({
 }));
 const lang = locale === 'zh' ? 'zh-CN' : 'en';
 const preferencesAria = `${ui.layout.languageLabel} / ${ui.layout.themeLabel}`;
+const siteOrigin = Astro.site ?? new URL(siteMeta.url);
+const canonicalUrl = new URL(Astro.url.pathname, siteOrigin).toString();
+const alternateUrl = new URL(switchHref, siteOrigin).toString();
+const socialImageUrl = new URL(withBase(imagePath), siteOrigin).toString();
+const ogLocale = locale === 'zh' ? 'zh_CN' : 'en_US';
+const alternateLocale = locale === 'zh' ? 'en_US' : 'zh_CN';
+const baseStructuredData: StructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: `${siteMeta.brand} | ${siteMeta.title}`,
+  url: siteMeta.url,
+  description,
+  inLanguage: ['zh-CN', 'en-US'],
+  publisher: {
+    '@type': 'Person',
+    name: siteMeta.author.name,
+    url: siteMeta.author.github
+  }
+};
+const structuredDataItems = [
+  baseStructuredData,
+  ...(structuredData ? (Array.isArray(structuredData) ? structuredData : [structuredData]) : [])
+];
 ---
 
 <!doctype html>
@@ -48,7 +90,29 @@ const preferencesAria = `${ui.layout.languageLabel} / ${ui.layout.themeLabel}`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content={noIndex ? 'noindex,nofollow' : 'index,follow'} />
+    <meta name="theme-color" content="#9a4a18" />
+    {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang={lang} href={canonicalUrl} />
+    <link rel="alternate" hreflang={locale === 'zh' ? 'en' : 'zh'} href={alternateUrl} />
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <meta property="og:site_name" content={`${siteMeta.brand} | ${siteMeta.title}`} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:locale:alternate" content={alternateLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageUrl} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {ogType === 'article' &&
+      keywords.map((keyword) => <meta property="article:tag" content={keyword} />)}
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredDataItems)} />
     <script is:inline>
       const storageKey = 'muzi-theme';
       const utterancesTheme = {

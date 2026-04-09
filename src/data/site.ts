@@ -1,6 +1,16 @@
 export const siteMeta = {
   title: "Yang's Blogs",
   brand: 'MUZI',
+  url: 'https://yangliubin9-cyber.github.io',
+  socialImage: '/social-card.svg',
+  author: {
+    name: 'Yang Liubin',
+    github: 'https://github.com/yangliubin9-cyber'
+  },
+  repositories: {
+    site: 'https://github.com/yangliubin9-cyber/yangliubin9-cyber.github.io',
+    comments: 'https://github.com/yangliubin9-cyber/Blogs-Comment'
+  },
   description: {
     zh: '记录 AI 基础设施、MLOps、Kubernetes、Docker 与工程实践的双语技术博客。',
     en: 'A bilingual engineering blog about AI infrastructure, MLOps, Kubernetes, Docker, and practical delivery.'

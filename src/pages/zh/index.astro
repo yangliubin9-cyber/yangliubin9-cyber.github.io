@@ -7,6 +7,19 @@ import { getUiText } from '../../data/ui';
 
 const featuredPosts = await getFeaturedPosts('zh');
 const homeUi = getUiText('zh').home;
+const homeStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'MUZI | AI 基础设施与工程实践',
+  description: siteMeta.description.zh,
+  url: new URL(localePath('zh'), siteMeta.url).toString(),
+  inLanguage: 'zh-CN',
+  isPartOf: {
+    '@type': 'WebSite',
+    name: `${siteMeta.brand} | ${siteMeta.title}`,
+    url: siteMeta.url
+  }
+};
 ---
 
 <BaseLayout
@@ -14,6 +27,8 @@ const homeUi = getUiText('zh').home;
   description={siteMeta.description.zh}
   locale="zh"
   switchHref={localePath('en')}
+  keywords={['AI 基础设施', 'MLOps', 'Kubernetes', 'Docker', '工程实践']}
+  structuredData={homeStructuredData}
 >
   <section class="hero hero-editorial">
     <span class="kicker">{homeUi.kicker}</span>

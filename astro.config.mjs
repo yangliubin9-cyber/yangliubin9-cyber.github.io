@@ -7,7 +7,7 @@ const isProjectPagesRepo = Boolean(
   repository && owner && repository !== `${owner}.github.io`
 );
 
-const site = process.env.SITE_URL ?? (owner ? `https://${owner}.github.io` : 'https://example.com');
+const site = process.env.SITE_URL ?? (owner ? `https://${owner}.github.io` : 'https://yangliubin9-cyber.github.io');
 const base = process.env.BASE_PATH ?? (isProjectPagesRepo ? `/${repository}` : '/');
 
 export default defineConfig({
@@ -17,7 +17,12 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/auth/login/') && !page.includes('/auth/register/')
+      filter: (page) =>
+        page !== site &&
+        page !== `${site}/` &&
+        !page.includes('/search/') &&
+        !page.includes('/auth/login/') &&
+        !page.includes('/auth/register/')
     })
   ]
 });

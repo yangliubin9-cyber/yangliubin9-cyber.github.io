@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localePath } from '../lib/routing';
+import { siteMeta } from '../data/site';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Page not found | MUZI',
+  description: 'The requested page is unavailable. Return to the bilingual blog entry points.',
+  url: new URL('/404.html', siteMeta.url).toString(),
+  inLanguage: ['zh-CN', 'en-US']
+};
+---
+
+<BaseLayout
+  title="Page not found | MUZI"
+  description="The requested page is unavailable. Return to the bilingual blog entry points."
+  locale="zh"
+  switchHref={localePath('en')}
+  noIndex={true}
+  structuredData={structuredData}
+>
+  <section class="hero hero-editorial">
+    <span class="kicker">404 / 页面不存在</span>
+    <h1 class="title">这个地址现在没有内容，先回到博客主入口。</h1>
+    <p class="lede">
+      你可以回到中文首页继续阅读，也可以直接打开 English homepage。站点主体内容仍然按
+      <code>/zh/</code> 和 <code>/en/</code> 两条路径组织。
+    </p>
+    <div class="hero-actions">
+      <a class="button-link primary" href={localePath('zh')}>返回中文首页</a>
+      <a class="button-link" href={localePath('en')}>Open English Home</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="grid">
+      <a class="card" href={localePath('zh', 'series')}>
+        <span class="eyebrow">继续阅读</span>
+        <h2>浏览中文系列</h2>
+        <p class="muted">按 Linux、Docker、Kubernetes 三条主线继续往下读。</p>
+      </a>
+
+      <a class="card" href={localePath('en', 'about')}>
+        <span class="eyebrow">About</span>
+        <h2>Read the English overview</h2>
+        <p class="muted">Jump to the bilingual site overview and author context.</p>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
