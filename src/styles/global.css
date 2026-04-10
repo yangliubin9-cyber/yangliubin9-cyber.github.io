@@ -96,6 +96,10 @@ body {
   transition: background 180ms ease, color 180ms ease;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 a {
   color: inherit;
   text-decoration: none;
