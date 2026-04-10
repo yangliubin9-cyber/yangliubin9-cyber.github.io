@@ -11,8 +11,7 @@ interface Props {
 const { locale, threadId } = Astro.props;
 const commentsUi = getUiText(locale).comments;
 const issueTerm = `${commentsConfig.issueTermPrefix}:${threadId}`;
-const repoUrl = `https://github.com/${commentsConfig.repo}`;
-const issuesUrl = `${repoUrl}/issues`;
+const issuesUrl = `https://github.com/${commentsConfig.repo}/issues`;
 ---
 
 <section class="section comments-section">
@@ -26,33 +25,7 @@ const issuesUrl = `${repoUrl}/issues`;
       <a class="button-link primary" href={issuesUrl} target="_blank" rel="noreferrer">
         {commentsUi.primaryActionLabel}
       </a>
-      <a class="button-link" href={repoUrl} target="_blank" rel="noreferrer">
-        {commentsUi.secondaryActionLabel}
-      </a>
     </div>
-  </div>
-
-  <div class="comments-guide">
-    <article class="comments-guide-card">
-      <span class="comments-guide-kicker">{commentsUi.guideTitle}</span>
-      <ol class="comments-steps">
-        {commentsUi.steps.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ol>
-    </article>
-
-    <aside class="comments-meta-card">
-      <div class="comments-meta-row">
-        <span>{commentsUi.repoLabel}</span>
-        <code>{commentsConfig.repo}</code>
-      </div>
-      <div class="comments-meta-row">
-        <span>{commentsUi.threadLabel}</span>
-        <code>{issueTerm}</code>
-      </div>
-      <p class="comments-hint">{commentsUi.hint}</p>
-    </aside>
   </div>
 
   <div class="comments-frame">

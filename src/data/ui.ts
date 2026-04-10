@@ -245,7 +245,7 @@ const zhUi: LocaleUi = {
     eyebrow: '交流讨论',
     title: '评论区',
     description:
-      '这里的讨论直接承载在 GitHub Issues 上，适合补充实践细节、记录现场问题，或者直接指出文中的可改进点。',
+      '可以登录账户在下面对本篇文章提出见解。',
     guideTitle: '参与方式',
     repoLabel: '评论仓库',
     threadLabel: '讨论标识',
@@ -388,7 +388,7 @@ const enUi: LocaleUi = {
     eyebrow: 'Discussion',
     title: 'Join the discussion',
     description:
-      'The discussion lives in GitHub Issues, which makes it easy to leave corrections, field notes, and follow-up questions in public.',
+      'Sign in and share your thoughts on this article below.',
     guideTitle: 'How to participate',
     repoLabel: 'Comment repo',
     threadLabel: 'Thread key',
