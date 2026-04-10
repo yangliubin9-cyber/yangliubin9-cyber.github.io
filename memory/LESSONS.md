@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-10: If a visual variant keeps fighting a shared utility class, stop stacking styles and split the variant into its own fully-owned class. A half-shared `.pill + .card-pill` setup is easy to misread and makes repeated badge tweaks slower and riskier.
+
 - 2026-04-10: For category badges, a width cap plus ellipsis is the wrong fallback when the label itself is the meaning. Keep the badge compact by reducing font size and padding first, and only clip when the card itself becomes narrower than the content.
 
 - 2026-04-10: Card badges that should look like pills should not use a shared fixed width. Use a shared class for typography and padding, but let width shrink to content with only a max-width cap. Fixed widths make short labels like Linux look bloated and create the exact "small box too wide" bug users notice first.
