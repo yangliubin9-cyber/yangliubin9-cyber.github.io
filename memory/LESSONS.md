@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-10: If a filter button needs centered text plus a count badge, do not center the text and badge as one flex row. Keep the button text centered and absolutely position the count bubble to the right, otherwise chips with different labels will look visually different even when the outer width is the same.
+
 - 2026-04-10: Search filter chips are a different UI problem from article badges. If the requirement is "all tags the same size", use a grid plus fixed-width count bubbles on `.search-filters` and `.filter-chip`, not repeated tweaks on the article `.card-pill`.
 
 - 2026-04-10: If a visual variant keeps fighting a shared utility class, stop stacking styles and split the variant into its own fully-owned class. A half-shared `.pill + .card-pill` setup is easy to misread and makes repeated badge tweaks slower and riskier.
