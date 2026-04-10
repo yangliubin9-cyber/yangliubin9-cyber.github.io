@@ -1207,21 +1207,26 @@ select {
 }
 
 .search-filters {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
 .filter-chip {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 10px 14px;
+  width: 100%;
+  min-height: 50px;
+  padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface-field);
   color: var(--text);
   cursor: pointer;
+  white-space: nowrap;
+  text-align: center;
   transition: border-color 140ms ease, transform 140ms ease, background 140ms ease;
 }
 
@@ -1232,9 +1237,12 @@ select {
 
 .filter-chip span {
   display: inline-flex;
-  min-width: 24px;
+  align-items: center;
   justify-content: center;
-  padding: 2px 8px;
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--primary-strong);
@@ -1254,6 +1262,18 @@ select {
 
 .filter-chip[data-empty='true']:not(.is-active) {
   opacity: 0.58;
+}
+
+@media (max-width: 900px) {
+  .search-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .search-filters {
+    grid-template-columns: 1fr;
+  }
 }
 
 .search-pagination {

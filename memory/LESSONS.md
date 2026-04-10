@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-10: Search filter chips are a different UI problem from article badges. If the requirement is "all tags the same size", use a grid plus fixed-width count bubbles on `.search-filters` and `.filter-chip`, not repeated tweaks on the article `.card-pill`.
+
 - 2026-04-10: If a visual variant keeps fighting a shared utility class, stop stacking styles and split the variant into its own fully-owned class. A half-shared `.pill + .card-pill` setup is easy to misread and makes repeated badge tweaks slower and riskier.
 
 - 2026-04-10: For category badges, a width cap plus ellipsis is the wrong fallback when the label itself is the meaning. Keep the badge compact by reducing font size and padding first, and only clip when the card itself becomes narrower than the content.
