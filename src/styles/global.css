@@ -520,7 +520,8 @@ select {
 }
 
 .card-pill {
-  width: min(100%, 8.75rem);
+  width: auto;
+  max-width: min(100%, 7.9rem);
   padding: 5px 10px;
   font-size: 0.78rem;
   line-height: 1.15;
