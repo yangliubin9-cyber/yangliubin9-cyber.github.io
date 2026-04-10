@@ -521,14 +521,14 @@ select {
 
 .card-pill {
   display: inline-block;
-  width: 7rem;
-  max-width: 7rem;
+  width: 7.9rem;
+  max-width: 7.9rem;
   box-sizing: border-box;
   padding: 3px 6px;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--primary-strong);
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   line-height: 1;
   font-weight: 600;
   letter-spacing: -0.01em;
