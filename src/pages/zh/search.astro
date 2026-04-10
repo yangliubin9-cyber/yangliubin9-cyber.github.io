@@ -63,12 +63,12 @@ const seriesOptions = series.map((item) => ({
 
     <div class="search-filters" aria-label={searchUi.filtersAria}>
       <button class="filter-chip is-active" type="button" data-series-filter="">
-        {searchUi.allFilter}
+        <span class="filter-chip-label">{searchUi.allFilter}</span>
         <span data-filter-count>{posts.length}</span>
       </button>
       {seriesOptions.map((item) => (
         <button class="filter-chip" type="button" data-series-filter={item.slug}>
-          {item.label}
+          <span class="filter-chip-label">{item.label}</span>
           <span data-filter-count>{item.count}</span>
         </button>
       ))}

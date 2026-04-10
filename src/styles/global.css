@@ -520,21 +520,29 @@ select {
 }
 
 .card-pill {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   width: 7.9rem;
+  min-width: 7.9rem;
   max-width: 7.9rem;
+  height: 1.5rem;
   box-sizing: border-box;
-  padding: 3px 6px;
+  padding: 0 0.5rem;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--primary-strong);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   line-height: 1;
   font-weight: 600;
   letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
-  text-align: left;
+  text-align: center;
   justify-self: start;
+  align-self: flex-start;
 }
 
 .section-header {
@@ -1214,12 +1222,10 @@ select {
 
 .filter-chip {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 100%;
   min-height: 50px;
-  padding: 10px 42px 10px 16px;
+  padding: 10px 42px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface-field);
@@ -1228,6 +1234,13 @@ select {
   white-space: nowrap;
   text-align: center;
   transition: border-color 140ms ease, transform 140ms ease, background 140ms ease;
+}
+
+.filter-chip-label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .filter-chip:hover {
