@@ -169,13 +169,12 @@ const zhUi: LocaleUi = {
   home: {
     kicker: '双语工程笔记',
     title: '把 AI 基础设施、容器交付和云原生实践写成可复用的工程笔记',
-    lede:
-      '首页只承担品牌介绍和阅读入口的作用，用精选文章把读者直接带入 Linux、Docker、Kubernetes 与工程交付这几条主线。',
+    lede: '',
     primaryAction: '开始阅读',
     secondaryAction: '关于作者',
     featuredEyebrow: '精选文章',
-    featuredTitle: '先读这些，最快进入站点主线',
-    featuredSummary: '首页保留少量精选入口，其他内容分别收进系列页、搜索页和文章页。',
+    featuredTitle: '',
+    featuredSummary: '',
     fallbackBadge: '文章'
   },
   about: {
@@ -205,8 +204,7 @@ const zhUi: LocaleUi = {
   seriesIndex: {
     kicker: '系列',
     title: '按主线组织内容，直接进入你关心的主题',
-    lede:
-      '当前内容围绕 Linux、Docker 和 Kubernetes 三条主线组织。每篇文章只归属一个系列，阅读顺序更清楚，归档结构也更稳定。',
+    lede: '',
     count: (count) => `${count} 篇文章`
   },
   seriesDetail: {

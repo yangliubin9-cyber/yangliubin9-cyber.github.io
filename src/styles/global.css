@@ -470,6 +470,10 @@ html[data-theme='dark'] .hero-avatar-frame {
   color: var(--muted);
 }
 
+.lede:empty {
+  display: none;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;

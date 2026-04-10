@@ -34,11 +34,11 @@ const homeStructuredData = {
   keywords={['AI 基础设施', 'MLOps', 'Kubernetes', 'Docker', '工程实践']}
   structuredData={homeStructuredData}
 >
-  <section class="hero hero-editorial">
+  <section class="hero hero-editorial hero-home">
     <div class="hero-copy">
       <span class="kicker">{homeUi.kicker}</span>
       <h1 class="title page-title">{homeUi.title}</h1>
-      <p class="lede">{homeUi.lede}</p>
+      {homeUi.lede && <p class="lede">{homeUi.lede}</p>}
       <div class="hero-actions">
         <a class="button-link primary" href="#featured-posts">{homeUi.primaryAction}</a>
         <a class="button-link" href={localePath('zh', 'about')}>{homeUi.secondaryAction}</a>
@@ -56,9 +56,9 @@ const homeStructuredData = {
     <div class="section-header section-header-stack">
       <div>
         <span class="eyebrow">{homeUi.featuredEyebrow}</span>
-        <h2>{homeUi.featuredTitle}</h2>
+        {homeUi.featuredTitle && <h2>{homeUi.featuredTitle}</h2>}
       </div>
-      <p class="section-summary">{homeUi.featuredSummary}</p>
+      {homeUi.featuredSummary && <p class="section-summary">{homeUi.featuredSummary}</p>}
     </div>
 
     <div class="track-grid">
