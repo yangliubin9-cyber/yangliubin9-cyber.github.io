@@ -1248,7 +1248,7 @@ select {
   border-color: var(--border-strong);
 }
 
-.filter-chip span {
+.filter-chip [data-filter-count] {
   position: absolute;
   top: 50%;
   right: 12px;
@@ -1272,7 +1272,7 @@ select {
   color: var(--primary-fg);
 }
 
-.filter-chip.is-active span {
+.filter-chip.is-active [data-filter-count] {
   background: var(--accent-overlay);
   color: inherit;
 }

@@ -16,6 +16,8 @@
 
 - 2026-04-10: If the user explicitly wants equal-height and equal-width article badges across search, home, and series cards, let `.card-pill` fully own that template with fixed width/height and centered flex alignment. Do not mix in `.filter-chip` rules or content-width badge sizing for that case.
 
+- 2026-04-10: If a filter chip contains both a text label span and a count badge span, never style it with a broad selector like `.filter-chip span`. Target the count node explicitly with `[data-filter-count]`, or the label will get turned into the badge by accident.
+
 - 2026-04-10: Astro 页面里的多个内联 `<script>` 共享全局词法作用域。公共布局脚本和页面脚本如果都写顶层 `const root` 这类同名变量，后面的脚本会直接失效，表现出来就是按钮能看到但事件完全不生效。做页面级交互脚本时，优先用 IIFE 或局部块包起来，避免污染全局。
 - 2026-04-10: 搜索/筛选类功能不能只看静态 HTML 或文本快照。要同时验证三件事：事件有没有绑定成功、DOM 上 `hidden` 状态有没有变化、计数文案有没有同步更新。headless 工具的快照有时不会直观看出隐藏状态，必要时直接用 DOM 查询确认。
 - 2026-04-10: 搜索页如果同时有“关键词”和“标签”两个入口，不能只更新顶部总数。更实用的做法是：标签数字跟着关键词实时变化，结果列表按筛选后的集合分页，筛选条件变化时自动回到第一页。否则用户会感觉“数字变了，但下面内容没跟上”。
