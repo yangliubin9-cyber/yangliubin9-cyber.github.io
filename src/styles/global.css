@@ -506,10 +506,8 @@ select {
 
 .eyebrow,
 .pill {
-  display: inline-flex;
-  width: fit-content;
+  display: inline-block;
   max-width: 100%;
-  align-items: center;
   padding: 6px 12px;
   border-radius: 999px;
   background: var(--accent-soft);
@@ -521,11 +519,12 @@ select {
   white-space: nowrap;
 }
 
-.card-post .pill {
-  max-width: min(100%, 10.5rem);
+.card-pill {
+  width: min(100%, 8.75rem);
   padding: 5px 10px;
   font-size: 0.78rem;
   line-height: 1.15;
+  text-align: left;
 }
 
 .section-header {
@@ -621,7 +620,7 @@ select {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 10px;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .track-count {

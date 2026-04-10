@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-10: When the same badge appears in multiple card templates, do not bind the width rule to one page-specific selector like `.card-post .pill`. Use a shared card badge class such as `.card-pill`, otherwise search cards may look fixed while home and series cards still drift.
+
 - 2026-04-10: If a shared badge style is used by cards, filters, and tag lists, keep the global `.pill` safe but tighten long labels with a local rule like `.card-post .pill`. Fixing the card variant avoids shrinking clickable filter chips.
 
 - 2026-04-10: Astro 页面里的多个内联 `<script>` 共享全局词法作用域。公共布局脚本和页面脚本如果都写顶层 `const root` 这类同名变量，后面的脚本会直接失效，表现出来就是按钮能看到但事件完全不生效。做页面级交互脚本时，优先用 IIFE 或局部块包起来，避免污染全局。
