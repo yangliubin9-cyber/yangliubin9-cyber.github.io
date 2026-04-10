@@ -20,6 +20,8 @@
 
 - 2026-04-10: If an article comments area is meant to feel like “comment directly below”, do not stack extra helper cards like participation steps and repo metadata above the widget. Keep a single intro card plus the comment frame, otherwise the support UI becomes visually heavier than the discussion itself.
 
+- 2026-04-10: If the homepage hero needs a right-side illustration across multiple locales, add a shared hero media slot in both locale index templates and serve the image from `public/`. Do not hardcode one locale-only layout or place the asset outside the published static directory.
+
 - 2026-04-10: Astro 页面里的多个内联 `<script>` 共享全局词法作用域。公共布局脚本和页面脚本如果都写顶层 `const root` 这类同名变量，后面的脚本会直接失效，表现出来就是按钮能看到但事件完全不生效。做页面级交互脚本时，优先用 IIFE 或局部块包起来，避免污染全局。
 - 2026-04-10: 搜索/筛选类功能不能只看静态 HTML 或文本快照。要同时验证三件事：事件有没有绑定成功、DOM 上 `hidden` 状态有没有变化、计数文案有没有同步更新。headless 工具的快照有时不会直观看出隐藏状态，必要时直接用 DOM 查询确认。
 - 2026-04-10: 搜索页如果同时有“关键词”和“标签”两个入口，不能只更新顶部总数。更实用的做法是：标签数字跟着关键词实时变化，结果列表按筛选后的集合分页，筛选条件变化时自动回到第一页。否则用户会感觉“数字变了，但下面内容没跟上”。

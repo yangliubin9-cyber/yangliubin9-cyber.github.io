@@ -35,12 +35,20 @@ const homeStructuredData = {
   structuredData={homeStructuredData}
 >
   <section class="hero hero-editorial">
-    <span class="kicker">{homeUi.kicker}</span>
-    <h1 class="title page-title">{homeUi.title}</h1>
-    <p class="lede">{homeUi.lede}</p>
-    <div class="hero-actions">
-      <a class="button-link primary" href="#featured-posts">{homeUi.primaryAction}</a>
-      <a class="button-link" href={localePath('zh', 'about')}>{homeUi.secondaryAction}</a>
+    <div class="hero-copy">
+      <span class="kicker">{homeUi.kicker}</span>
+      <h1 class="title page-title">{homeUi.title}</h1>
+      <p class="lede">{homeUi.lede}</p>
+      <div class="hero-actions">
+        <a class="button-link primary" href="#featured-posts">{homeUi.primaryAction}</a>
+        <a class="button-link" href={localePath('zh', 'about')}>{homeUi.secondaryAction}</a>
+      </div>
+    </div>
+
+    <div class="hero-avatar-panel" aria-hidden="true">
+      <div class="hero-avatar-frame">
+        <img src="/Blog.png" alt="" loading="eager" decoding="async" />
+      </div>
     </div>
   </section>
 
