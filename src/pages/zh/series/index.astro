@@ -32,7 +32,9 @@ const overviewAction = seriesUi.overviewAction ?? '查看系列页';
         return (
           <article class="card card-track card-track-series">
             <div class="track-topline">
-              <span class="pill">{getSeriesName('zh', seriesItem)}</span>
+              <span class="pill" title={getSeriesName('zh', seriesItem)}>
+                {getSeriesName('zh', seriesItem)}
+              </span>
               <span class="track-count">{seriesUi.count(posts.length)}</span>
             </div>
 

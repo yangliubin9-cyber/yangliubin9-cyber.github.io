@@ -508,11 +508,24 @@ select {
 .pill {
   display: inline-flex;
   width: fit-content;
+  max-width: 100%;
+  align-items: center;
   padding: 6px 12px;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--primary-strong);
   font-size: 0.85rem;
+  justify-self: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-post .pill {
+  max-width: min(100%, 10.5rem);
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  line-height: 1.15;
 }
 
 .section-header {

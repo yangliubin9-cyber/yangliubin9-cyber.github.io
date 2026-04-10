@@ -87,7 +87,11 @@ const seriesOptions = series.map((item) => ({
               seriesItem ? getSeriesName('zh', seriesItem) : ''
             }`.toLowerCase()}
           >
-            {seriesItem && <span class="pill">{getSeriesName('zh', seriesItem)}</span>}
+            {seriesItem && (
+              <span class="pill" title={getSeriesName('zh', seriesItem)}>
+                {getSeriesName('zh', seriesItem)}
+              </span>
+            )}
             <h3>{post.data.title}</h3>
             <p class="muted">{post.data.summary}</p>
             <strong>{getReadingLabel('zh', post.data.readingMinutes)}</strong>
