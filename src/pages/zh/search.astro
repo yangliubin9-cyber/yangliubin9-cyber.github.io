@@ -7,9 +7,16 @@ import { getUiText } from '../../data/ui';
 
 const posts = await getPosts('zh');
 const searchUi = getUiText('zh').search;
+const pageSize = 8;
 const searchCountTemplates = {
   all: '当前展示全部 {total} 篇文章。',
   filtered: '筛选结果：{visible} / {total} 篇文章。'
+};
+const searchPaginationUi = {
+  previous: '上一页',
+  next: '下一页',
+  status: '第 {page} / {totalPages} 页',
+  aria: '搜索结果分页'
 };
 const seriesOptions = series.map((item) => ({
   slug: item.slug,
@@ -34,6 +41,8 @@ const seriesOptions = series.map((item) => ({
     class="section search-shell"
     data-search-all-template={searchCountTemplates.all}
     data-search-filtered-template={searchCountTemplates.filtered}
+    data-search-page-status-template={searchPaginationUi.status}
+    data-search-page-size={pageSize}
   >
     <div class="search-toolbar">
       <label class="search-label" for="post-search-zh">{searchUi.label}</label>
@@ -55,12 +64,12 @@ const seriesOptions = series.map((item) => ({
     <div class="search-filters" aria-label={searchUi.filtersAria}>
       <button class="filter-chip is-active" type="button" data-series-filter="">
         {searchUi.allFilter}
-        <span>{posts.length}</span>
+        <span data-filter-count>{posts.length}</span>
       </button>
       {seriesOptions.map((item) => (
         <button class="filter-chip" type="button" data-series-filter={item.slug}>
           {item.label}
-          <span>{item.count}</span>
+          <span data-filter-count>{item.count}</span>
         </button>
       ))}
     </div>
@@ -87,6 +96,17 @@ const seriesOptions = series.map((item) => ({
       })}
     </div>
 
+    <div class="search-pagination" data-search-pagination aria-label={searchPaginationUi.aria} hidden>
+      <button class="search-page-button" type="button" data-search-prev disabled>
+        {searchPaginationUi.previous}
+      </button>
+      <div class="search-page-list" data-search-page-list></div>
+      <button class="search-page-button" type="button" data-search-next disabled>
+        {searchPaginationUi.next}
+      </button>
+    </div>
+
+    <p class="search-page-status muted" data-search-page-status hidden></p>
     <p class="search-empty muted" data-search-empty hidden>{searchUi.empty}</p>
 
     <script is:inline>
@@ -102,11 +122,21 @@ const seriesOptions = series.map((item) => ({
         const filteredTemplate =
           searchRoot.getAttribute('data-search-filtered-template') ??
           'Showing {visible} of {total} posts.';
+        const pageStatusTemplate =
+          searchRoot.getAttribute('data-search-page-status-template') ??
+          'Page {page} of {totalPages}';
+        const pageSize = Math.max(1, Number(searchRoot.getAttribute('data-search-page-size') ?? '8'));
         const items = Array.from(searchRoot.querySelectorAll('[data-search-item]'));
         const filters = Array.from(searchRoot.querySelectorAll('[data-series-filter]'));
+        const pagination = searchRoot.querySelector('[data-search-pagination]');
+        const pageList = searchRoot.querySelector('[data-search-page-list]');
+        const pageStatus = searchRoot.querySelector('[data-search-page-status]');
+        const prevButton = searchRoot.querySelector('[data-search-prev]');
+        const nextButton = searchRoot.querySelector('[data-search-next]');
         const empty = searchRoot.querySelector('[data-search-empty]');
         const total = items.length;
         let activeSeries = '';
+        let currentPage = 1;
 
         const formatTemplate = (template, values) =>
           Object.entries(values).reduce(
@@ -114,10 +144,24 @@ const seriesOptions = series.map((item) => ({
             template
           );
 
+        const getQuery = () =>
+          input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+
+        const matchesQuery = (item, query) => {
+          const text = item.getAttribute('data-search-text') ?? '';
+          return !query || text.includes(query);
+        };
+
+        const matchesSeries = (item, series) => {
+          const itemSeries = item.getAttribute('data-search-series') ?? '';
+          return !series || itemSeries === series;
+        };
+
         const updateActiveFilter = () => {
           filters.forEach((filter) => {
             const value = filter.getAttribute('data-series-filter') ?? '';
             filter.classList.toggle('is-active', value === activeSeries);
+            filter.setAttribute('aria-pressed', String(value === activeSeries));
           });
         };
 
@@ -129,23 +173,115 @@ const seriesOptions = series.map((item) => ({
             : formatTemplate(allTemplate, { total });
         };
 
-        const applyFilter = () => {
-          const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
-          const hasFilter = Boolean(query || activeSeries);
-          let visible = 0;
+        const updateFilterCounts = (query) => {
+          const countsBySeries = new Map();
+          let queryMatchedTotal = 0;
 
           items.forEach((item) => {
-            const text = item.getAttribute('data-search-text') ?? '';
-            const itemSeries = item.getAttribute('data-search-series') ?? '';
-            const matched =
-              (!query || text.includes(query)) &&
-              (!activeSeries || itemSeries === activeSeries);
+            if (!matchesQuery(item, query)) return;
 
-            item.toggleAttribute('hidden', !matched);
-            if (matched) visible += 1;
+            queryMatchedTotal += 1;
+
+            const itemSeries = item.getAttribute('data-search-series') ?? '';
+            countsBySeries.set(itemSeries, (countsBySeries.get(itemSeries) ?? 0) + 1);
+          });
+
+          filters.forEach((filter) => {
+            const value = filter.getAttribute('data-series-filter') ?? '';
+            const badge = filter.querySelector('[data-filter-count]');
+            const filterCount = value ? (countsBySeries.get(value) ?? 0) : queryMatchedTotal;
+
+            if (badge) {
+              badge.textContent = String(filterCount);
+            }
+
+            filter.toggleAttribute('data-empty', filterCount === 0);
+          });
+        };
+
+        const updatePagination = (visible) => {
+          const totalPages = Math.max(1, Math.ceil(visible / pageSize));
+          const shouldPaginate = visible > pageSize;
+
+          if (pagination instanceof HTMLElement) {
+            pagination.hidden = !shouldPaginate;
+          }
+
+          if (pageStatus instanceof HTMLElement) {
+            pageStatus.hidden = !shouldPaginate;
+            pageStatus.textContent = shouldPaginate
+              ? formatTemplate(pageStatusTemplate, { page: currentPage, totalPages })
+              : '';
+          }
+
+          if (prevButton instanceof HTMLButtonElement) {
+            prevButton.disabled = !shouldPaginate || currentPage === 1;
+          }
+
+          if (nextButton instanceof HTMLButtonElement) {
+            nextButton.disabled = !shouldPaginate || currentPage === totalPages;
+          }
+
+          if (!(pageList instanceof HTMLElement)) return totalPages;
+
+          if (!shouldPaginate) {
+            pageList.replaceChildren();
+            return totalPages;
+          }
+
+          const pageButtons = [];
+
+          for (let page = 1; page <= totalPages; page += 1) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'search-page-button';
+            button.textContent = String(page);
+            button.classList.toggle('is-active', page === currentPage);
+
+            if (page === currentPage) {
+              button.setAttribute('aria-current', 'page');
+            }
+
+            button.addEventListener('click', () => {
+              currentPage = page;
+              applyFilter();
+            });
+
+            pageButtons.push(button);
+          }
+
+          pageList.replaceChildren(...pageButtons);
+
+          return totalPages;
+        };
+
+        const applyFilter = (resetPage = false) => {
+          const query = getQuery();
+          const hasFilter = Boolean(query || activeSeries);
+
+          updateFilterCounts(query);
+
+          const matchedItems = items.filter(
+            (item) => matchesQuery(item, query) && matchesSeries(item, activeSeries)
+          );
+          const visible = matchedItems.length;
+
+          if (resetPage) {
+            currentPage = 1;
+          }
+
+          const totalPages = Math.max(1, Math.ceil(visible / pageSize));
+          currentPage = Math.min(currentPage, totalPages);
+
+          const startIndex = (currentPage - 1) * pageSize;
+          const currentItems = new Set(matchedItems.slice(startIndex, startIndex + pageSize));
+
+          items.forEach((item) => {
+            item.toggleAttribute('hidden', !currentItems.has(item));
           });
 
           updateCount(visible, hasFilter);
+          updatePagination(visible);
 
           if (empty) {
             empty.toggleAttribute('hidden', visible !== 0);
@@ -158,13 +294,26 @@ const seriesOptions = series.map((item) => ({
 
         filters.forEach((filter) => {
           filter.addEventListener('click', () => {
-            activeSeries = filter.getAttribute('data-series-filter') ?? '';
+            const value = filter.getAttribute('data-series-filter') ?? '';
+            activeSeries = activeSeries === value ? '' : value;
             updateActiveFilter();
-            applyFilter();
+            applyFilter(true);
           });
         });
 
-        input?.addEventListener('input', applyFilter);
+        input?.addEventListener('input', () => {
+          applyFilter(true);
+        });
+
+        prevButton?.addEventListener('click', () => {
+          currentPage = Math.max(1, currentPage - 1);
+          applyFilter();
+        });
+
+        nextButton?.addEventListener('click', () => {
+          currentPage += 1;
+          applyFilter();
+        });
 
         clearButton?.addEventListener('click', () => {
           if (input instanceof HTMLInputElement) {
@@ -173,12 +322,13 @@ const seriesOptions = series.map((item) => ({
           }
 
           activeSeries = '';
+          currentPage = 1;
           updateActiveFilter();
-          applyFilter();
+          applyFilter(true);
         });
 
         updateActiveFilter();
-        applyFilter();
+        applyFilter(true);
       })();
     </script>
   </section>
