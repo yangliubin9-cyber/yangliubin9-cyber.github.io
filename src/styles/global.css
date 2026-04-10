@@ -372,6 +372,12 @@ select {
   align-items: center;
 }
 
+.hero-page {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  text-align: left;
+}
+
 .hero-copy {
   position: relative;
   z-index: 1;
