@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-10: For category badges, a width cap plus ellipsis is the wrong fallback when the label itself is the meaning. Keep the badge compact by reducing font size and padding first, and only clip when the card itself becomes narrower than the content.
+
 - 2026-04-10: Card badges that should look like pills should not use a shared fixed width. Use a shared class for typography and padding, but let width shrink to content with only a max-width cap. Fixed widths make short labels like Linux look bloated and create the exact "small box too wide" bug users notice first.
 
 - 2026-04-10: When the same badge appears in multiple card templates, do not bind the width rule to one page-specific selector like `.card-post .pill`. Use a shared card badge class such as `.card-pill`, otherwise search cards may look fixed while home and series cards still drift.
