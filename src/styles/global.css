@@ -520,6 +520,17 @@ select {
   margin-bottom: 18px;
 }
 
+.section-header-stack {
+  align-items: start;
+}
+
+.section-summary {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 .section h2,
 .card h2,
 .card h3,
@@ -566,6 +577,193 @@ select {
   color: var(--muted);
   font-size: 0.92rem;
   white-space: nowrap;
+}
+
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.card-track,
+.card-entry {
+  gap: 18px;
+  align-content: start;
+}
+
+.card-track {
+  background: var(--surface-highlight);
+}
+
+.card-track-series {
+  background: var(--surface-card);
+}
+
+.track-topline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.track-count {
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.track-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.track-copy p,
+.track-description,
+.track-fact p,
+.track-link p,
+.series-journey-card p {
+  margin: 0;
+  line-height: 1.65;
+}
+
+.track-copy h2,
+.track-copy h3,
+.card-entry h3,
+.series-journey-card h3 {
+  font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+  line-height: 1.18;
+}
+
+.track-copy h2,
+.track-copy h3 {
+  font-size: clamp(1.3rem, 1.8vw, 1.55rem);
+}
+
+.track-facts,
+.track-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.track-fact,
+.track-link,
+.series-preview {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--surface-card);
+}
+
+.track-fact,
+.track-link {
+  flex: 1 1 220px;
+}
+
+.track-link {
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.track-link:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  box-shadow: var(--card-shadow);
+}
+
+.track-label {
+  color: var(--primary-strong);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.track-fact strong,
+.track-link strong {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.track-actions .button-link {
+  flex: 1 1 180px;
+}
+
+.series-preview ol {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.series-preview li {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.series-preview strong {
+  color: var(--text);
+  font-size: 0.98rem;
+}
+
+.entry-meta,
+.series-journey-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.series-journey {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.series-journey-item {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.series-journey-step {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  color: var(--primary-fg);
+  font-weight: 700;
+  box-shadow: var(--card-shadow);
+}
+
+.series-journey-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface-card);
+}
+
+.series-journey-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+
+.series-journey-card h3 {
+  margin: 8px 0 0;
+  font-size: 1.35rem;
 }
 
 .article-body {
@@ -1286,6 +1484,10 @@ select {
   .comments-guide {
     grid-template-columns: 1fr;
   }
+
+  .series-journey-item {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 820px) {
@@ -1354,6 +1556,10 @@ select {
     flex: 1 1 180px;
     justify-content: center;
     text-align: center;
+  }
+
+  .track-actions {
+    display: grid;
   }
 
   .comments-steps li {

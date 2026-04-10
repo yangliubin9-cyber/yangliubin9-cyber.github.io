@@ -31,6 +31,10 @@ type HomeCopy = {
   featuredEyebrow: string;
   featuredTitle: string;
   featuredSummary: string;
+  trackCount?: (count: number) => string;
+  trackLatestLabel?: string;
+  trackEntryAction?: string;
+  trackSeriesAction?: string;
   fallbackBadge: string;
 };
 
@@ -60,12 +64,29 @@ type SeriesIndexCopy = {
   title: string;
   lede: string;
   count: (count: number) => string;
+  startLabel?: string;
+  latestLabel?: string;
+  previewLabel?: string;
+  entryAction?: string;
+  overviewAction?: string;
 };
 
 type SeriesDetailCopy = {
   kicker: string;
   countLabel: string;
   latestPublishLabel: string;
+  overviewEyebrow?: string;
+  overviewTitle?: string;
+  overviewSummary?: string;
+  startLabel?: string;
+  latestLabel?: string;
+  publishedLabel?: string;
+  readingTimeLabel?: string;
+  readAction?: string;
+  timelineEyebrow?: string;
+  timelineTitle?: string;
+  timelineSummary?: string;
+  stepLabel?: (current: number, total: number) => string;
 };
 
 type ArticleCopy = {
@@ -274,6 +295,10 @@ const enUi: LocaleUi = {
     featuredEyebrow: 'Featured posts',
     featuredTitle: 'Start with the notes that define the main tracks',
     featuredSummary: 'The home page keeps only a small curated entry set. Everything else lives on its own page.',
+    trackCount: (count) => `${count} posts`,
+    trackLatestLabel: 'Latest update',
+    trackEntryAction: 'Read this entry',
+    trackSeriesAction: 'View series',
     fallbackBadge: 'Article'
   },
   about: {
@@ -305,12 +330,31 @@ const enUi: LocaleUi = {
     title: 'Use learning tracks to structure the archive',
     lede:
       'The archive is organized around Linux, Docker, and Kubernetes. Each post belongs to one primary series, which keeps reading order and navigation clear.',
-    count: (count) => `${count} posts`
+    count: (count) => `${count} posts`,
+    startLabel: 'Best place to start',
+    latestLabel: 'Latest update',
+    previewLabel: 'Reading order',
+    entryAction: 'Start here',
+    overviewAction: 'Open series'
   },
   seriesDetail: {
     kicker: 'Series Detail',
     countLabel: 'posts',
-    latestPublishLabel: 'latest publish date'
+    latestPublishLabel: 'latest publish date',
+    overviewEyebrow: 'Entry points',
+    overviewTitle: 'Start at the door that fits your context',
+    overviewSummary:
+      'If this is your first pass through the series, start with the opening post. If you are already following along, jump to the newest update.',
+    startLabel: 'Starting point',
+    latestLabel: 'Latest update',
+    publishedLabel: 'Published',
+    readingTimeLabel: 'Reading time',
+    readAction: 'Open post',
+    timelineEyebrow: 'Ordered path',
+    timelineTitle: 'Read the series in the intended order',
+    timelineSummary:
+      'Each post is arranged by seriesOrder so the track reads like a sequence instead of a pile of links.',
+    stepLabel: (current, total) => `Post ${current} of ${total}`
   },
   article: {
     kicker: 'Field Note',

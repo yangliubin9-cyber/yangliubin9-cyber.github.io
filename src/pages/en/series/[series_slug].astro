@@ -1,19 +1,25 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { formatPublishDate, getPosts, getReadingLabel, type PostEntry } from '../../../lib/content';
+import {
+  formatPublishDate,
+  getPostsBySeries,
+  getReadingLabel,
+  type PostEntry
+} from '../../../lib/content';
 import { localePath } from '../../../lib/routing';
 import { getSeriesDescription, getSeriesName, series, type Series } from '../../../data/site';
 import { getUiText } from '../../../data/ui';
 
 export async function getStaticPaths() {
-  const posts = await getPosts('en');
-  return series.map((item) => ({
-    params: { series_slug: item.slug },
-    props: {
-      seriesItem: item,
-      seriesPosts: posts.filter((post) => post.data.series === item.slug)
-    }
-  }));
+  return Promise.all(
+    series.map(async (item) => ({
+      params: { series_slug: item.slug },
+      props: {
+        seriesItem: item,
+        seriesPosts: await getPostsBySeries('en', item.slug, 'asc')
+      }
+    }))
+  );
 }
 
 const { seriesItem, seriesPosts } = Astro.props as {
@@ -22,6 +28,27 @@ const { seriesItem, seriesPosts } = Astro.props as {
 };
 
 const seriesDetailUi = getUiText('en').seriesDetail;
+const startPost = seriesPosts[0];
+const latestPost = [...seriesPosts].sort(
+  (left, right) => right.data.publishedAt.getTime() - left.data.publishedAt.getTime()
+)[0];
+const overviewEyebrow = seriesDetailUi.overviewEyebrow ?? 'Entry points';
+const overviewTitle = seriesDetailUi.overviewTitle ?? 'Start at the door that fits your context';
+const overviewSummary =
+  seriesDetailUi.overviewSummary ??
+  'If this is your first pass through the series, start with the opening post. If you are already following along, jump to the newest update.';
+const startLabel = seriesDetailUi.startLabel ?? 'Starting point';
+const latestLabel = seriesDetailUi.latestLabel ?? 'Latest update';
+const publishedLabel = seriesDetailUi.publishedLabel ?? 'Published';
+const readingTimeLabel = seriesDetailUi.readingTimeLabel ?? 'Reading time';
+const readAction = seriesDetailUi.readAction ?? 'Open post';
+const timelineEyebrow = seriesDetailUi.timelineEyebrow ?? 'Ordered path';
+const timelineTitle = seriesDetailUi.timelineTitle ?? 'Read the series in the intended order';
+const timelineSummary =
+  seriesDetailUi.timelineSummary ??
+  'Each post is arranged by seriesOrder so the track reads like a sequence instead of a pile of links.';
+const stepLabel =
+  seriesDetailUi.stepLabel ?? ((current: number, total: number) => `Post ${current} of ${total}`);
 ---
 
 <BaseLayout
@@ -32,15 +59,16 @@ const seriesDetailUi = getUiText('en').seriesDetail;
 >
   <section class="hero hero-editorial">
     <span class="kicker">{seriesDetailUi.kicker}</span>
-    <h1 class="title">{getSeriesName('en', seriesItem)}</h1>
+    <h1 class="title page-title">{getSeriesName('en', seriesItem)}</h1>
+    <p class="lede">{getSeriesDescription('en', seriesItem)}</p>
     <div class="hero-facts">
       <div class="fact-chip">
         <strong>{seriesPosts.length}</strong>
         <span>{seriesDetailUi.countLabel}</span>
       </div>
-      {seriesPosts[0] && (
+      {latestPost && (
         <div class="fact-chip">
-          <strong>{formatPublishDate('en', seriesPosts[0].data.publishedAt)}</strong>
+          <strong>{formatPublishDate('en', latestPost.data.publishedAt)}</strong>
           <span>{seriesDetailUi.latestPublishLabel}</span>
         </div>
       )}
@@ -48,18 +76,82 @@ const seriesDetailUi = getUiText('en').seriesDetail;
   </section>
 
   <section class="section">
-    <ul class="list">
-      {seriesPosts.map((post) => (
-        <li>
-          <a class="list-link" href={localePath('en', post.data.pathSlug)}>
-            <div class="list-head">
-              <strong>{post.data.title}</strong>
-              <span class="list-meta">{getReadingLabel('en', post.data.readingMinutes)}</span>
+    <div class="section-header section-header-stack">
+      <div>
+        <span class="eyebrow">{overviewEyebrow}</span>
+        <h2>{overviewTitle}</h2>
+      </div>
+      <p class="section-summary">{overviewSummary}</p>
+    </div>
+
+    <div class="track-grid">
+      {startPost && (
+        <article class="card card-entry">
+          <span class="track-label">{startLabel}</span>
+          <h3>{startPost.data.title}</h3>
+          <p class="muted">{startPost.data.summary}</p>
+          <div class="entry-meta">
+            <span>{publishedLabel} · {formatPublishDate('en', startPost.data.publishedAt)}</span>
+            <span>{readingTimeLabel} · {getReadingLabel('en', startPost.data.readingMinutes)}</span>
+          </div>
+          <div class="track-actions">
+            <a class="button-link primary" href={localePath('en', startPost.data.pathSlug)}>
+              {readAction}
+            </a>
+          </div>
+        </article>
+      )}
+
+      {latestPost && (
+        <article class="card card-entry">
+          <span class="track-label">{latestLabel}</span>
+          <h3>{latestPost.data.title}</h3>
+          <p class="muted">{latestPost.data.summary}</p>
+          <div class="entry-meta">
+            <span>{publishedLabel} · {formatPublishDate('en', latestPost.data.publishedAt)}</span>
+            <span>{readingTimeLabel} · {getReadingLabel('en', latestPost.data.readingMinutes)}</span>
+          </div>
+          <div class="track-actions">
+            <a class="button-link primary" href={localePath('en', latestPost.data.pathSlug)}>
+              {readAction}
+            </a>
+          </div>
+        </article>
+      )}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-header section-header-stack">
+      <div>
+        <span class="eyebrow">{timelineEyebrow}</span>
+        <h2>{timelineTitle}</h2>
+      </div>
+      <p class="section-summary">{timelineSummary}</p>
+    </div>
+
+    <ol class="series-journey">
+      {seriesPosts.map((post, index) => (
+        <li class="series-journey-item">
+          <span class="series-journey-step">{index + 1}</span>
+          <article class="series-journey-card">
+            <div class="series-journey-head">
+              <div>
+                <span class="track-label">{stepLabel(index + 1, seriesPosts.length)}</span>
+                <h3>{post.data.title}</h3>
+              </div>
+              <div class="series-journey-meta">
+                <span>{formatPublishDate('en', post.data.publishedAt)}</span>
+                <span>{getReadingLabel('en', post.data.readingMinutes)}</span>
+              </div>
             </div>
             <p class="muted">{post.data.summary}</p>
-          </a>
+            <div class="track-actions">
+              <a class="button-link" href={localePath('en', post.data.pathSlug)}>{readAction}</a>
+            </div>
+          </article>
         </li>
       ))}
-    </ul>
+    </ol>
   </section>
 </BaseLayout>

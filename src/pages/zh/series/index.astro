@@ -1,12 +1,17 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getPosts } from '../../../lib/content';
+import { formatPublishDate, getSeriesTracks } from '../../../lib/content';
 import { localePath } from '../../../lib/routing';
-import { getSeriesDescription, getSeriesName, series, siteMeta } from '../../../data/site';
+import { getSeriesDescription, getSeriesName, siteMeta } from '../../../data/site';
 import { getUiText } from '../../../data/ui';
 
-const posts = await getPosts('zh');
+const seriesTracks = await getSeriesTracks('zh');
 const seriesUi = getUiText('zh').seriesIndex;
+const startLabel = seriesUi.startLabel ?? '推荐起点';
+const latestLabel = seriesUi.latestLabel ?? '最新更新';
+const previewLabel = seriesUi.previewLabel ?? '阅读顺序';
+const entryAction = seriesUi.entryAction ?? '从这里开始';
+const overviewAction = seriesUi.overviewAction ?? '查看系列页';
 ---
 
 <BaseLayout
@@ -18,19 +23,56 @@ const seriesUi = getUiText('zh').seriesIndex;
   <section class="hero hero-editorial">
     <span class="kicker">{seriesUi.kicker}</span>
     <h1 class="title page-title">{seriesUi.title}</h1>
+    <p class="lede">{seriesUi.lede}</p>
   </section>
 
   <section class="section">
-    <div class="grid">
-      {series.map((item) => {
-        const seriesPosts = posts.filter((post) => post.data.series === item.slug);
+    <div class="track-grid">
+      {seriesTracks.map(({ seriesItem, posts, startPost, latestPost }) => {
         return (
-          <a class="card card-series" href={localePath('zh', `series/${item.slug}`)}>
-            <span class="pill">{getSeriesName('zh', item)}</span>
-            <h3>{getSeriesName('zh', item)}</h3>
-            <p>{getSeriesDescription('zh', item)}</p>
-            <strong>{seriesUi.count(seriesPosts.length)}</strong>
-          </a>
+          <article class="card card-track card-track-series">
+            <div class="track-topline">
+              <span class="pill">{getSeriesName('zh', seriesItem)}</span>
+              <span class="track-count">{seriesUi.count(posts.length)}</span>
+            </div>
+
+            <div class="track-copy">
+              <h2>{getSeriesName('zh', seriesItem)}</h2>
+              <p class="muted">{getSeriesDescription('zh', seriesItem)}</p>
+            </div>
+
+            <div class="track-facts">
+              <div class="track-fact">
+                <span class="track-label">{startLabel}</span>
+                <strong>{startPost.data.title}</strong>
+              </div>
+              <div class="track-fact">
+                <span class="track-label">{latestLabel}</span>
+                <strong>{latestPost.data.title}</strong>
+                <p>{formatPublishDate('zh', latestPost.data.publishedAt)}</p>
+              </div>
+            </div>
+
+            <div class="series-preview">
+              <span class="track-label">{previewLabel}</span>
+              <ol>
+                {posts.map((post, index) => (
+                  <li>
+                    <strong>{index + 1}. {post.data.title}</strong>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div class="track-actions">
+              <a class="button-link primary" href={localePath('zh', startPost.data.pathSlug)}>
+                {entryAction}
+              </a>
+              <a class="button-link" href={localePath('zh', `series/${seriesItem.slug}`)}>
+                {overviewAction}
+              </a>
+            </div>
+          </article>
         );
       })}
     </div>

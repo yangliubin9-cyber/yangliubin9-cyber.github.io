@@ -1,12 +1,16 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getFeaturedPosts, getReadingLabel } from '../../lib/content';
+import { getSeriesTracks } from '../../lib/content';
 import { localePath } from '../../lib/routing';
-import { getSeriesBySlug, getSeriesName, siteMeta } from '../../data/site';
+import { getSeriesDescription, getSeriesName, siteMeta } from '../../data/site';
 import { getUiText } from '../../data/ui';
 
-const featuredPosts = await getFeaturedPosts('zh');
+const seriesTracks = await getSeriesTracks('zh');
 const homeUi = getUiText('zh').home;
+const trackCount = homeUi.trackCount ?? ((count: number) => `${count} 篇文章`);
+const trackLatestLabel = homeUi.trackLatestLabel ?? '最新更新';
+const trackEntryAction = homeUi.trackEntryAction ?? '从这篇开始';
+const trackSeriesAction = homeUi.trackSeriesAction ?? '查看系列';
 const homeStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
@@ -33,6 +37,7 @@ const homeStructuredData = {
   <section class="hero hero-editorial">
     <span class="kicker">{homeUi.kicker}</span>
     <h1 class="title page-title">{homeUi.title}</h1>
+    <p class="lede">{homeUi.lede}</p>
     <div class="hero-actions">
       <a class="button-link primary" href="#featured-posts">{homeUi.primaryAction}</a>
       <a class="button-link" href={localePath('zh', 'about')}>{homeUi.secondaryAction}</a>
@@ -40,25 +45,44 @@ const homeStructuredData = {
   </section>
 
   <section class="section" id="featured-posts">
-    <div class="section-header">
+    <div class="section-header section-header-stack">
       <div>
         <span class="eyebrow">{homeUi.featuredEyebrow}</span>
         <h2>{homeUi.featuredTitle}</h2>
       </div>
+      <p class="section-summary">{homeUi.featuredSummary}</p>
     </div>
 
-    <div class="grid">
-      {featuredPosts.map((post) => {
-        const seriesItem = getSeriesBySlug(post.data.series);
+    <div class="track-grid">
+      {seriesTracks.map(({ seriesItem, featuredPost, latestPost, posts }) => {
         return (
-          <a class="card card-post" href={localePath('zh', post.data.pathSlug)}>
-            <span class="pill">
-              {seriesItem ? getSeriesName('zh', seriesItem) : homeUi.fallbackBadge}
-            </span>
-            <h3>{post.data.title}</h3>
-            <p class="muted">{post.data.summary}</p>
-            <strong>{getReadingLabel('zh', post.data.readingMinutes)}</strong>
-          </a>
+          <article class="card card-track">
+            <div class="track-topline">
+              <span class="pill">{getSeriesName('zh', seriesItem)}</span>
+              <span class="track-count">{trackCount(posts.length)}</span>
+            </div>
+
+            <div class="track-copy">
+              <h3>{featuredPost.data.title}</h3>
+              <p class="muted">{featuredPost.data.summary}</p>
+              <p class="track-description">{getSeriesDescription('zh', seriesItem)}</p>
+            </div>
+
+            <a class="track-link" href={localePath('zh', latestPost.data.pathSlug)}>
+              <span class="track-label">{trackLatestLabel}</span>
+              <strong>{latestPost.data.title}</strong>
+              <p>{latestPost.data.summary}</p>
+            </a>
+
+            <div class="track-actions">
+              <a class="button-link primary" href={localePath('zh', featuredPost.data.pathSlug)}>
+                {trackEntryAction}
+              </a>
+              <a class="button-link" href={localePath('zh', `series/${seriesItem.slug}`)}>
+                {trackSeriesAction}
+              </a>
+            </div>
+          </article>
         );
       })}
     </div>

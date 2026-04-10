@@ -1,8 +1,15 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import type { Locale, SeriesSlug } from '../data/site';
+import { series, type Locale, type Series, type SeriesSlug } from '../data/site';
 
 export type PostEntry = CollectionEntry<'posts'>;
 export type SortOrder = 'asc' | 'desc';
+export type SeriesTrack = {
+  seriesItem: Series;
+  posts: PostEntry[];
+  startPost: PostEntry;
+  featuredPost: PostEntry;
+  latestPost: PostEntry;
+};
 
 let contentValidated = false;
 
@@ -125,6 +132,36 @@ export async function getPostsBySeries(
 export async function getRelatedPosts(locale: Locale, seriesSlug: SeriesSlug, slug: string) {
   const posts = await getPostsBySeries(locale, seriesSlug);
   return posts.filter((item) => item.data.pathSlug !== slug).slice(0, 3);
+}
+
+export async function getSeriesTracks(locale: Locale): Promise<SeriesTrack[]> {
+  const tracks = await Promise.all(
+    series.map(async (seriesItem) => {
+      const posts = await getPostsBySeries(locale, seriesItem.slug, 'asc');
+      const startPost = posts[0];
+
+      if (!startPost) {
+        return undefined;
+      }
+
+      const featuredPost = posts.find((item) => item.data.featured) ?? startPost;
+      const latestPost = sortPostsByPublishDate(posts, 'desc')[0];
+
+      if (!latestPost) {
+        return undefined;
+      }
+
+      return {
+        seriesItem,
+        posts,
+        startPost,
+        featuredPost,
+        latestPost
+      };
+    })
+  );
+
+  return tracks.filter((track): track is SeriesTrack => Boolean(track));
 }
 
 export function getSeriesNavigation(posts: PostEntry[], slug: string) {
