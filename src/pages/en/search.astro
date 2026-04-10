@@ -7,6 +7,10 @@ import { getUiText } from '../../data/ui';
 
 const posts = await getPosts('en');
 const searchUi = getUiText('en').search;
+const searchCountTemplates = {
+  all: 'Showing all {total} posts.',
+  filtered: 'Showing {visible} of {total} posts.'
+};
 const seriesOptions = series.map((item) => ({
   slug: item.slug,
   label: getSeriesName('en', item),
@@ -26,7 +30,11 @@ const seriesOptions = series.map((item) => ({
     <h1 class="title page-title">{searchUi.title}</h1>
   </section>
 
-  <section class="section search-shell">
+  <section
+    class="section search-shell"
+    data-search-all-template={searchCountTemplates.all}
+    data-search-filtered-template={searchCountTemplates.filtered}
+  >
     <div class="search-toolbar">
       <label class="search-label" for="post-search-en">{searchUi.label}</label>
       <div class="search-input-row">
@@ -66,7 +74,9 @@ const seriesOptions = series.map((item) => ({
             href={localePath('en', post.data.pathSlug)}
             data-search-item
             data-search-series={post.data.series}
-            data-search-text={`${post.data.title} ${post.data.summary} ${post.data.tags.join(' ')} ${seriesItem ? getSeriesName('en', seriesItem) : ''}`.toLowerCase()}
+            data-search-text={`${post.data.title} ${post.data.summary} ${post.data.tags.join(' ')} ${
+              seriesItem ? getSeriesName('en', seriesItem) : ''
+            }`.toLowerCase()}
           >
             {seriesItem && <span class="pill">{getSeriesName('en', seriesItem)}</span>}
             <h3>{post.data.title}</h3>
@@ -80,78 +90,96 @@ const seriesOptions = series.map((item) => ({
     <p class="search-empty muted" data-search-empty hidden>{searchUi.empty}</p>
 
     <script is:inline>
-      const root = document.currentScript?.closest('.search-shell');
-      const input = root?.querySelector('[data-search-input]');
-      const clearButton = root?.querySelector('[data-search-clear]');
-      const count = root?.querySelector('[data-search-count]');
-      const items = Array.from(root?.querySelectorAll('[data-search-item]') ?? []);
-      const filters = Array.from(root?.querySelectorAll('[data-series-filter]') ?? []);
-      const empty = root?.querySelector('[data-search-empty]');
-      const total = items.length;
-      let activeSeries = '';
+      (() => {
+        const searchRoot = document.querySelector('.search-shell');
+        if (!(searchRoot instanceof HTMLElement)) return;
 
-      const updateActiveFilter = () => {
+        const input = searchRoot.querySelector('[data-search-input]');
+        const clearButton = searchRoot.querySelector('[data-search-clear]');
+        const count = searchRoot.querySelector('[data-search-count]');
+        const allTemplate =
+          searchRoot.getAttribute('data-search-all-template') ?? 'Showing all {total} posts.';
+        const filteredTemplate =
+          searchRoot.getAttribute('data-search-filtered-template') ??
+          'Showing {visible} of {total} posts.';
+        const items = Array.from(searchRoot.querySelectorAll('[data-search-item]'));
+        const filters = Array.from(searchRoot.querySelectorAll('[data-series-filter]'));
+        const empty = searchRoot.querySelector('[data-search-empty]');
+        const total = items.length;
+        let activeSeries = '';
+
+        const formatTemplate = (template, values) =>
+          Object.entries(values).reduce(
+            (result, [key, value]) => result.replaceAll(`{${key}}`, String(value)),
+            template
+          );
+
+        const updateActiveFilter = () => {
+          filters.forEach((filter) => {
+            const value = filter.getAttribute('data-series-filter') ?? '';
+            filter.classList.toggle('is-active', value === activeSeries);
+          });
+        };
+
+        const updateCount = (visible, hasFilter) => {
+          if (!count) return;
+
+          count.textContent = hasFilter
+            ? formatTemplate(filteredTemplate, { visible, total })
+            : formatTemplate(allTemplate, { total });
+        };
+
+        const applyFilter = () => {
+          const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+          const hasFilter = Boolean(query || activeSeries);
+          let visible = 0;
+
+          items.forEach((item) => {
+            const text = item.getAttribute('data-search-text') ?? '';
+            const itemSeries = item.getAttribute('data-search-series') ?? '';
+            const matched =
+              (!query || text.includes(query)) &&
+              (!activeSeries || itemSeries === activeSeries);
+
+            item.toggleAttribute('hidden', !matched);
+            if (matched) visible += 1;
+          });
+
+          updateCount(visible, hasFilter);
+
+          if (empty) {
+            empty.toggleAttribute('hidden', visible !== 0);
+          }
+
+          if (clearButton instanceof HTMLButtonElement) {
+            clearButton.disabled = !hasFilter;
+          }
+        };
+
         filters.forEach((filter) => {
-          const value = filter.getAttribute('data-series-filter') ?? '';
-          filter.classList.toggle('is-active', value === activeSeries);
-        });
-      };
-
-      const updateCount = (visible, hasFilter) => {
-        if (!count) return;
-
-        count.textContent = hasFilter
-          ? `Showing ${visible} of ${total} posts.`
-          : `Showing all ${total} posts.`;
-      };
-
-      const applyFilter = () => {
-        const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
-        const hasFilter = Boolean(query || activeSeries);
-        let visible = 0;
-
-        items.forEach((item) => {
-          const text = item.getAttribute('data-search-text') ?? '';
-          const itemSeries = item.getAttribute('data-search-series') ?? '';
-          const matched =
-            (!query || text.includes(query)) &&
-            (!activeSeries || itemSeries === activeSeries);
-
-          item.toggleAttribute('hidden', !matched);
-          if (matched) visible += 1;
+          filter.addEventListener('click', () => {
+            activeSeries = filter.getAttribute('data-series-filter') ?? '';
+            updateActiveFilter();
+            applyFilter();
+          });
         });
 
-        updateCount(visible, hasFilter);
+        input?.addEventListener('input', applyFilter);
 
-        if (empty) {
-          empty.toggleAttribute('hidden', visible !== 0);
-        }
+        clearButton?.addEventListener('click', () => {
+          if (input instanceof HTMLInputElement) {
+            input.value = '';
+            input.focus();
+          }
 
-        if (clearButton instanceof HTMLButtonElement) {
-          clearButton.disabled = !hasFilter;
-        }
-      };
-
-      filters.forEach((filter) => {
-        filter.addEventListener('click', () => {
-          activeSeries = filter.getAttribute('data-series-filter') ?? '';
+          activeSeries = '';
           updateActiveFilter();
           applyFilter();
         });
-      });
 
-      input?.addEventListener('input', applyFilter);
-
-      clearButton?.addEventListener('click', () => {
-        if (input instanceof HTMLInputElement) {
-          input.value = '';
-          input.focus();
-        }
-
-        activeSeries = '';
         updateActiveFilter();
         applyFilter();
-      });
+      })();
     </script>
   </section>
 </BaseLayout>
