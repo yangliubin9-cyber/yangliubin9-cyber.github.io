@@ -522,9 +522,11 @@ select {
 .card-pill {
   width: fit-content;
   max-width: 100%;
-  padding: 4px 8px;
-  font-size: 0.72rem;
-  line-height: 1.1;
+  padding: 3px 6px;
+  font-size: 0.64rem;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   text-align: left;
 }
 
