@@ -1,22 +1,5 @@
 ---
-type SummaryItem = {
-  label: string;
-  text: string;
-};
-
-type FocusItem = {
-  index: string;
-  title: string;
-  summary: string;
-};
-
-type SiteModule = {
-  name: string;
-  detail: string;
-};
-
-type IntroItem = {
-  title: string;
+type AboutParagraph = {
   text: string;
 };
 
@@ -31,27 +14,13 @@ interface AboutContent {
   kicker: string;
   title: string;
   lede: string;
-  profileEyebrow: string;
-  profileTitle: string;
-  introItems: IntroItem[];
+  aboutEyebrow: string;
+  aboutTitle: string;
+  aboutParagraphs: AboutParagraph[];
   contactEyebrow: string;
   contactTitle: string;
   contactSummary: string;
   contactItems: ContactItem[];
-  summaryEyebrow: string;
-  summaryTitle: string;
-  summaryItems: SummaryItem[];
-  focusEyebrow: string;
-  focusTitle: string;
-  focusSummary: string;
-  focusAreas: FocusItem[];
-  systemEyebrow: string;
-  systemTitle: string;
-  systemSummary: string;
-  siteModules: SiteModule[];
-  readerEyebrow: string;
-  readerTitle: string;
-  readers: string[];
 }
 
 interface Props {
@@ -69,22 +38,17 @@ const { content } = Astro.props;
   </div>
 </section>
 
-<section class="section about-page-profile">
-  <div class="about-page-profile-main">
-    <div class="about-page-ledger-head">
-      <span class="eyebrow">{content.profileEyebrow}</span>
-      <h2>{content.profileTitle}</h2>
-    </div>
+<section class="section about-page-main">
+  <article class="about-page-about">
+    <span class="eyebrow">{content.aboutEyebrow}</span>
+    <h2>{content.aboutTitle}</h2>
 
-    <div class="about-page-profile-list">
-      {content.introItems.map((item) => (
-        <article class="about-page-profile-item">
-          <strong>{item.title}</strong>
-          <p>{item.text}</p>
-        </article>
+    <div class="about-page-paragraphs">
+      {content.aboutParagraphs.map((item) => (
+        <p>{item.text}</p>
       ))}
     </div>
-  </div>
+  </article>
 
   <aside class="about-page-contact-card">
     <span class="eyebrow">{content.contactEyebrow}</span>
@@ -101,76 +65,6 @@ const { content } = Astro.props;
       ))}
     </div>
   </aside>
-</section>
-
-<section class="section about-page-ledger">
-  <div class="about-page-ledger-head">
-    <span class="eyebrow">{content.summaryEyebrow}</span>
-    <h2>{content.summaryTitle}</h2>
-  </div>
-
-  <div class="about-page-ledger-grid">
-    {content.summaryItems.map((item) => (
-      <article>
-        <span class="about-page-ledger-label">{item.label}</span>
-        <p>{item.text}</p>
-      </article>
-    ))}
-  </div>
-</section>
-
-<section class="section about-page-flow">
-  <div class="section-header section-header-stack">
-    <div>
-      <span class="eyebrow">{content.focusEyebrow}</span>
-      <h2>{content.focusTitle}</h2>
-    </div>
-    <p class="section-summary">{content.focusSummary}</p>
-  </div>
-
-  <div class="about-page-flow-list">
-    {content.focusAreas.map((item) => (
-      <article class="about-page-flow-item">
-        <div class="about-page-flow-index">{item.index}</div>
-        <div class="about-page-flow-copy">
-          <h3>{item.title}</h3>
-          <p>{item.summary}</p>
-        </div>
-      </article>
-    ))}
-  </div>
-</section>
-
-<section class="section about-page-system">
-  <div class="section-header section-header-stack">
-    <div>
-      <span class="eyebrow">{content.systemEyebrow}</span>
-      <h2>{content.systemTitle}</h2>
-    </div>
-    <p class="section-summary">{content.systemSummary}</p>
-  </div>
-
-  <div class="about-page-system-list">
-    {content.siteModules.map((item) => (
-      <article class="about-page-system-row">
-        <strong>{item.name}</strong>
-        <p>{item.detail}</p>
-      </article>
-    ))}
-  </div>
-</section>
-
-<section class="section about-page-reader">
-  <div class="about-page-reader-copy">
-    <span class="eyebrow">{content.readerEyebrow}</span>
-    <h2>{content.readerTitle}</h2>
-  </div>
-
-  <ul class="about-page-reader-list">
-    {content.readers.map((item) => (
-      <li>{item}</li>
-    ))}
-  </ul>
 </section>
 
 <style>
@@ -192,71 +86,45 @@ const { content } = Astro.props;
 
   .about-page-title {
     max-width: 16ch;
-    font-size: clamp(2rem, 3.4vw, 3.4rem);
+    font-size: clamp(2rem, 3.4vw, 3.35rem);
     line-height: 1.04;
   }
 
   .about-page-lede {
-    max-width: 62ch;
+    max-width: 60ch;
     margin: 0;
     font-size: 1.04rem;
     line-height: 1.82;
   }
 
-  .about-page-ledger {
+  .about-page-main {
     display: grid;
-    gap: 22px;
-  }
-
-  .about-page-profile {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    grid-template-columns: minmax(0, 1.28fr) minmax(280px, 0.72fr);
     gap: 24px;
     align-items: start;
   }
 
-  .about-page-ledger-head h2,
-  .about-page-reader-copy h2,
+  .about-page-about h2,
   .about-page-contact-card h2 {
     margin: 10px 0 0;
-    max-width: 28ch;
-    font-size: clamp(1.55rem, 2.3vw, 2.25rem);
+    max-width: 24ch;
+    font-size: clamp(1.55rem, 2.3vw, 2.2rem);
     line-height: 1.12;
     font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
     letter-spacing: -0.02em;
   }
 
-  .about-page-ledger-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-  }
-
-  .about-page-profile-list,
-  .about-page-contact-list {
+  .about-page-paragraphs {
     display: grid;
     gap: 16px;
-    margin-top: 18px;
+    margin-top: 22px;
   }
 
-  .about-page-profile-item,
-  .about-page-contact-item {
-    border-top: 1px solid var(--border-strong);
-    padding-top: 16px;
-  }
-
-  .about-page-profile-item strong,
-  .about-page-contact-item a {
-    font-size: 1.05rem;
-    line-height: 1.35;
-  }
-
-  .about-page-profile-item p,
-  .about-page-contact-item p,
-  .about-page-contact-summary {
-    margin: 10px 0 0;
+  .about-page-paragraphs p {
+    margin: 0;
     color: var(--muted);
-    line-height: 1.74;
+    line-height: 1.82;
+    font-size: 1rem;
   }
 
   .about-page-contact-card {
@@ -269,6 +137,23 @@ const { content } = Astro.props;
 
   html[data-theme='dark'] .about-page-contact-card {
     background: rgba(24, 20, 17, 0.88);
+  }
+
+  .about-page-contact-summary {
+    margin: 12px 0 0;
+    color: var(--muted);
+    line-height: 1.74;
+  }
+
+  .about-page-contact-list {
+    display: grid;
+    gap: 16px;
+    margin-top: 22px;
+  }
+
+  .about-page-contact-item {
+    border-top: 1px solid var(--border-strong);
+    padding-top: 16px;
   }
 
   .about-page-contact-label {
@@ -284,6 +169,8 @@ const { content } = Astro.props;
     margin-top: 8px;
     color: var(--text);
     text-decoration: none;
+    font-size: 1.05rem;
+    line-height: 1.35;
     border-bottom: 1px solid transparent;
   }
 
@@ -291,127 +178,15 @@ const { content } = Astro.props;
     border-color: currentColor;
   }
 
-  .about-page-ledger-grid article,
-  .about-page-system-row,
-  .about-page-reader {
-    border-top: 1px solid var(--border-strong);
-    padding-top: 16px;
-  }
-
-  .about-page-ledger-label,
-  .about-page-flow-index {
-    font-size: 0.74rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--primary-strong);
-  }
-
-  .about-page-ledger-grid p,
-  .about-page-system-row p {
+  .about-page-contact-item p {
     margin: 10px 0 0;
     color: var(--muted);
-    line-height: 1.74;
-  }
-
-  .about-page-flow-list,
-  .about-page-system-list {
-    display: grid;
-    gap: 16px;
-  }
-
-  .about-page-flow-item {
-    display: grid;
-    grid-template-columns: 68px minmax(0, 1fr);
-    gap: 18px;
-    padding: 16px 0;
-    border-top: 1px solid var(--border);
-  }
-
-  .about-page-flow-item:first-child,
-  .about-page-system-row:first-child {
-    padding-top: 0;
-    border-top: 0;
-  }
-
-  .about-page-flow-index {
-    font-size: 0.88rem;
-    padding-top: 4px;
-  }
-
-  .about-page-flow-copy h3,
-  .about-page-system-row strong {
-    font-size: 1.08rem;
-    line-height: 1.3;
-  }
-
-  .about-page-flow-copy p {
-    margin: 8px 0 0;
-    color: var(--muted);
-    line-height: 1.76;
-  }
-
-  .about-page-system-row {
-    display: grid;
-    grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
-    gap: 16px;
-  }
-
-  .about-page-reader {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    gap: 28px;
-    align-items: start;
-  }
-
-  .about-page-reader-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 14px;
-  }
-
-  .about-page-reader-list li {
-    position: relative;
-    padding: 0 0 14px 18px;
-    border-bottom: 1px solid var(--border);
     line-height: 1.72;
-    color: var(--muted);
-  }
-
-  .about-page-reader-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.72em;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--primary-strong);
-    transform: translateY(-50%);
   }
 
   @media (max-width: 900px) {
-    .about-page-profile,
-    .about-page-ledger-grid,
-    .about-page-reader,
-    .about-page-system-row {
+    .about-page-main {
       grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  @media (max-width: 640px) {
-    .about-page-flow-item {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 10px;
-    }
-
-    .about-page-flow-index {
-      padding-top: 0;
-    }
-
-    .about-page-reader-list li {
-      padding-left: 14px;
     }
   }
 </style>

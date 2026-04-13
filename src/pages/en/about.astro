@@ -22,21 +22,18 @@ const aboutContent = {
   kicker: 'About',
   title: 'Writing at the boundary of AI systems, platforms, and operations',
   lede:
-    'I am Yang Liubin, also writing under the name MUZI. This blog is my long-term engineering notebook for AI infrastructure, platform delivery, and cloud-native work that keeps showing up in real systems.',
-  profileEyebrow: 'Profile',
-  profileTitle: 'This page is not just an about screen, it is the formal entry point for who I am and what I work on',
-  introItems: [
+    'I am Yang Liubin, also writing under the name MUZI. I want this page to read more like a real introduction from a real person, and less like site documentation.',
+  aboutEyebrow: 'About Me',
+  aboutTitle: 'I see myself as someone doing long-term engineering note taking in public',
+  aboutParagraphs: [
     {
-      title: 'What I write about',
-      text: 'My focus is AI infrastructure, MLOps, Kubernetes, Docker, CI/CD, and practical cloud-native delivery. The writing stays close to deployment reality, system stability, and maintenance tradeoffs.'
+      text: 'Most of my attention goes to AI infrastructure, MLOps, Kubernetes, Docker, CI/CD, and the messy parts of delivery and operations that show up once systems leave the whiteboard. I care less about listing commands and more about the reasoning behind them.'
     },
     {
-      title: 'Why this site exists',
-      text: 'Part of the reason is personal, I need a place to turn scattered field notes into something structured. The other part is public, I want the lessons to be useful for someone else facing the same engineering choices.'
+      text: 'This blog started as a way to stop losing useful experience. A lot of engineering lessons get re-learned because nobody writes them down while they are still fresh. Over time it became a place where I try to turn those scattered notes into something more durable and useful for other people too.'
     },
     {
-      title: 'What kind of writing to expect',
-      text: 'Less generic theory, more concrete judgment. When to use Kubernetes, when not to. What belongs to tooling, what is actually a platform design issue, and what breaks when delivery pressure hits.'
+      text: 'If you keep reading, you will probably notice my bias quickly. Less generic theory, more concrete judgment. When Kubernetes is worth the cost, when it is not. When a failure is really a tooling issue, and when it is actually a platform design problem wearing a tooling mask.'
     }
   ],
   contactEyebrow: 'Contact',
@@ -55,70 +52,6 @@ const aboutContent = {
       href: 'https://github.com/yangliubin9-cyber',
       note: 'Best for code, issues, and continuing technical discussion around posts or projects.'
     }
-  ],
-  summaryEyebrow: 'Three questions first',
-  summaryTitle: 'A first-time reader should understand the point of this site at a glance',
-  summaryItems: [
-    {
-      label: 'What you will read',
-      text: 'The writing stays focused on AI infrastructure, platform delivery, and cloud-native practice. Not a loose pile of tools. Not theory detached from shipping.'
-    },
-    {
-      label: 'How this site works',
-      text: 'The series structure, search, discussions, and bilingual setup all serve the same goal, keeping the archive easy to navigate, revisit, and extend.'
-    },
-    {
-      label: 'Why keep reading',
-      text: 'The goal is reusable engineering judgment. You should leave with a method you can apply again, not just a command snippet from one incident.'
-    }
-  ],
-  focusEyebrow: 'Main tracks',
-  focusTitle: 'This blog is about how systems hold up under real delivery pressure',
-  focusSummary: 'Each topic is framed around tradeoffs, boundaries, and the long-term cost of keeping systems operational.',
-  focusAreas: [
-    {
-      index: '01',
-      title: 'AI infrastructure',
-      summary: 'Training, inference, GPU scheduling, and MLOps, the places where capacity, stability, and delivery constraints meet.'
-    },
-    {
-      index: '02',
-      title: 'Platforms and delivery',
-      summary: 'Kubernetes, Docker, and CI/CD are treated as parts of a real shipping pipeline, not isolated setup notes.'
-    },
-    {
-      index: '03',
-      title: 'Reusable judgment',
-      summary: 'Each post aims to leave behind a decision pattern you can apply elsewhere, not just a one-time fix log.'
-    }
-  ],
-  systemEyebrow: 'Site modules',
-  systemTitle: 'If the page does not explain the modules, readers only see empty space',
-  systemSummary: 'The site already has structure and tools. The about page should explain what each module does for the reader instead of burying everything in one paragraph.',
-  siteModules: [
-    {
-      name: 'Series tracks',
-      detail: 'Content is grouped into learning paths, so new readers can enter through a clear starting point instead of a raw archive.'
-    },
-    {
-      name: 'On-site search',
-      detail: 'When someone needs to revisit permissions, deployment, container, or ops topics, they can jump there directly.'
-    },
-    {
-      name: 'Article discussions',
-      detail: 'Each post can continue into GitHub discussion, which keeps experience attached to the writing instead of trapped in the page.'
-    },
-    {
-      name: 'Bilingual publishing',
-      detail: 'Chinese and English share one structure, which supports long-term writing and future expansion without fragmenting the archive.'
-    }
-  ],
-  readerEyebrow: 'Who this is for',
-  readerTitle: 'If you are in one of these groups, the page should tell you quickly that you are in the right place',
-  readers: [
-    'Engineers working on cloud-native systems, platform engineering, or AI infrastructure',
-    'People trying to turn scattered operational experience into reusable methods',
-    'Readers who want the reasoning behind system design, not just a list of commands'
   ]
 };
 ---
