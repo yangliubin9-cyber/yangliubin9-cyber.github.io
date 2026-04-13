@@ -3,7 +3,7 @@ locale: en
 translationKey: docker-basic
 pathSlug: docker-basic
 title: "Docker Basics: Installation, Images, and Containers"
-summary: Understand the boundary between images and containers to support real delivery work.
+summary: "Understand the boundary between images and containers to support real delivery work."
 publishedAt: 2026-04-02
 updatedAt: 2026-04-09
 readingMinutes: 10
@@ -14,6 +14,10 @@ tags:
   - docker
   - containers
   - beginner
+translationSourceHash: 2cfdcc6498641d33f0396f1d7d6cd812c5c7b3f41625d7f05ec079e4b32418b3
+translationStatus: reviewed
+translationModel: manual
+translationUpdatedAt: 2026-04-13
 ---
 
 Many Docker beginners blur images, containers, registries, and runtime behavior into one big concept. A better starting point is to separate those layers before collecting more commands.

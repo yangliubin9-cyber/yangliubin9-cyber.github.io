@@ -3,7 +3,7 @@ locale: en
 translationKey: k8s-pod-deployment
 pathSlug: k8s-pod-deployment
 title: "Pod vs Deployment in Kubernetes: When to Inspect Pods and When to Change Deployments"
-summary: Understand that Pods are running instances while Deployments define the desired state, so release and debugging work target the right object.
+summary: "Understand that Pods are running instances while Deployments define the desired state, so release and debugging work target the right object."
 publishedAt: 2026-04-09
 updatedAt: 2026-04-09
 readingMinutes: 9
@@ -14,6 +14,10 @@ tags:
   - kubernetes
   - pod
   - deployment
+translationSourceHash: ccaa2c13f76290f2ef77fcd34bf91469aa60ba2f91723304c7870746c6c16737
+translationStatus: reviewed
+translationModel: manual
+translationUpdatedAt: 2026-04-13
 ---
 
 When people first meet Kubernetes, Pod and Deployment can feel like two similar resource types. That confusion causes trouble during release and debugging. People delete Pods by hand, edit Pod settings directly, or assume Pod recreation means the cluster is unstable. To read the system correctly, the two roles need to be separated early.

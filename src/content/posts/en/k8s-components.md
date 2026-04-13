@@ -2,8 +2,8 @@
 locale: en
 translationKey: k8s-components
 pathSlug: k8s-components
-title: Kubernetes Core Components and How They Work
-summary: See how the apiserver, scheduler, controller manager, and kubelet fit together.
+title: "Kubernetes Core Components and How They Work"
+summary: "See how the apiserver, scheduler, controller manager, and kubelet fit together."
 publishedAt: 2026-04-05
 updatedAt: 2026-04-09
 readingMinutes: 9
@@ -14,6 +14,10 @@ tags:
   - kubernetes
   - control-plane
   - operations
+translationSourceHash: fa692f06427ee14b07c7125cc5a0fc1bde006f559283ae34a6f30b02a5b1b647
+translationStatus: reviewed
+translationModel: manual
+translationUpdatedAt: 2026-04-13
 ---
 
 If the first Kubernetes article explains the broad shape of a cluster, this one opens the machine and looks at the main moving parts. There are many component names, but the system becomes much easier once each one is tied to a clear responsibility.

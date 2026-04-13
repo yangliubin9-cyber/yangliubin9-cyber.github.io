@@ -343,6 +343,12 @@ select {
   cursor: default;
 }
 
+.segmented-option.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .page {
   display: grid;
   gap: 24px;

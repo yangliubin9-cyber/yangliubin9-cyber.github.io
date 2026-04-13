@@ -8,7 +8,11 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "translate:one": "node ./scripts/translate-posts.mjs one",
+    "translate:changed": "node ./scripts/translate-posts.mjs changed",
+    "translate:check": "node ./scripts/translate-posts.mjs check",
+    "translate:review": "node ./scripts/translate-posts.mjs review"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.8",

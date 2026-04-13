@@ -3,7 +3,7 @@ locale: en
 translationKey: docker-deploy
 pathSlug: docker-deploy
 title: "Docker Deployment Practice: From Local Run to Service Release"
-summary: Connect local runtime, image publishing, and service startup into one release path.
+summary: "Connect local runtime, image publishing, and service startup into one release path."
 publishedAt: 2026-04-03
 updatedAt: 2026-04-09
 readingMinutes: 12
@@ -14,6 +14,10 @@ tags:
   - docker
   - deployment
   - registry
+translationSourceHash: baa5b9915c36d190fe8da2ffdba2aba6e48882888909b732f9e0dfeab9a2e64e
+translationStatus: reviewed
+translationModel: manual
+translationUpdatedAt: 2026-04-13
 ---
 
 Writing a `Dockerfile` is only the beginning. Real delivery work starts when local development, image builds, registry publishing, and service restarts become one repeatable path instead of a pile of ad-hoc commands.

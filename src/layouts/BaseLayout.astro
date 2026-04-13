@@ -11,7 +11,7 @@ interface Props {
   title: string;
   description: string;
   locale: Locale;
-  switchHref: string;
+  switchHref?: string;
   switchLabel?: string;
   ogType?: 'website' | 'article';
   imagePath?: string;
@@ -40,16 +40,22 @@ const nav = [
   { label: ui.layout.nav.search, href: localePath(locale, 'search') },
   { label: ui.layout.nav.about, href: localePath(locale, 'about') }
 ];
+const translationUnavailableLabel =
+  locale === 'zh'
+    ? '目标语言暂时还没有同步内容。'
+    : 'This locale is not available for the current page yet.';
 const languageOptions = [
   {
     code: languageCodes.zh,
     href: locale === 'zh' ? localePath('zh') : switchHref,
-    active: locale === 'zh'
+    active: locale === 'zh',
+    available: locale === 'zh' || Boolean(switchHref)
   },
   {
     code: languageCodes.en,
     href: locale === 'en' ? localePath('en') : switchHref,
-    active: locale === 'en'
+    active: locale === 'en',
+    available: locale === 'en' || Boolean(switchHref)
   }
 ];
 const themeOptions = themeModes.map((mode) => ({
@@ -60,7 +66,7 @@ const lang = locale === 'zh' ? 'zh-CN' : 'en';
 const preferencesAria = `${ui.layout.languageLabel} / ${ui.layout.themeLabel}`;
 const siteOrigin = Astro.site ?? new URL(siteMeta.url);
 const canonicalUrl = new URL(Astro.url.pathname, siteOrigin).toString();
-const alternateUrl = new URL(switchHref, siteOrigin).toString();
+const alternateUrl = switchHref ? new URL(switchHref, siteOrigin).toString() : undefined;
 const socialImageUrl = new URL(withBase(imagePath), siteOrigin).toString();
 const ogLocale = locale === 'zh' ? 'zh_CN' : 'en_US';
 const alternateLocale = locale === 'zh' ? 'en_US' : 'zh_CN';
@@ -95,7 +101,9 @@ const structuredDataItems = [
     {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
     <link rel="canonical" href={canonicalUrl} />
     <link rel="alternate" hreflang={lang} href={canonicalUrl} />
-    <link rel="alternate" hreflang={locale === 'zh' ? 'en' : 'zh'} href={alternateUrl} />
+    {alternateUrl && (
+      <link rel="alternate" hreflang={locale === 'zh' ? 'en' : 'zh'} href={alternateUrl} />
+    )}
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     <meta property="og:site_name" content={`${siteMeta.brand} | ${siteMeta.title}`} />
     <meta property="og:title" content={title} />
@@ -104,7 +112,7 @@ const structuredDataItems = [
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={socialImageUrl} />
     <meta property="og:locale" content={ogLocale} />
-    <meta property="og:locale:alternate" content={alternateLocale} />
+    {alternateUrl && <meta property="og:locale:alternate" content={alternateLocale} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -289,6 +297,14 @@ const structuredDataItems = [
                   {languageOptions.map((item) =>
                     item.active ? (
                       <span class="segmented-option is-active" aria-current="page">
+                        {item.code}
+                      </span>
+                    ) : !item.available ? (
+                      <span
+                        class="segmented-option is-disabled"
+                        aria-disabled="true"
+                        title={translationUnavailableLabel}
+                      >
                         {item.code}
                       </span>
                     ) : (

@@ -10,8 +10,10 @@ export type SeriesTrack = {
   featuredPost: PostEntry;
   latestPost: PostEntry;
 };
+type TranslationSet = Partial<Record<Locale, PostEntry>>;
 
 let contentValidated = false;
+let translationsByKey = new Map<string, TranslationSet>();
 
 function sortPostsByPublishDate(entries: PostEntry[], order: SortOrder) {
   const direction = order === 'asc' ? 1 : -1;
@@ -42,7 +44,7 @@ async function validateContentCollection() {
   const posts = await getCollection('posts');
   const seenLocaleSlug = new Set<string>();
   const seenLocaleTranslationKey = new Set<string>();
-  const translations = new Map<string, PostEntry[]>();
+  translationsByKey = new Map<string, TranslationSet>();
 
   for (const post of posts) {
     const slugKey = `${post.data.locale}:${post.data.pathSlug}`;
@@ -59,19 +61,21 @@ async function validateContentCollection() {
     seenLocaleSlug.add(slugKey);
     seenLocaleTranslationKey.add(translationLocaleKey);
 
-    const entries = translations.get(post.data.translationKey) ?? [];
-    entries.push(post);
-    translations.set(post.data.translationKey, entries);
+    const entries = translationsByKey.get(post.data.translationKey) ?? {};
+    entries[post.data.locale] = post;
+    translationsByKey.set(post.data.translationKey, entries);
   }
 
-  for (const [translationKey, entries] of translations.entries()) {
-    const zhPost = entries.find((item) => item.data.locale === 'zh');
-    const enPost = entries.find((item) => item.data.locale === 'en');
+  for (const [translationKey, entries] of translationsByKey.entries()) {
+    const zhPost = entries.zh;
+    const enPost = entries.en;
 
-    if (!zhPost || !enPost || entries.length !== 2) {
-      throw new Error(
-        `Translation pair "${translationKey}" must contain exactly one zh post and one en post.`
-      );
+    if (!zhPost) {
+      throw new Error(`Translation set "${translationKey}" must include a zh post before adding en.`);
+    }
+
+    if (!enPost) {
+      continue;
     }
 
     if (zhPost.data.pathSlug !== enPost.data.pathSlug) {
@@ -114,6 +118,16 @@ export async function getPostBySlug(locale: Locale, slug: string) {
     ({ data }) => data.locale === locale && data.pathSlug === slug
   );
   return posts[0];
+}
+
+export async function getTranslatedPost(post: PostEntry, locale: Locale) {
+  await validateContentCollection();
+
+  if (post.data.locale === locale) {
+    return post;
+  }
+
+  return translationsByKey.get(post.data.translationKey)?.[locale];
 }
 
 export async function getPostsBySeries(

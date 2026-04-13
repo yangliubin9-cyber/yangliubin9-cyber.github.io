@@ -2,8 +2,8 @@
 locale: en
 translationKey: k8s
 pathSlug: k8s
-title: Getting Started with Kubernetes Cluster Deployment
-summary: Understand Kubernetes clusters by starting from the control plane, nodes, and networking.
+title: "Getting Started with Kubernetes Cluster Deployment"
+summary: "Understand Kubernetes clusters by starting from the control plane, nodes, and networking."
 publishedAt: 2026-04-04
 updatedAt: 2026-04-09
 readingMinutes: 11
@@ -14,6 +14,10 @@ tags:
   - kubernetes
   - cluster
   - beginner
+translationSourceHash: 08b10e611061bb93d58e9d91a6a3010c7c6483f018e70dff9ce022527b32de2a
+translationStatus: reviewed
+translationModel: manual
+translationUpdatedAt: 2026-04-13
 ---
 
 Kubernetes feels intimidating when you meet it through YAML and jargon first. A better starting point is a systems question: who makes decisions in a cluster, who executes them, how does traffic reach workloads, and how does the platform know whether reality still matches intent?

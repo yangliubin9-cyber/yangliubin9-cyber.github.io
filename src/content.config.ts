@@ -19,7 +19,11 @@ const posts = defineCollection({
     series: z.enum(seriesSlugs),
     seriesOrder: z.number().int().positive(),
     featured: z.boolean().default(false),
-    tags: z.array(z.string().min(1)).default([])
+    tags: z.array(z.string().min(1)).default([]),
+    translationSourceHash: z.string().length(64).optional(),
+    translationStatus: z.enum(['ai-generated', 'reviewed', 'needs-update']).optional(),
+    translationModel: z.string().min(1).optional(),
+    translationUpdatedAt: z.coerce.date().optional()
   })
 });
 

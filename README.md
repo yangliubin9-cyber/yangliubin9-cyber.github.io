@@ -53,6 +53,7 @@ Current content source:
 - `src/content.config.ts`
 - `src/content/templates/*.md`
 - `CONTENT_GUIDE.md`
+- `scripts/translate-posts.mjs`
 
 ## Content Workflow
 
@@ -66,11 +67,45 @@ Required post fields now include:
 
 Current publishing rules:
 
-- every published post must exist in both `zh` and `en`
+- `zh` is the source of truth
+- `en` is a derived translation that can be created later
+- `en` must never exist without a matching `zh`
 - both locale files must share the same `translationKey`
-- both locale files must share the same `pathSlug`
-- both locale files must stay in the same `series`
-- both locale files must use the same `seriesOrder`
+- if an `en` file exists, it must share the same `pathSlug`
+- if an `en` file exists, it must stay in the same `series`
+- if an `en` file exists, it must use the same `seriesOrder`
+
+Translation metadata for English files:
+
+- `translationSourceHash`: hash of the current Chinese source snapshot
+- `translationStatus`: `ai-generated`, `reviewed`, or reserved `needs-update`
+- `translationModel`: the model used for the last machine translation
+- `translationUpdatedAt`: last machine-sync date
+
+Recommended translation flow:
+
+1. Write or update the Chinese post under `src/content/posts/zh/`
+2. Generate or refresh English with `npm run translate:one -- --key your-key` or `npm run translate:changed`
+3. Review the English content manually
+4. Mark it as reviewed with `npm run translate:review -- --key your-key`
+5. Run `npm run translate:check`, `npm run check`, and `npm run build`
+
+Environment variables for translation:
+
+- `OPENAI_API_KEY`: required for translation requests
+- `OPENAI_TRANSLATION_MODEL`: optional, defaults to `gpt-5.4-mini`
+
+Useful translation commands:
+
+```bash
+npm run translate:one -- --key linux-basic
+npm run translate:changed
+npm run translate:check
+npm run translate:review -- --key linux-basic
+npm run translate:review -- --all
+```
+
+If you already have hand-written English files from before this workflow existed, run `npm run translate:review -- --all` once to baseline them as reviewed translations without overwriting the content.
 
 Use these authoring references before adding new posts:
 
@@ -196,6 +231,7 @@ If the comment box appears but posting fails:
 ```text
 .
 |-- public/
+|-- scripts/
 |-- src/
 |   |-- content/
 |   |-- content.config.ts

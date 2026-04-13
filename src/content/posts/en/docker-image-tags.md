@@ -3,7 +3,7 @@ locale: en
 translationKey: docker-image-tags
 pathSlug: docker-image-tags
 title: "Docker Image Tag Strategy: Stop Releasing with Only latest"
-summary: Use version tags, Git SHAs, and a fixed release order to make container delivery traceable and reversible.
+summary: "Use version tags, Git SHAs, and a fixed release order to make container delivery traceable and reversible."
 publishedAt: 2026-04-09
 updatedAt: 2026-04-09
 readingMinutes: 8
@@ -14,6 +14,10 @@ tags:
   - docker
   - registry
   - release
+translationSourceHash: f770d0706ef893cd2847e46e23b169a1309f872dee1a6ac017bfc1df3c703435
+translationStatus: reviewed
+translationModel: manual
+translationUpdatedAt: 2026-04-13
 ---
 
 Many teams start Docker delivery with a single tag: `latest`. It is fast at first, but once you need collaboration, rollback, or debugging, the weakness shows immediately. The real problem is not the tag syntax. It is that you can no longer answer one simple question: what exact version is production running right now?

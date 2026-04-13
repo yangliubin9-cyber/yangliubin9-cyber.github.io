@@ -8,6 +8,7 @@ import {
   getPostsBySeries,
   getReadingLabel,
   getSeriesNavigation,
+  getTranslatedPost,
   type PostEntry
 } from '../../lib/content';
 import { localePath } from '../../lib/routing';
@@ -57,6 +58,7 @@ const { post, seriesPosts, progressIndex, totalInSeries, previousPost, nextPost,
 const seriesItem = getSeriesBySlug(post.data.series);
 const articleUi = getUiText('en').article;
 const { Content, headings } = await render(post);
+const alternatePost = await getTranslatedPost(post, 'zh');
 const progressPercent = totalInSeries > 0 ? `${(progressIndex / totalInSeries) * 100}%` : '0%';
 const articleKeywords = [...post.data.tags, ...(seriesItem ? [getSeriesName('en', seriesItem)] : [])];
 const articleStructuredData = {
@@ -86,7 +88,7 @@ const articleStructuredData = {
   title={`${post.data.title} | MUZI`}
   description={post.data.summary}
   locale="en"
-  switchHref={localePath('zh', post.data.pathSlug)}
+  switchHref={alternatePost ? localePath('zh', alternatePost.data.pathSlug) : undefined}
   ogType="article"
   publishedTime={post.data.publishedAt.toISOString()}
   keywords={articleKeywords}

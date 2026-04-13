@@ -3,7 +3,7 @@ locale: en
 translationKey: linux-basic
 pathSlug: linux-basic
 title: "Linux Basics: Files, Directories, and Common Commands"
-summary: Build a practical mental model for Linux by mastering paths, directories, and daily commands first.
+summary: "Build a practical mental model for Linux by mastering paths, directories, and daily commands first."
 publishedAt: 2026-04-01
 updatedAt: 2026-04-09
 readingMinutes: 8
@@ -14,6 +14,10 @@ tags:
   - shell
   - filesystem
   - beginner
+translationSourceHash: c57cb12fbefe81798f3344eb0ff6cb94416cc13ea94830afac2bcaaa68e08282
+translationStatus: reviewed
+translationModel: manual
+translationUpdatedAt: 2026-04-13
 ---
 
 Linux becomes much easier once you stop treating commands as isolated tricks. The real foundation is knowing where you are, what file a command is acting on, and whether the current user is allowed to touch it.

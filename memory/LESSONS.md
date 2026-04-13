@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-13: If the site wants Chinese-first bilingual publishing, do not hard-require every `translationKey` to have both `zh` and `en` at build time. Let `zh` publish first, treat `en` as derived content, and gate the language switch by whether the translated page actually exists.
+
 - 2026-04-13: About 页如果同时承担“作者介绍”和“站点说明”，不能只放标题加两段正文。至少要把内容范围、站点模块、适合读者这三层信息拆开，不然读者会觉得页面很空，也看不懂这个模块到底有什么用。
 - 2026-04-13: 如果 About 页是正式对外页面，不要只写抽象定位。至少要有真人身份介绍、当前写作方向和明确联系方式，不然页面再有结构，也还是会像半成品。
 - 2026-04-13: About 页如果已经有真人介绍和联系方式，就不要再堆额外的小模块去解释站点逻辑。对这种页面来说，少而准比“内容很全”更重要，模块太多反而会把人的存在感冲淡。

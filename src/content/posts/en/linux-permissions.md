@@ -3,7 +3,7 @@ locale: en
 translationKey: linux-permissions
 pathSlug: linux-permissions
 title: "Linux Permissions and Users: Understand chmod, chown, and Permission Denied"
-summary: Put users, groups, permission bits, and the basic troubleshooting order into one model so `Permission denied` stops being guesswork.
+summary: "Put users, groups, permission bits, and the basic troubleshooting order into one model so `Permission denied` stops being guesswork."
 publishedAt: 2026-04-09
 updatedAt: 2026-04-09
 readingMinutes: 9
@@ -14,6 +14,10 @@ tags:
   - linux
   - permissions
   - users
+translationSourceHash: 0594e04c781496c0343b16af8f57041b7e0d7001dc198e9613870d8d62870a0d
+translationStatus: reviewed
+translationModel: manual
+translationUpdatedAt: 2026-04-13
 ---
 
 Many people get stuck on Linux not because the command is unfamiliar, but because the command is clear and the result is still `Permission denied`. If you debug that by guessing, the system usually gets messier. The useful model is smaller: who is acting, who owns the target, and which permission column applies to the current user.
