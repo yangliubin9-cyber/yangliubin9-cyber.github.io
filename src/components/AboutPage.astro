@@ -15,10 +15,29 @@ type SiteModule = {
   detail: string;
 };
 
+type IntroItem = {
+  title: string;
+  text: string;
+};
+
+type ContactItem = {
+  label: string;
+  value: string;
+  href: string;
+  note: string;
+};
+
 interface AboutContent {
   kicker: string;
   title: string;
   lede: string;
+  profileEyebrow: string;
+  profileTitle: string;
+  introItems: IntroItem[];
+  contactEyebrow: string;
+  contactTitle: string;
+  contactSummary: string;
+  contactItems: ContactItem[];
   summaryEyebrow: string;
   summaryTitle: string;
   summaryItems: SummaryItem[];
@@ -48,6 +67,40 @@ const { content } = Astro.props;
     <h1 class="title page-title about-page-title">{content.title}</h1>
     <p class="lede about-page-lede">{content.lede}</p>
   </div>
+</section>
+
+<section class="section about-page-profile">
+  <div class="about-page-profile-main">
+    <div class="about-page-ledger-head">
+      <span class="eyebrow">{content.profileEyebrow}</span>
+      <h2>{content.profileTitle}</h2>
+    </div>
+
+    <div class="about-page-profile-list">
+      {content.introItems.map((item) => (
+        <article class="about-page-profile-item">
+          <strong>{item.title}</strong>
+          <p>{item.text}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+
+  <aside class="about-page-contact-card">
+    <span class="eyebrow">{content.contactEyebrow}</span>
+    <h2>{content.contactTitle}</h2>
+    <p class="about-page-contact-summary">{content.contactSummary}</p>
+
+    <div class="about-page-contact-list">
+      {content.contactItems.map((item) => (
+        <article class="about-page-contact-item">
+          <span class="about-page-contact-label">{item.label}</span>
+          <a href={item.href}>{item.value}</a>
+          <p>{item.note}</p>
+        </article>
+      ))}
+    </div>
+  </aside>
 </section>
 
 <section class="section about-page-ledger">
@@ -155,8 +208,16 @@ const { content } = Astro.props;
     gap: 22px;
   }
 
+  .about-page-profile {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    gap: 24px;
+    align-items: start;
+  }
+
   .about-page-ledger-head h2,
-  .about-page-reader-copy h2 {
+  .about-page-reader-copy h2,
+  .about-page-contact-card h2 {
     margin: 10px 0 0;
     max-width: 28ch;
     font-size: clamp(1.55rem, 2.3vw, 2.25rem);
@@ -169,6 +230,65 @@ const { content } = Astro.props;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px;
+  }
+
+  .about-page-profile-list,
+  .about-page-contact-list {
+    display: grid;
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .about-page-profile-item,
+  .about-page-contact-item {
+    border-top: 1px solid var(--border-strong);
+    padding-top: 16px;
+  }
+
+  .about-page-profile-item strong,
+  .about-page-contact-item a {
+    font-size: 1.05rem;
+    line-height: 1.35;
+  }
+
+  .about-page-profile-item p,
+  .about-page-contact-item p,
+  .about-page-contact-summary {
+    margin: 10px 0 0;
+    color: var(--muted);
+    line-height: 1.74;
+  }
+
+  .about-page-contact-card {
+    padding: 24px;
+    background: rgba(255, 253, 249, 0.72);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 6px);
+    box-shadow: var(--shadow);
+  }
+
+  html[data-theme='dark'] .about-page-contact-card {
+    background: rgba(24, 20, 17, 0.88);
+  }
+
+  .about-page-contact-label {
+    display: inline-flex;
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary-strong);
+  }
+
+  .about-page-contact-item a {
+    display: inline-flex;
+    margin-top: 8px;
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+
+  .about-page-contact-item a:hover {
+    border-color: currentColor;
   }
 
   .about-page-ledger-grid article,
@@ -272,6 +392,7 @@ const { content } = Astro.props;
   }
 
   @media (max-width: 900px) {
+    .about-page-profile,
     .about-page-ledger-grid,
     .about-page-reader,
     .about-page-system-row {
