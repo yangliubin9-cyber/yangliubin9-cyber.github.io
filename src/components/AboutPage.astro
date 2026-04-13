@@ -1,0 +1,296 @@
+---
+type SummaryItem = {
+  label: string;
+  text: string;
+};
+
+type FocusItem = {
+  index: string;
+  title: string;
+  summary: string;
+};
+
+type SiteModule = {
+  name: string;
+  detail: string;
+};
+
+interface AboutContent {
+  kicker: string;
+  title: string;
+  lede: string;
+  summaryEyebrow: string;
+  summaryTitle: string;
+  summaryItems: SummaryItem[];
+  focusEyebrow: string;
+  focusTitle: string;
+  focusSummary: string;
+  focusAreas: FocusItem[];
+  systemEyebrow: string;
+  systemTitle: string;
+  systemSummary: string;
+  siteModules: SiteModule[];
+  readerEyebrow: string;
+  readerTitle: string;
+  readers: string[];
+}
+
+interface Props {
+  content: AboutContent;
+}
+
+const { content } = Astro.props;
+---
+
+<section class="hero about-page-hero">
+  <div class="about-page-intro">
+    <span class="kicker">{content.kicker}</span>
+    <h1 class="title page-title about-page-title">{content.title}</h1>
+    <p class="lede about-page-lede">{content.lede}</p>
+  </div>
+</section>
+
+<section class="section about-page-ledger">
+  <div class="about-page-ledger-head">
+    <span class="eyebrow">{content.summaryEyebrow}</span>
+    <h2>{content.summaryTitle}</h2>
+  </div>
+
+  <div class="about-page-ledger-grid">
+    {content.summaryItems.map((item) => (
+      <article>
+        <span class="about-page-ledger-label">{item.label}</span>
+        <p>{item.text}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="section about-page-flow">
+  <div class="section-header section-header-stack">
+    <div>
+      <span class="eyebrow">{content.focusEyebrow}</span>
+      <h2>{content.focusTitle}</h2>
+    </div>
+    <p class="section-summary">{content.focusSummary}</p>
+  </div>
+
+  <div class="about-page-flow-list">
+    {content.focusAreas.map((item) => (
+      <article class="about-page-flow-item">
+        <div class="about-page-flow-index">{item.index}</div>
+        <div class="about-page-flow-copy">
+          <h3>{item.title}</h3>
+          <p>{item.summary}</p>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="section about-page-system">
+  <div class="section-header section-header-stack">
+    <div>
+      <span class="eyebrow">{content.systemEyebrow}</span>
+      <h2>{content.systemTitle}</h2>
+    </div>
+    <p class="section-summary">{content.systemSummary}</p>
+  </div>
+
+  <div class="about-page-system-list">
+    {content.siteModules.map((item) => (
+      <article class="about-page-system-row">
+        <strong>{item.name}</strong>
+        <p>{item.detail}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="section about-page-reader">
+  <div class="about-page-reader-copy">
+    <span class="eyebrow">{content.readerEyebrow}</span>
+    <h2>{content.readerTitle}</h2>
+  </div>
+
+  <ul class="about-page-reader-list">
+    {content.readers.map((item) => (
+      <li>{item}</li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .about-page-hero {
+    background:
+      linear-gradient(180deg, rgba(255, 251, 244, 0.96), rgba(252, 246, 238, 0.92)),
+      var(--panel);
+  }
+
+  html[data-theme='dark'] .about-page-hero {
+    background:
+      linear-gradient(180deg, rgba(38, 29, 23, 0.96), rgba(27, 21, 17, 0.94)),
+      var(--panel);
+  }
+
+  .about-page-intro {
+    max-width: 66ch;
+  }
+
+  .about-page-title {
+    max-width: 16ch;
+    font-size: clamp(2rem, 3.4vw, 3.4rem);
+    line-height: 1.04;
+  }
+
+  .about-page-lede {
+    max-width: 62ch;
+    margin: 0;
+    font-size: 1.04rem;
+    line-height: 1.82;
+  }
+
+  .about-page-ledger {
+    display: grid;
+    gap: 22px;
+  }
+
+  .about-page-ledger-head h2,
+  .about-page-reader-copy h2 {
+    margin: 10px 0 0;
+    max-width: 28ch;
+    font-size: clamp(1.55rem, 2.3vw, 2.25rem);
+    line-height: 1.12;
+    font-family: "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    letter-spacing: -0.02em;
+  }
+
+  .about-page-ledger-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .about-page-ledger-grid article,
+  .about-page-system-row,
+  .about-page-reader {
+    border-top: 1px solid var(--border-strong);
+    padding-top: 16px;
+  }
+
+  .about-page-ledger-label,
+  .about-page-flow-index {
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary-strong);
+  }
+
+  .about-page-ledger-grid p,
+  .about-page-system-row p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    line-height: 1.74;
+  }
+
+  .about-page-flow-list,
+  .about-page-system-list {
+    display: grid;
+    gap: 16px;
+  }
+
+  .about-page-flow-item {
+    display: grid;
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 18px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .about-page-flow-item:first-child,
+  .about-page-system-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .about-page-flow-index {
+    font-size: 0.88rem;
+    padding-top: 4px;
+  }
+
+  .about-page-flow-copy h3,
+  .about-page-system-row strong {
+    font-size: 1.08rem;
+    line-height: 1.3;
+  }
+
+  .about-page-flow-copy p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    line-height: 1.76;
+  }
+
+  .about-page-system-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .about-page-reader {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 28px;
+    align-items: start;
+  }
+
+  .about-page-reader-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 14px;
+  }
+
+  .about-page-reader-list li {
+    position: relative;
+    padding: 0 0 14px 18px;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.72;
+    color: var(--muted);
+  }
+
+  .about-page-reader-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary-strong);
+    transform: translateY(-50%);
+  }
+
+  @media (max-width: 900px) {
+    .about-page-ledger-grid,
+    .about-page-reader,
+    .about-page-system-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .about-page-flow-item {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .about-page-flow-index {
+      padding-top: 0;
+    }
+
+    .about-page-reader-list li {
+      padding-left: 14px;
+    }
+  }
+</style>

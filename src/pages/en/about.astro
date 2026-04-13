@@ -1,10 +1,9 @@
 ---
+import AboutPage from '../../components/AboutPage.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { localePath } from '../../lib/routing';
 import { siteMeta } from '../../data/site';
-import { getUiText } from '../../data/ui';
 
-const aboutUi = getUiText('en').about;
 const aboutStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
@@ -18,6 +17,77 @@ const aboutStructuredData = {
     url: siteMeta.author.github
   }
 };
+
+const aboutContent = {
+  kicker: 'About',
+  title: 'Writing at the boundary of AI systems, platforms, and operations',
+  lede:
+    'I am MUZI, an engineer writing about AI infrastructure and practical delivery. This page should do more than name the author. It should tell readers what the site covers, how to move through it, and why it is worth following over time.',
+  summaryEyebrow: 'Three questions first',
+  summaryTitle: 'A first-time reader should understand the point of this site at a glance',
+  summaryItems: [
+    {
+      label: 'What you will read',
+      text: 'The writing stays focused on AI infrastructure, platform delivery, and cloud-native practice. Not a loose pile of tools. Not theory detached from shipping.'
+    },
+    {
+      label: 'How this site works',
+      text: 'The series structure, search, discussions, and bilingual setup all serve the same goal, keeping the archive easy to navigate, revisit, and extend.'
+    },
+    {
+      label: 'Why keep reading',
+      text: 'The goal is reusable engineering judgment. You should leave with a method you can apply again, not just a command snippet from one incident.'
+    }
+  ],
+  focusEyebrow: 'Main tracks',
+  focusTitle: 'This blog is about how systems hold up under real delivery pressure',
+  focusSummary: 'Each topic is framed around tradeoffs, boundaries, and the long-term cost of keeping systems operational.',
+  focusAreas: [
+    {
+      index: '01',
+      title: 'AI infrastructure',
+      summary: 'Training, inference, GPU scheduling, and MLOps, the places where capacity, stability, and delivery constraints meet.'
+    },
+    {
+      index: '02',
+      title: 'Platforms and delivery',
+      summary: 'Kubernetes, Docker, and CI/CD are treated as parts of a real shipping pipeline, not isolated setup notes.'
+    },
+    {
+      index: '03',
+      title: 'Reusable judgment',
+      summary: 'Each post aims to leave behind a decision pattern you can apply elsewhere, not just a one-time fix log.'
+    }
+  ],
+  systemEyebrow: 'Site modules',
+  systemTitle: 'If the page does not explain the modules, readers only see empty space',
+  systemSummary: 'The site already has structure and tools. The about page should explain what each module does for the reader instead of burying everything in one paragraph.',
+  siteModules: [
+    {
+      name: 'Series tracks',
+      detail: 'Content is grouped into learning paths, so new readers can enter through a clear starting point instead of a raw archive.'
+    },
+    {
+      name: 'On-site search',
+      detail: 'When someone needs to revisit permissions, deployment, container, or ops topics, they can jump there directly.'
+    },
+    {
+      name: 'Article discussions',
+      detail: 'Each post can continue into GitHub discussion, which keeps experience attached to the writing instead of trapped in the page.'
+    },
+    {
+      name: 'Bilingual publishing',
+      detail: 'Chinese and English share one structure, which supports long-term writing and future expansion without fragmenting the archive.'
+    }
+  ],
+  readerEyebrow: 'Who this is for',
+  readerTitle: 'If you are in one of these groups, the page should tell you quickly that you are in the right place',
+  readers: [
+    'Engineers working on cloud-native systems, platform engineering, or AI infrastructure',
+    'People trying to turn scattered operational experience into reusable methods',
+    'Readers who want the reasoning behind system design, not just a list of commands'
+  ]
+};
 ---
 
 <BaseLayout
@@ -28,14 +98,5 @@ const aboutStructuredData = {
   keywords={['about the author', 'AI infrastructure', 'cloud native', 'engineering blog']}
   structuredData={aboutStructuredData}
 >
-  <section class="hero">
-    <span class="kicker">{aboutUi.kicker}</span>
-    <h1 class="title page-title">{aboutUi.title}</h1>
-  </section>
-
-  <section class="article-body">
-    {aboutUi.paragraphs.map((item) => (
-      <p>{item}</p>
-    ))}
-  </section>
+  <AboutPage content={aboutContent} />
 </BaseLayout>

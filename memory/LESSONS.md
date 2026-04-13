@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-13: About 页如果同时承担“作者介绍”和“站点说明”，不能只放标题加两段正文。至少要把内容范围、站点模块、适合读者这三层信息拆开，不然读者会觉得页面很空，也看不懂这个模块到底有什么用。
+
 - 2026-04-10: If a filter button needs centered text plus a count badge, do not center the text and badge as one flex row. Keep the button text centered and absolutely position the count bubble to the right, otherwise chips with different labels will look visually different even when the outer width is the same.
 
 - 2026-04-10: Search filter chips are a different UI problem from article badges. If the requirement is "all tags the same size", use a grid plus fixed-width count bubbles on `.search-filters` and `.filter-chip`, not repeated tweaks on the article `.card-pill`.

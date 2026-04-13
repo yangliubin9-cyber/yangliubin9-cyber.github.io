@@ -1,10 +1,9 @@
 ---
+import AboutPage from '../../components/AboutPage.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { localePath } from '../../lib/routing';
 import { siteMeta } from '../../data/site';
-import { getUiText } from '../../data/ui';
 
-const aboutUi = getUiText('zh').about;
 const aboutStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
@@ -18,6 +17,77 @@ const aboutStructuredData = {
     url: siteMeta.author.github
   }
 };
+
+const aboutContent = {
+  kicker: '关于',
+  title: '在 AI、平台与运维交界处写工程博客',
+  lede:
+    '我是 MUZI，一名长期写 AI 基础设施与工程交付的工程师。这一页不只介绍作者，也先说明这个站写什么、怎么读、以及它为什么值得你继续跟进。',
+  summaryEyebrow: '先回答三个问题',
+  summaryTitle: '第一次来到这里的人，应该一眼就知道这站在讲什么',
+  summaryItems: [
+    {
+      label: '你会读到什么',
+      text: '内容围绕 AI 基础设施、平台交付和云原生实践展开，不是零散工具清单，也不是只停留在概念层。'
+    },
+    {
+      label: '这个站怎么读',
+      text: '系列、搜索、讨论和双语结构都服务同一件事，就是让内容能被持续查找、复用和扩展。'
+    },
+    {
+      label: '为什么值得继续看',
+      text: '我更关心可复用的工程判断，而不是一次性的命令集合。读完应该能带走方法，不只是带走截图。'
+    }
+  ],
+  focusEyebrow: '内容主线',
+  focusTitle: '这里写的不是工具名词，而是系统在真实交付里怎么站住',
+  focusSummary: '我会把问题放回真实系统里讨论，尽量解释取舍、边界和长期维护成本。',
+  focusAreas: [
+    {
+      index: '01',
+      title: 'AI 基础设施',
+      summary: '关注训练、推理、GPU 调度、MLOps 这些会同时碰到资源、稳定性和交付压力的问题。'
+    },
+    {
+      index: '02',
+      title: '平台与交付',
+      summary: '不只讲 Kubernetes、Docker、CI/CD 怎么用，还会讲它们怎样接入团队的日常发布链路。'
+    },
+    {
+      index: '03',
+      title: '可复用判断',
+      summary: '每篇内容都尽量沉淀成可迁移的方法，减少“这次能用、下次重来”的重复劳动。'
+    }
+  ],
+  systemEyebrow: '站点模块',
+  systemTitle: '功能如果不被讲清楚，读者只会觉得页面很空，而不会觉得它很轻',
+  systemSummary: 'about 页不该把站点能力塞进一句话里。更好的做法，是直接解释每个模块对读者有什么帮助。',
+  siteModules: [
+    {
+      name: '系列主线',
+      detail: '把内容按学习路径组织起来，新读者不用一开始就掉进文章列表。'
+    },
+    {
+      name: '站内搜索',
+      detail: '回查权限、部署、容器或运维问题时，可以直接按关键词定位，不必来回翻页。'
+    },
+    {
+      name: '文章级讨论',
+      detail: '每篇文章都能挂接 GitHub 讨论，让经验从页面延伸到具体交流。'
+    },
+    {
+      name: '双语发布',
+      detail: '中英文使用同一套结构，既方便长期写作，也方便后面继续扩充内容。'
+    }
+  ],
+  readerEyebrow: '适合谁读',
+  readerTitle: '如果你属于下面这些人，这页应该让你立刻知道自己来对地方了',
+  readers: [
+    '正在做云原生、平台工程或 AI 基础设施的开发者',
+    '想把零散操作经验整理成长期可复用方法的人',
+    '不想只看命令合集，更想知道为什么这么设计的人'
+  ]
+};
 ---
 
 <BaseLayout
@@ -28,14 +98,5 @@ const aboutStructuredData = {
   keywords={['关于作者', 'AI 基础设施', '云原生', '工程博客']}
   structuredData={aboutStructuredData}
 >
-  <section class="hero">
-    <span class="kicker">{aboutUi.kicker}</span>
-    <h1 class="title page-title">{aboutUi.title}</h1>
-  </section>
-
-  <section class="article-body">
-    {aboutUi.paragraphs.map((item) => (
-      <p>{item}</p>
-    ))}
-  </section>
+  <AboutPage content={aboutContent} />
 </BaseLayout>
