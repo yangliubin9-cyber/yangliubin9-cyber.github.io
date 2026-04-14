@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-14: If a repo's "OpenAI key" actually belongs to an OpenAI-compatible relay, translation code must not hardcode `https://api.openai.com/v1/responses`. Make the base URL configurable, normalize `.../v1` to `.../v1/responses`, and pass the same env through local scripts and GitHub Actions.
+
 - 2026-04-14: If the requirement is "Chinese updates should automatically translate to English and sync out", a nightly-only workflow is not enough even when the scripts already exist. Keep the Feishu pull workflow separate, and add a push-triggered workflow scoped to `src/content/posts/zh/**` so zh commits generate en updates immediately without creating a bot-trigger loop.
 
 - 2026-04-14: Home featured content on this blog should be curated, not automatically expanded by every new series. Keep the homepage pinned to the core editorial tracks and let newly added series or imported articles live on their own series/article pages until you intentionally promote them.

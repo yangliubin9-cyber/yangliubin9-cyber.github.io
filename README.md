@@ -101,6 +101,7 @@ GitHub Actions automation:
 Environment variables for translation:
 
 - `OPENAI_API_KEY`: required for translation requests
+- `OPENAI_BASE_URL`: optional, defaults to `https://api.openai.com/v1`; set this when you use an OpenAI-compatible relay such as `https://ai.yunfei.best/v1`
 - `OPENAI_TRANSLATION_MODEL`: optional, defaults to `gpt-5.4-mini`
 
 Useful translation commands:
@@ -111,6 +112,13 @@ npm run translate:changed
 npm run translate:check
 npm run translate:review -- --key linux-basic
 npm run translate:review -- --all
+```
+
+If you use an OpenAI-compatible relay instead of the official OpenAI endpoint, set:
+
+```bash
+OPENAI_API_KEY=your-relay-key
+OPENAI_BASE_URL=https://ai.yunfei.best/v1
 ```
 
 ## Feishu Manual Sync

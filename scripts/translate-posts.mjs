@@ -10,7 +10,6 @@ const projectRoot = path.resolve(__dirname, '..');
 const postsRoot = path.join(projectRoot, 'src', 'content', 'posts');
 const zhRoot = path.join(postsRoot, 'zh');
 const enRoot = path.join(postsRoot, 'en');
-const openaiEndpoint = 'https://api.openai.com/v1/responses';
 const defaultModel = process.env.OPENAI_TRANSLATION_MODEL || 'gpt-5.4-mini';
 const translationStatuses = {
   aiGenerated: 'ai-generated',
@@ -45,6 +44,26 @@ const translationSchema = {
     body: { type: 'string' }
   }
 };
+
+function resolveOpenAIEndpoint() {
+  const configuredBaseUrl = process.env.OPENAI_BASE_URL?.trim();
+
+  if (!configuredBaseUrl) {
+    return 'https://api.openai.com/v1/responses';
+  }
+
+  const normalizedBaseUrl = configuredBaseUrl.replace(/\/+$/, '');
+
+  if (normalizedBaseUrl.endsWith('/responses')) {
+    return normalizedBaseUrl;
+  }
+
+  if (normalizedBaseUrl.endsWith('/v1')) {
+    return `${normalizedBaseUrl}/responses`;
+  }
+
+  return `${normalizedBaseUrl}/v1/responses`;
+}
 
 function parseArguments(argv) {
   const [command, ...rest] = argv;
@@ -364,6 +383,7 @@ function validateTranslationPayload(payload) {
 
 async function requestTranslation(zhPost, model) {
   const apiKey = process.env.OPENAI_API_KEY;
+  const openaiEndpoint = resolveOpenAIEndpoint();
 
   if (!apiKey) {
     throw new Error('Missing OPENAI_API_KEY. Set it before running translation commands.');

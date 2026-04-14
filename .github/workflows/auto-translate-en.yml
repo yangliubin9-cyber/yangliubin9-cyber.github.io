@@ -36,6 +36,7 @@ jobs:
       - name: Translate changed Chinese posts into English
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_TRANSLATION_MODEL: ${{ secrets.OPENAI_TRANSLATION_MODEL }}
         run: node ./scripts/translate-posts.mjs changed
 
