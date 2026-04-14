@@ -29,6 +29,8 @@ export type Locale = (typeof locales)[number];
 
 export const seriesSlugs = ['linux', 'docker', 'k8s', 'services'] as const;
 export type SeriesSlug = (typeof seriesSlugs)[number];
+export const homeFeaturedSeriesSlugs = ['linux', 'docker', 'k8s'] as const satisfies readonly SeriesSlug[];
+const homeFeaturedSeriesSlugSet = new Set<SeriesSlug>(homeFeaturedSeriesSlugs);
 
 export type Series = {
   slug: SeriesSlug;
@@ -73,6 +75,10 @@ export const series: Series[] = [
 
 export function getSeriesName(locale: Locale, item: Series) {
   return locale === 'zh' ? item.zhName : item.enName;
+}
+
+export function isHomeFeaturedSeries(slug: SeriesSlug) {
+  return homeFeaturedSeriesSlugSet.has(slug);
 }
 
 export function getSeriesDescription(locale: Locale, item: Series) {

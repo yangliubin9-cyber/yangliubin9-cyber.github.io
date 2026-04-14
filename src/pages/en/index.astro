@@ -2,10 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getSeriesTracks } from '../../lib/content';
 import { localePath } from '../../lib/routing';
-import { getSeriesDescription, getSeriesName, siteMeta } from '../../data/site';
+import { getSeriesDescription, getSeriesName, isHomeFeaturedSeries, siteMeta } from '../../data/site';
 import { getUiText } from '../../data/ui';
 
-const seriesTracks = await getSeriesTracks('en');
+const seriesTracks = (await getSeriesTracks('en')).filter(({ seriesItem }) => isHomeFeaturedSeries(seriesItem.slug));
 const homeUi = getUiText('en').home;
 const trackCount = homeUi.trackCount ?? ((count: number) => `${count} posts`);
 const trackLatestLabel = homeUi.trackLatestLabel ?? 'Latest update';

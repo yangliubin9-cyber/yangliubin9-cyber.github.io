@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-14: Home featured content on this blog should be curated, not automatically expanded by every new series. Keep the homepage pinned to the core editorial tracks and let newly added series or imported articles live on their own series/article pages until you intentionally promote them.
+
 - 2026-04-14: If a series page promises an explicit reading path, `seriesOrder` must be unique within each locale + series, not just present. Otherwise the site still builds and sorts by publish date as a tiebreaker, but the editorial sequence stops being deterministic.
 
 - 2026-04-14: Feishu automation that reads folders or Docx blocks must paginate both collection endpoints and child-block endpoints. A one-page implementation can look fine in dry runs with a small dataset, then silently miss older docs or leave stale tail content behind once the folder or document grows.

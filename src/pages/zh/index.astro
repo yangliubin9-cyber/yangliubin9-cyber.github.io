@@ -2,10 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getSeriesTracks } from '../../lib/content';
 import { localePath } from '../../lib/routing';
-import { getSeriesDescription, getSeriesName, siteMeta } from '../../data/site';
+import { getSeriesDescription, getSeriesName, isHomeFeaturedSeries, siteMeta } from '../../data/site';
 import { getUiText } from '../../data/ui';
 
-const seriesTracks = await getSeriesTracks('zh');
+const seriesTracks = (await getSeriesTracks('zh')).filter(({ seriesItem }) => isHomeFeaturedSeries(seriesItem.slug));
 const homeUi = getUiText('zh').home;
 const trackCount = homeUi.trackCount ?? ((count: number) => `${count} 篇文章`);
 const trackLatestLabel = homeUi.trackLatestLabel ?? '最新更新';
