@@ -92,6 +92,12 @@ Recommended translation flow:
 4. Mark it as reviewed with `npm run translate:review -- --key your-key`
 5. Run `npm run translate:check`, `npm run check`, and `npm run build`
 
+GitHub Actions automation:
+
+- pushes to `main` that change `src/content/posts/zh/**` automatically run translation for pending English files and publish changed English docs back to Feishu
+- this automation preserves protected English states such as `stale-reviewed` and `synced-reviewed`; reviewed translations are not overwritten unless you run the translation command with `--force-reviewed`
+- the nightly Feishu workflow remains the pull-from-Feishu entrypoint and is separate from the push-triggered zh -> en automation
+
 Environment variables for translation:
 
 - `OPENAI_API_KEY`: required for translation requests
@@ -179,6 +185,7 @@ Current behavior:
 - reading time is re-estimated from the synced Markdown body
 - the script does not delete local files that are missing from Bitable
 - the nightly GitHub Actions workflow forwards both Bitable and Folder secrets, then uses whichever source mode is fully configured
+- a separate push-triggered GitHub Actions workflow watches `src/content/posts/zh/**`, auto-translates pending English files, and syncs the resulting English docs back to Feishu
 
 Current limitations:
 

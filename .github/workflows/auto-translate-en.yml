@@ -1,0 +1,67 @@
+name: Auto Translate and Sync English
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/posts/zh/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-translate-en
+  cancel-in-progress: true
+
+jobs:
+  sync-en:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Translate changed Chinese posts into English
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_TRANSLATION_MODEL: ${{ secrets.OPENAI_TRANSLATION_MODEL }}
+        run: node ./scripts/translate-posts.mjs changed
+
+      - name: Publish changed English posts to Feishu
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_DRIVE_EN_FOLDER_TOKEN: ${{ secrets.FEISHU_DRIVE_EN_FOLDER_TOKEN }}
+          FEISHU_SYNC_TIMEOUT_MS: ${{ secrets.FEISHU_SYNC_TIMEOUT_MS }}
+        run: node ./scripts/feishu-publish-en.mjs
+
+      - name: Validate content and build
+        env:
+          ASTRO_TELEMETRY_DISABLED: '1'
+        run: |
+          npm run check
+          npm run build
+
+      - name: Commit and push generated English updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/content/posts/en memory/feishu-en-doc-manifest.json
+          if git diff --cached --quiet; then
+            echo "No generated English changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: auto sync english translations"
+          git push
