@@ -11,6 +11,10 @@ const postsRoot = path.join(projectRoot, 'src', 'content', 'posts');
 const zhRoot = path.join(postsRoot, 'zh');
 const enRoot = path.join(postsRoot, 'en');
 const defaultModel = process.env.OPENAI_TRANSLATION_MODEL || 'gpt-5.4-mini';
+const maxTranslationChunkChars = Number.parseInt(
+  process.env.OPENAI_TRANSLATION_MAX_CHARS || '4000',
+  10
+);
 const translationStatuses = {
   aiGenerated: 'ai-generated',
   reviewed: 'reviewed',
@@ -34,17 +38,6 @@ const frontmatterOrder = [
   'translationModel',
   'translationUpdatedAt'
 ];
-const translationSchema = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['title', 'summary', 'body'],
-  properties: {
-    title: { type: 'string' },
-    summary: { type: 'string' },
-    body: { type: 'string' }
-  }
-};
-
 function resolveOpenAIEndpoint() {
   const configuredBaseUrl = process.env.OPENAI_BASE_URL?.trim();
 
@@ -107,6 +100,13 @@ function normalizeLineEndings(value) {
 
 function parseScalar(rawValue) {
   const value = rawValue.trim();
+
+  if (
+    (value.startsWith('[') && value.endsWith(']')) ||
+    (value.startsWith('{') && value.endsWith('}'))
+  ) {
+    return JSON.parse(value);
+  }
 
   if (value.startsWith('"') && value.endsWith('"')) {
     return JSON.parse(value);
@@ -303,6 +303,11 @@ function serializeFrontmatter(frontmatter) {
     }
 
     if (Array.isArray(value)) {
+      if (value.length === 0) {
+        lines.push(`${key}: []`);
+        continue;
+      }
+
       lines.push(`${key}:`);
       for (const item of value) {
         lines.push(`  - ${serializeScalar(item)}`);
@@ -381,6 +386,137 @@ function validateTranslationPayload(payload) {
   return payload;
 }
 
+function splitMarkdownBlocks(markdown) {
+  const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
+  const blocks = [];
+  let currentLines = [];
+  let inCodeFence = false;
+
+  for (const line of lines) {
+    if (/^\s*```/.test(line) || /^\s*~~~/.test(line)) {
+      inCodeFence = !inCodeFence;
+    }
+
+    if (!inCodeFence && !line.trim()) {
+      if (currentLines.length > 0) {
+        blocks.push(currentLines.join('\n').trimEnd());
+        currentLines = [];
+      }
+      continue;
+    }
+
+    currentLines.push(line);
+  }
+
+  if (currentLines.length > 0) {
+    blocks.push(currentLines.join('\n').trimEnd());
+  }
+
+  return blocks.filter(Boolean);
+}
+
+function splitMarkdownIntoChunks(markdown, maxChars = maxTranslationChunkChars) {
+  const blocks = splitMarkdownBlocks(markdown);
+  const chunks = [];
+  let currentChunk = '';
+
+  for (const block of blocks) {
+    if (!currentChunk) {
+      currentChunk = block;
+      continue;
+    }
+
+    const candidate = `${currentChunk}\n\n${block}`;
+    if (candidate.length <= maxChars) {
+      currentChunk = candidate;
+      continue;
+    }
+
+    chunks.push(currentChunk);
+    currentChunk = block;
+  }
+
+  if (currentChunk) {
+    chunks.push(currentChunk);
+  }
+
+  return chunks;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function requestOpenAI({
+  apiKey,
+  openaiEndpoint,
+  model,
+  systemPrompt,
+  userPrompt,
+  schema,
+  retries = 2
+}) {
+  let lastError = null;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const response = await fetch(openaiEndpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.2,
+        input: [
+          {
+            role: 'system',
+            content: [{ type: 'input_text', text: systemPrompt }]
+          },
+          {
+            role: 'user',
+            content: [{ type: 'input_text', text: userPrompt }]
+          }
+        ],
+        ...(schema
+          ? {
+              text: {
+                format: {
+                  type: 'json_schema',
+                  name: 'translation_result',
+                  schema,
+                  strict: true
+                }
+              }
+            }
+          : {})
+      })
+    });
+
+    if (response.ok) {
+      const responseJson = await response.json();
+      const outputText = extractOutputText(responseJson);
+
+      if (!outputText) {
+        throw new Error('OpenAI returned no translation output.');
+      }
+
+      return outputText;
+    }
+
+    const errorText = await response.text();
+    lastError = new Error(`OpenAI request failed (${response.status}): ${errorText}`);
+
+    if (attempt === retries || ![429, 502, 503, 504].includes(response.status)) {
+      throw lastError;
+    }
+
+    await sleep(1000 * (attempt + 1));
+  }
+
+  throw lastError || new Error('OpenAI request failed.');
+}
+
 async function requestTranslation(zhPost, model) {
   const apiKey = process.env.OPENAI_API_KEY;
   const openaiEndpoint = resolveOpenAIEndpoint();
@@ -396,67 +532,73 @@ async function requestTranslation(zhPost, model) {
     'Keep the tone practical and direct.',
     'Only translate title, summary, and body.'
   ].join(' ');
+  const fragmentPrompt = [
+    'You translate Chinese markdown fragments into concise, natural English for engineers.',
+    'Preserve markdown structure, heading hierarchy, lists, links, code fences, inline code, and commands.',
+    'Do not invent facts, examples, commands, or configuration values that are not present in the source.',
+    'Return only the translated markdown fragment.'
+  ].join(' ');
 
-  const userPrompt = JSON.stringify(
+  const metadataPrompt = JSON.stringify(
     {
       translationKey: zhPost.frontmatter.translationKey,
       pathSlug: zhPost.frontmatter.pathSlug,
       source: {
         title: zhPost.frontmatter.title,
-        summary: zhPost.frontmatter.summary,
-        body: zhPost.body
+        summary: zhPost.frontmatter.summary
       }
     },
     null,
     2
   );
-
-  const response = await fetch(openaiEndpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model,
-      reasoning: {
-        effort: 'low'
-      },
-      temperature: 0.2,
-      input: [
-        {
-          role: 'system',
-          content: [{ type: 'input_text', text: systemPrompt }]
-        },
-        {
-          role: 'user',
-          content: [{ type: 'input_text', text: userPrompt }]
-        }
-      ],
-      text: {
-        format: {
-          type: 'json_schema',
-          name: 'translation_result',
-          schema: translationSchema,
-          strict: true
-        }
+  const metadataOutput = await requestOpenAI({
+    apiKey,
+    openaiEndpoint,
+    model,
+    systemPrompt,
+    userPrompt: metadataPrompt,
+    schema: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['title', 'summary'],
+      properties: {
+        title: { type: 'string' },
+        summary: { type: 'string' }
       }
-    })
+    }
   });
+  const metadata = JSON.parse(metadataOutput);
+  const bodyChunks = splitMarkdownIntoChunks(zhPost.body);
+  const translatedChunks = [];
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`OpenAI request failed (${response.status}): ${errorText}`);
+  for (const [index, chunk] of bodyChunks.entries()) {
+    console.log(
+      `translating ${zhPost.frontmatter.translationKey} chunk ${index + 1}/${bodyChunks.length}`
+    );
+    const translatedChunk = await requestOpenAI({
+      apiKey,
+      openaiEndpoint,
+      model,
+      systemPrompt: fragmentPrompt,
+      userPrompt: JSON.stringify(
+        {
+          translationKey: zhPost.frontmatter.translationKey,
+          chunk: index + 1,
+          totalChunks: bodyChunks.length,
+          markdown: chunk
+        },
+        null,
+        2
+      )
+    });
+    translatedChunks.push(translatedChunk.trim());
   }
 
-  const responseJson = await response.json();
-  const outputText = extractOutputText(responseJson);
-
-  if (!outputText) {
-    throw new Error('OpenAI returned no translation output.');
-  }
-
-  return validateTranslationPayload(JSON.parse(outputText));
+  return validateTranslationPayload({
+    title: metadata.title,
+    summary: metadata.summary,
+    body: translatedChunks.join('\n\n')
+  });
 }
 
 async function loadContentState() {

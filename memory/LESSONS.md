@@ -1,5 +1,9 @@
 # Lessons
 
+- 2026-04-14: For relay-backed machine translation, large technical posts can time out if you send title, summary, and the full markdown body in one request. Split the markdown into chunk-sized fragments, translate each chunk separately, and retry transient 429/502/503/504 responses instead of treating the whole article as one shot.
+
+- 2026-04-14: If local markdown uses inline empty arrays like `tags: []`, custom frontmatter parsers and serializers must preserve them as real arrays on both read and write. Turning `[]` into `"[]"` or `tags:` will break Astro collection validation on generated English files.
+
 - 2026-04-14: If a repo's "OpenAI key" actually belongs to an OpenAI-compatible relay, translation code must not hardcode `https://api.openai.com/v1/responses`. Make the base URL configurable, normalize `.../v1` to `.../v1/responses`, and pass the same env through local scripts and GitHub Actions.
 
 - 2026-04-14: If the requirement is "Chinese updates should automatically translate to English and sync out", a nightly-only workflow is not enough even when the scripts already exist. Keep the Feishu pull workflow separate, and add a push-triggered workflow scoped to `src/content/posts/zh/**` so zh commits generate en updates immediately without creating a bot-trigger loop.
