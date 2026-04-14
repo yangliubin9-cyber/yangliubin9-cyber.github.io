@@ -44,11 +44,13 @@ async function validateContentCollection() {
   const posts = await getCollection('posts');
   const seenLocaleSlug = new Set<string>();
   const seenLocaleTranslationKey = new Set<string>();
+  const seenSeriesOrder = new Map<string, string>();
   translationsByKey = new Map<string, TranslationSet>();
 
   for (const post of posts) {
     const slugKey = `${post.data.locale}:${post.data.pathSlug}`;
     const translationLocaleKey = `${post.data.locale}:${post.data.translationKey}`;
+    const seriesOrderKey = `${post.data.locale}:${post.data.series}:${post.data.seriesOrder}`;
 
     if (seenLocaleSlug.has(slugKey)) {
       throw new Error(`Duplicate post slug detected: ${slugKey}`);
@@ -58,8 +60,15 @@ async function validateContentCollection() {
       throw new Error(`Duplicate translation key detected: ${translationLocaleKey}`);
     }
 
+    if (seenSeriesOrder.has(seriesOrderKey)) {
+      throw new Error(
+        `Duplicate seriesOrder detected for ${seriesOrderKey}: ${seenSeriesOrder.get(seriesOrderKey)} and ${post.data.pathSlug}`
+      );
+    }
+
     seenLocaleSlug.add(slugKey);
     seenLocaleTranslationKey.add(translationLocaleKey);
+    seenSeriesOrder.set(seriesOrderKey, post.data.pathSlug);
 
     const entries = translationsByKey.get(post.data.translationKey) ?? {};
     entries[post.data.locale] = post;

@@ -1,5 +1,19 @@
 # Lessons
 
+- 2026-04-14: If a series page promises an explicit reading path, `seriesOrder` must be unique within each locale + series, not just present. Otherwise the site still builds and sorts by publish date as a tiebreaker, but the editorial sequence stops being deterministic.
+
+- 2026-04-14: Feishu automation that reads folders or Docx blocks must paginate both collection endpoints and child-block endpoints. A one-page implementation can look fine in dry runs with a small dataset, then silently miss older docs or leave stale tail content behind once the folder or document grows.
+
+- 2026-04-14: When resuming Feishu blog-sync work, validate the pipeline in layers instead of jumping straight to the full nightly job. First run `node ./scripts/feishu-sync.mjs --help` or `npm run sync:feishu -- --dry-run --locale zh` to verify Feishu auth and folder parsing, then run `node ./scripts/feishu-publish-en.mjs --dry-run` to verify English doc publishing, and only after that run `ASTRO_TELEMETRY_DISABLED=1 npm run check` plus `npm run build` to confirm the synced content still builds cleanly.
+
+- 2026-04-13: Feishu Drive folder children under `drive/explorer/v2/folder/.../children` may come back in `data.children` keyed by token rather than a flat `items` array. Folder sync code needs to normalize both response shapes before deciding the folder is empty.
+
+- 2026-04-13: When syncing Feishu folders without Bitable metadata, title matching alone is too fragile. Keep a small doc-token override map for stable `slug`, `series`, and `seriesOrder`, then let folder sync create missing local Markdown files instead of forcing the current site titles to match the Feishu doc titles exactly.
+
+- 2026-04-13: If a Feishu content source lives under `my.feishu.cn/drive/folder/...`, app-only auth with `tenant_access_token/internal` can authenticate successfully but still fail with Drive `forbidden`. Treat that as an access-boundary problem first, not a parsing bug: the app usually needs the folder moved/shared into an app-readable space or the integration must switch to user-access-token auth.
+
+- 2026-04-13: For a static Astro blog that treats Feishu as the upstream source, the safest V1 integration is a manual sync script that writes normalized Markdown into the existing `src/content/posts/<locale>/` folders. This keeps the site build path unchanged, preserves local Markdown as the fallback when sync is not run, and avoids mixing live Feishu credentials into frontend code.
+
 - 2026-04-13: If the site wants Chinese-first bilingual publishing, do not hard-require every `translationKey` to have both `zh` and `en` at build time. Let `zh` publish first, treat `en` as derived content, and gate the language switch by whether the translated page actually exists.
 
 - 2026-04-13: About 页如果同时承担“作者介绍”和“站点说明”，不能只放标题加两段正文。至少要把内容范围、站点模块、适合读者这三层信息拆开，不然读者会觉得页面很空，也看不懂这个模块到底有什么用。

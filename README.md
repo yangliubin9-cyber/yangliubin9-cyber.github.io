@@ -53,6 +53,8 @@ Current content source:
 - `src/content.config.ts`
 - `src/content/templates/*.md`
 - `CONTENT_GUIDE.md`
+- `.env.example`
+- `scripts/feishu-sync.mjs`
 - `scripts/translate-posts.mjs`
 
 ## Content Workflow
@@ -104,6 +106,86 @@ npm run translate:check
 npm run translate:review -- --key linux-basic
 npm run translate:review -- --all
 ```
+
+## Feishu Manual Sync
+
+The repo now includes a manual Feishu sync entry that writes directly into the existing
+Markdown content folders, so local Markdown stays the fallback until you actively run sync.
+
+Environment setup:
+
+1. Copy `.env.example` to your local `.env` or `.env.local`, or set the variables in your shell
+2. Fill these required Feishu values:
+   - `FEISHU_APP_ID`
+   - `FEISHU_APP_SECRET`
+3. Choose one content source mode:
+   - Bitable mode:
+     - `FEISHU_BITABLE_APP_TOKEN`
+     - `FEISHU_BITABLE_ARTICLES_TABLE_ID`
+   - Folder mode:
+     - `FEISHU_DRIVE_ZH_FOLDER_TOKEN`
+     - `FEISHU_DRIVE_EN_FOLDER_TOKEN`
+3. Optional:
+   - `FEISHU_BITABLE_ARTICLES_VIEW_ID`
+   - `FEISHU_DRIVE_ZH_FOLDER_TOKEN`
+   - `FEISHU_DRIVE_EN_FOLDER_TOKEN`
+   - `FEISHU_SYNC_LOCALES`
+   - `FEISHU_SYNC_TIMEOUT_MS`
+   - `FEISHU_SYNC_USE_RAW_CONTENT`
+
+Expected Bitable fields:
+
+- `slug`
+- `zh_title`
+- `en_title`
+- `zh_summary`
+- `en_summary`
+- `zh_doc_id`
+- `en_doc_id`
+- `series_slug`
+- `series_order`
+- `tag_slugs`
+- `featured`
+- `zh_status`
+- `en_status`
+- `published_at`
+- `updated_at`
+
+Folder mode assumptions:
+
+- you already have local Markdown files under `src/content/posts/zh/` and `src/content/posts/en/`
+- each Feishu folder contains the matching locale documents
+- the Feishu document title must match the local post `title`
+- local frontmatter remains the metadata source; sync only refreshes the article body and reading time
+- for known folder docs, the sync script can create new Markdown posts with stable slug and series overrides
+
+Commands:
+
+```bash
+npm run sync:feishu -- --dry-run
+npm run sync:feishu -- --slug linux-basic
+npm run sync:feishu -- --locale zh
+```
+
+Current behavior:
+
+- only records with `zh_status` or `en_status` set to `published` are synced
+- output files are written to `src/content/posts/zh/*.md` and `src/content/posts/en/*.md`
+- the sync script auto-loads `.env` and `.env.local` before reading Feishu variables
+- if folder tokens are configured, folder mode takes priority and syncs by matching document title to local post title
+- folder mode can also create new `zh` posts for mapped Feishu docs when no local Markdown file exists yet
+- English files synced from Feishu are marked as `reviewed` with `translationModel: feishu-doc`
+- English Feishu publishing batches the full article body instead of truncating after a fixed paragraph cap
+- reading time is re-estimated from the synced Markdown body
+- the script does not delete local files that are missing from Bitable
+- the nightly GitHub Actions workflow forwards both Bitable and Folder secrets, then uses whichever source mode is fully configured
+
+Current limitations:
+
+- image blocks are preserved as text placeholders, not downloaded assets
+- the script targets the Feishu Docs + Bitable field model described in `PLAN.md`
+- if your Feishu tenant only supports the raw-content doc endpoint reliably, set
+  `FEISHU_SYNC_USE_RAW_CONTENT=true`
 
 If you already have hand-written English files from before this workflow existed, run `npm run translate:review -- --all` once to baseline them as reviewed translations without overwriting the content.
 
@@ -260,7 +342,7 @@ Near-term:
 
 1. Expand the article catalog and polish article navigation
 2. Upgrade the current instant search to Pagefind if the archive grows
-3. Add Feishu manual sync without breaking the local content fallback
+3. Dogfood the new Feishu manual sync with a real Bitable + Docs dataset and refine block rendering
 
 Later:
 

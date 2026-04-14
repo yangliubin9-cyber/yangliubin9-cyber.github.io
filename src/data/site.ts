@@ -27,7 +27,7 @@ export const defaultLocale = 'zh';
 export const locales = ['zh', 'en'] as const;
 export type Locale = (typeof locales)[number];
 
-export const seriesSlugs = ['linux', 'docker', 'k8s'] as const;
+export const seriesSlugs = ['linux', 'docker', 'k8s', 'services'] as const;
 export type SeriesSlug = (typeof seriesSlugs)[number];
 
 export type Series = {
@@ -59,6 +59,15 @@ export const series: Series[] = [
     enName: 'Kubernetes Cluster',
     zhDescription: '聚焦集群搭建、核心组件和云原生运维实践。',
     enDescription: 'Focus on cluster setup, core components, and production-oriented cloud native practice.'
+  }
+  ,
+  {
+    slug: 'services',
+    zhName: '服务搭建',
+    enName: 'Service Setup',
+    zhDescription: '围绕常见基础服务的单机、集群与可用性部署，沉淀更贴近真实环境的搭建笔记。',
+    enDescription:
+      'Deployment notes for practical infrastructure services, from single-node setup to cluster-oriented rollout.'
   }
 ];
 
