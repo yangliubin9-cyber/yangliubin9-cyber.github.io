@@ -39,11 +39,9 @@ jobs:
           FEISHU_BITABLE_ARTICLES_TABLE_ID: ${{ secrets.FEISHU_BITABLE_ARTICLES_TABLE_ID }}
           FEISHU_BITABLE_ARTICLES_VIEW_ID: ${{ secrets.FEISHU_BITABLE_ARTICLES_VIEW_ID }}
           FEISHU_DRIVE_ZH_FOLDER_TOKEN: ${{ secrets.FEISHU_DRIVE_ZH_FOLDER_TOKEN }}
-          FEISHU_DRIVE_EN_FOLDER_TOKEN: ${{ secrets.FEISHU_DRIVE_EN_FOLDER_TOKEN }}
-          FEISHU_PUBLISH_EN_ENABLED: ${{ secrets.FEISHU_PUBLISH_EN_ENABLED }}
           FEISHU_SYNC_TIMEOUT_MS: ${{ secrets.FEISHU_SYNC_TIMEOUT_MS }}
           FEISHU_SYNC_USE_RAW_CONTENT: ${{ secrets.FEISHU_SYNC_USE_RAW_CONTENT }}
-        run: node ./scripts/feishu-nightly-sync.mjs
+        run: node ./scripts/feishu-sync.mjs --locale zh --translate-en
 
       - name: Validate content and build
         env:
@@ -56,7 +54,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/content/posts/zh src/content/posts/en memory/feishu-en-doc-manifest.json
+          git add src/content/posts/zh src/content/posts/en
           if git diff --cached --quiet; then
             echo "No content changes to commit"
             exit 0

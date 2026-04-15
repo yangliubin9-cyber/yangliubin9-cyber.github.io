@@ -5,7 +5,7 @@ pathSlug: rancher-deployment
 title: "Rancher部署"
 summary: "文件中所有内容要根据自己的情况修改，列主机名、 image、/data地址、端口号、networks、硬件资源等；需要提前准备好自己的镜像仓库，或镜像在本地。"
 publishedAt: 2026-04-13
-updatedAt: 2026-04-13
+updatedAt: 2026-04-15
 readingMinutes: 2
 series: services
 seriesOrder: 1
@@ -21,17 +21,7 @@ tags: []
 
 ### 部署环境
 
-系统
-
-节点
-
-IP
-
-Ubuntu24.04
-
-Redis
-
-10.14.0.38
+<div class="feishu-table-wrap"><table><thead><tr><th><strong>系统</strong></th><th><strong>节点</strong></th><th><strong>IP</strong></th></tr></thead><tbody><tr><td><strong>Ubuntu24.04</strong></td><td><strong>Redis</strong></td><td><strong>10.14.0.38</strong></td></tr></tbody></table></div>
 
 ### 前提准备
 

@@ -30,7 +30,6 @@ What is already in place:
 
 What is not integrated yet:
 
-- Feishu content sync
 - User authentication backend
 
 Legacy auth URLs are kept only as silent redirect routes back to the locale home page. They are not public product pages.
@@ -44,7 +43,7 @@ What is already wired in for comments:
 
 Comment posting currently requires a GitHub account.
 
-Feishu sync stays for later, after the blog shell and comment path are stable.
+Feishu sync is now available as a repo-side pull + translate workflow; user auth still stays for later.
 
 Current content source:
 
@@ -96,8 +95,8 @@ GitHub Actions automation:
 
 - pushes to `main` that change `src/content/posts/zh/**` automatically run translation for pending English files and commit the generated English Markdown back to the repo
 - this automation preserves protected English states such as `stale-reviewed` and `synced-reviewed`; reviewed translations are not overwritten unless you run the translation command with `--force-reviewed`
-- English Feishu publishing is currently optional and should stay disabled until the target folder grants create-document permission to the Feishu app
-- the nightly Feishu workflow remains the pull-from-Feishu entrypoint and is separate from the push-triggered zh -> en automation
+- the nightly Feishu workflow pulls Chinese content first, then translates matching English Markdown back into this repo
+- no English article is written back to Feishu; English only needs to exist under `src/content/posts/en/`
 
 Environment variables for translation:
 
@@ -139,12 +138,9 @@ Environment setup:
      - `FEISHU_BITABLE_ARTICLES_TABLE_ID`
    - Folder mode:
      - `FEISHU_DRIVE_ZH_FOLDER_TOKEN`
-     - `FEISHU_DRIVE_EN_FOLDER_TOKEN`
 3. Optional:
    - `FEISHU_BITABLE_ARTICLES_VIEW_ID`
 - `FEISHU_DRIVE_ZH_FOLDER_TOKEN`
-- `FEISHU_DRIVE_EN_FOLDER_TOKEN`
-- `FEISHU_PUBLISH_EN_ENABLED`
 - `FEISHU_SYNC_LOCALES`
 - `FEISHU_SYNC_TIMEOUT_MS`
 - `FEISHU_SYNC_USE_RAW_CONTENT`
@@ -169,10 +165,9 @@ Expected Bitable fields:
 
 Folder mode assumptions:
 
-- you already have local Markdown files under `src/content/posts/zh/` and `src/content/posts/en/`
-- each Feishu folder contains the matching locale documents
-- the Feishu document title must match the local post `title`
-- local frontmatter remains the metadata source; sync only refreshes the article body and reading time
+- Feishu only needs to hold the Chinese source documents
+- local frontmatter remains the metadata source; sync refreshes the Chinese article body and reading time first
+- if you pass `--translate-en`, the script immediately generates or refreshes the matching English Markdown under `src/content/posts/en/`
 - for known folder docs, the sync script can create new Markdown posts with stable slug and series overrides
 
 Commands:
@@ -193,13 +188,11 @@ Current behavior:
 - if you pass `--translate-en`, the script syncs zh first and then immediately generates or refreshes matching English Markdown under `src/content/posts/en/`
 - if folder tokens are configured, folder mode takes priority and syncs by matching document title to local post title
 - folder mode can also create new `zh` posts for mapped Feishu docs when no local Markdown file exists yet
-- English files synced from Feishu are marked as `reviewed` with `translationModel: feishu-doc`
-- English Feishu publishing batches the full article body instead of truncating after a fixed paragraph cap
 - reading time is re-estimated from the synced Markdown body
 - the script does not delete local files that are missing from Bitable
 - the nightly GitHub Actions workflow forwards both Bitable and Folder secrets, then uses whichever source mode is fully configured
 - a separate push-triggered GitHub Actions workflow watches `src/content/posts/zh/**` and auto-translates pending English files back into the repo
-- nightly English Feishu publishing only runs when `FEISHU_PUBLISH_EN_ENABLED=true`
+- no workflow writes generated English content back into Feishu
 
 Current limitations:
 

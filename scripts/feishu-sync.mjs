@@ -127,14 +127,14 @@ Required env:
   FEISHU_APP_SECRET
   One of:
     - FEISHU_BITABLE_APP_TOKEN + FEISHU_BITABLE_ARTICLES_TABLE_ID
-    - FEISHU_DRIVE_ZH_FOLDER_TOKEN / FEISHU_DRIVE_EN_FOLDER_TOKEN
+    - FEISHU_DRIVE_ZH_FOLDER_TOKEN
 
 Optional env:
   FEISHU_BITABLE_ARTICLES_VIEW_ID
   FEISHU_DRIVE_ZH_FOLDER_TOKEN
-  FEISHU_DRIVE_EN_FOLDER_TOKEN
+  FEISHU_DRIVE_EN_FOLDER_TOKEN     legacy manual en pull only
   FEISHU_OPEN_BASE_URL           default: https://open.feishu.cn
-  FEISHU_SYNC_LOCALES            default: zh,en
+  FEISHU_SYNC_LOCALES            default: zh
   FEISHU_SYNC_TIMEOUT_MS         default: 20000
   FEISHU_SYNC_USE_RAW_CONTENT    default: false
 
@@ -275,7 +275,7 @@ async function writeMarkdownPost(filePath, frontmatter, body) {
 }
 
 function parseLocaleSet(value) {
-  const raw = value || process.env.FEISHU_SYNC_LOCALES || 'zh,en';
+  const raw = value || process.env.FEISHU_SYNC_LOCALES || 'zh';
   const locales = raw
     .split(',')
     .map((item) => item.trim())
@@ -363,6 +363,18 @@ function normalizeText(value) {
 
 function normalizeTextList(value) {
   if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          return normalizeTextList(parsed);
+        }
+      } catch {
+        // Fall through to comma-split parsing.
+      }
+    }
+
     return value
       .split(',')
       .map((item) => item.trim())
@@ -690,11 +702,37 @@ function parseScalar(rawValue) {
   const value = rawValue.trim();
 
   if (value.startsWith('"') && value.endsWith('"')) {
-    return JSON.parse(value);
+    const parsed = JSON.parse(value);
+    if (typeof parsed === 'string') {
+      const nested = parsed.trim();
+      if (
+        (nested.startsWith('[') && nested.endsWith(']')) ||
+        (nested.startsWith('{') && nested.endsWith('}'))
+      ) {
+        try {
+          return JSON.parse(nested);
+        } catch {
+          return parsed;
+        }
+      }
+    }
+
+    return parsed;
   }
 
   if (value.startsWith("'") && value.endsWith("'")) {
     return value.slice(1, -1).replace(/''/g, "'");
+  }
+
+  if (
+    (value.startsWith('[') && value.endsWith(']')) ||
+    (value.startsWith('{') && value.endsWith('}'))
+  ) {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
   }
 
   if (value === 'true') {
@@ -897,7 +935,7 @@ function buildFolderPostDraft(locale, document, body, existingPost) {
     series,
     seriesOrder: existingPost?.frontmatter.seriesOrder || override.seriesOrder || 99,
     featured,
-    tags: existingPost?.frontmatter.tags || []
+    tags: normalizeTextList(existingPost?.frontmatter.tags)
   };
 }
 
@@ -995,7 +1033,9 @@ function getBlockPayload(block) {
     'callout',
     'equation',
     'divider',
-    'image'
+    'image',
+    'table',
+    'table_cell'
   ];
 
   for (const key of knownKeys) {
@@ -1017,7 +1057,47 @@ function escapeInlineCode(value) {
   return value.replace(/`/g, '\\`');
 }
 
-function renderTextElements(elements) {
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function applyInlineStyle(content, style, options = {}) {
+  const format = options.format === 'html' ? 'html' : 'markdown';
+  const text = format === 'html' ? escapeHtml(content) : content;
+
+  if (style?.inline_code) {
+    return format === 'html' ? `<code>${text}</code>` : `\`${escapeInlineCode(content)}\``;
+  }
+
+  let result = text;
+
+  if (style?.bold) {
+    result = format === 'html' ? `<strong>${result}</strong>` : `**${result}**`;
+  }
+
+  if (style?.italic) {
+    result = format === 'html' ? `<em>${result}</em>` : `*${result}*`;
+  }
+
+  if (style?.strikethrough) {
+    result = format === 'html' ? `<s>${result}</s>` : `~~${result}~~`;
+  }
+
+  if (style?.underline) {
+    result = format === 'html' ? `<u>${result}</u>` : `<u>${result}</u>`;
+  }
+
+  return result;
+}
+
+function renderTextElements(elements, options = {}) {
+  const format = options.format === 'html' ? 'html' : 'markdown';
+
   if (!Array.isArray(elements)) {
     return '';
   }
@@ -1028,14 +1108,64 @@ function renderTextElements(elements) {
     if (typeof element?.text_run?.content === 'string') {
       const content = element.text_run.content;
       const link = normalizeText(element.text_run.link || element.text_run.href);
+      const style = element.text_run.text_element_style;
+      const styledContent = applyInlineStyle(content, style, { format });
 
       if (link) {
-        parts.push(`[${content}](${link})`);
-      } else if (element.text_run.text_element_style?.inline_code) {
-        parts.push(`\`${escapeInlineCode(content)}\``);
+        parts.push(
+          format === 'html'
+            ? `<a href="${escapeHtml(link)}">${styledContent}</a>`
+            : `[${styledContent}](${link})`
+        );
       } else {
-        parts.push(content);
+        parts.push(styledContent);
       }
+      continue;
+    }
+
+    if (typeof element?.mention_user?.name === 'string') {
+      const mention = `@${element.mention_user.name}`;
+      parts.push(format === 'html' ? escapeHtml(mention) : mention);
+      continue;
+    }
+
+    if (typeof element?.mention_doc?.title === 'string') {
+      const title = element.mention_doc.title;
+      parts.push(format === 'html' ? escapeHtml(title) : title);
+      continue;
+    }
+
+    if (typeof element?.equation?.content === 'string') {
+      const equation = `$${element.equation.content}$`;
+      parts.push(format === 'html' ? escapeHtml(equation) : equation);
+      continue;
+    }
+
+    if (typeof element?.text_element?.content === 'string') {
+      const content = element.text_element.content;
+      parts.push(format === 'html' ? escapeHtml(content) : content);
+      continue;
+    }
+
+    const fallback = normalizeText(element);
+    if (fallback) {
+      parts.push(format === 'html' ? escapeHtml(fallback) : fallback);
+    }
+  }
+
+  return parts.join('');
+}
+
+function renderPlainTextElements(elements) {
+  if (!Array.isArray(elements)) {
+    return '';
+  }
+
+  const parts = [];
+
+  for (const element of elements) {
+    if (typeof element?.text_run?.content === 'string') {
+      parts.push(element.text_run.content);
       continue;
     }
 
@@ -1066,6 +1196,198 @@ function renderTextElements(elements) {
   }
 
   return parts.join('');
+}
+
+function renderTableCellHtmlBlocks(blocks, options = {}) {
+  const parts = [];
+
+  for (const block of blocks) {
+    const { type, value } = getBlockPayload(block);
+    const children = renderTableCellHtmlBlocks(block.childNodes || [], options);
+    const richText = renderTextElements(value?.elements, { format: 'html' });
+    const plainText = normalizeText(value?.text);
+
+    switch (type) {
+      case 'text':
+      case 'heading1':
+      case 'heading2':
+      case 'heading3':
+      case 'heading4':
+      case 'heading5':
+      case 'heading6': {
+        const content = richText || escapeHtml(plainText);
+        if (content) {
+          parts.push(content);
+        }
+        if (children) {
+          parts.push(children);
+        }
+        break;
+      }
+      case 'bullet':
+      case 'ordered':
+      case 'todo': {
+        const marker =
+          type === 'bullet'
+            ? '&bull; '
+            : type === 'ordered'
+              ? `${options.index || 1}. `
+              : value?.checked
+                ? '[x] '
+                : '[ ] ';
+        const content = richText || escapeHtml(plainText);
+        parts.push(`${marker}${content}`.trim());
+        if (children) {
+          parts.push(children);
+        }
+        break;
+      }
+      case 'quote':
+      case 'callout': {
+        const content = [richText || escapeHtml(plainText), children].filter(Boolean).join('<br />');
+        if (content) {
+          parts.push(content);
+        }
+        break;
+      }
+      case 'code': {
+        const codeText = renderPlainTextElements(value?.elements) || plainText || children;
+        if (codeText) {
+          parts.push(`<code>${escapeHtml(codeText).replace(/\n/g, '<br />')}</code>`);
+        }
+        break;
+      }
+      case 'equation': {
+        const equation = normalizeText(value?.content || renderTextElements(value?.elements));
+        if (equation) {
+          parts.push(escapeHtml(`$${equation}$`));
+        }
+        break;
+      }
+      case 'image': {
+        const alt = normalizeText(value?.caption) || 'Image from Feishu';
+        parts.push(escapeHtml(`[${alt}]`));
+        break;
+      }
+      case 'divider':
+        break;
+      default: {
+        const fallback = [richText, escapeHtml(plainText), children].filter(Boolean).join('<br />');
+        if (fallback) {
+          parts.push(fallback);
+        }
+      }
+    }
+  }
+
+  return parts
+    .filter(Boolean)
+    .join('<br />')
+    .replace(/(?:<br \/>){3,}/g, '<br /><br />');
+}
+
+function buildTableGrid(cellIds, mergeInfo, rowCount, columnCount) {
+  const grid = Array.from({ length: rowCount }, () => Array(columnCount).fill(null));
+  let currentRow = 0;
+  let currentColumn = 0;
+
+  const advanceCursor = () => {
+    while (currentRow < rowCount && grid[currentRow][currentColumn]) {
+      currentColumn += 1;
+      if (currentColumn >= columnCount) {
+        currentRow += 1;
+        currentColumn = 0;
+      }
+    }
+  };
+
+  for (let index = 0; index < cellIds.length; index += 1) {
+    advanceCursor();
+    if (currentRow >= rowCount) {
+      break;
+    }
+
+    const merge = mergeInfo[index] || {};
+    const rowspan = Math.max(1, Number(merge.row_span) || 1);
+    const colspan = Math.max(1, Number(merge.col_span) || 1);
+    const cell = {
+      cellId: cellIds[index],
+      rowspan,
+      colspan,
+      isOrigin: true
+    };
+
+    for (let rowOffset = 0; rowOffset < rowspan; rowOffset += 1) {
+      for (let columnOffset = 0; columnOffset < colspan; columnOffset += 1) {
+        const rowIndex = currentRow + rowOffset;
+        const columnIndex = currentColumn + columnOffset;
+
+        if (rowIndex >= rowCount || columnIndex >= columnCount) {
+          continue;
+        }
+
+        grid[rowIndex][columnIndex] =
+          rowOffset === 0 && columnOffset === 0 ? cell : { isOrigin: false };
+      }
+    }
+
+    currentColumn += colspan;
+    if (currentColumn >= columnCount) {
+      currentRow += 1;
+      currentColumn = 0;
+    }
+  }
+
+  return grid;
+}
+
+function renderTable(block) {
+  const { value } = getBlockPayload(block);
+  const property = value?.property || {};
+  const rowCount = Math.max(1, Number(property.row_size) || 0);
+  const columnCount = Math.max(1, Number(property.column_size) || 0);
+  const cellIds = Array.isArray(value?.cells) ? value.cells : [];
+  const mergeInfo = Array.isArray(property.merge_info) ? property.merge_info : [];
+
+  if (!cellIds.length || !rowCount || !columnCount) {
+    return renderBlocks(block.childNodes || []);
+  }
+
+  const cellMap = new Map((block.childNodes || []).map((cell) => [cell.block_id, cell]));
+  const grid = buildTableGrid(cellIds, mergeInfo, rowCount, columnCount);
+  const rowMarkup = grid
+    .map((row, rowIndex) => {
+      const tag = rowIndex === 0 ? 'th' : 'td';
+      const cells = row
+        .map((cell) => {
+          if (!cell?.isOrigin || !cell.cellId) {
+            return '';
+          }
+
+          const cellBlock = cellMap.get(cell.cellId);
+          const content = renderTableCellHtmlBlocks(cellBlock?.childNodes || []);
+          const spanAttrs = [
+            cell.colspan > 1 ? ` colspan="${cell.colspan}"` : '',
+            cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : ''
+          ].join('');
+
+          return `<${tag}${spanAttrs}>${content || '&nbsp;'}</${tag}>`;
+        })
+        .filter(Boolean)
+        .join('');
+
+      return cells ? `<tr>${cells}</tr>` : '';
+    })
+    .filter(Boolean);
+
+  if (!rowMarkup.length) {
+    return renderBlocks(block.childNodes || []);
+  }
+
+  const [headRow, ...bodyRows] = rowMarkup;
+  const head = `<thead>${headRow}</thead>`;
+  const body = bodyRows.length ? `<tbody>${bodyRows.join('')}</tbody>` : '';
+  return `<div class="feishu-table-wrap"><table>${head}${body}</table></div>`;
 }
 
 function indentBlock(text, prefix) {
@@ -1148,7 +1470,7 @@ function renderBlock(block, index) {
     }
     case 'code': {
       const language = normalizeText(value?.language || value?.lang);
-      const codeText = richText || normalizeText(value?.text) || children;
+      const codeText = renderPlainTextElements(value?.elements) || normalizeText(value?.text) || children;
       return `\`\`\`${language}\n${codeText.trimEnd()}\n\`\`\``;
     }
     case 'equation':
@@ -1162,6 +1484,10 @@ function renderBlock(block, index) {
         ? `> [Image omitted from Feishu sync: ${alt} (${token})]`
         : `> [Image omitted from Feishu sync: ${alt}]`;
     }
+    case 'table':
+      return renderTable(block);
+    case 'table_cell':
+      return children;
     default: {
       const fallback = [richText, normalizeText(value?.text), children].filter(Boolean).join('\n\n');
       return fallback;

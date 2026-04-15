@@ -5,7 +5,7 @@ pathSlug: postgres-cluster-deployment
 title: "Postgres 集群部署"
 summary: "文件中所有内容要根据自己的情况修改，比如说 image、/data地址、端口号、networks、硬件资源等；"
 publishedAt: 2026-04-13
-updatedAt: 2026-04-13
+updatedAt: 2026-04-15
 readingMinutes: 5
 series: services
 seriesOrder: 5
@@ -93,22 +93,22 @@ services:
     image: 10.14.0.37/postgres/postgres-18:V1
     container_name: pg-primary
     restart: unless-stopped
-
+    
     ports:
       - "5432:5432"
-
+    
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 'postgres@!QAZxsw2'
       POSTGRES_DB: postgres
       PGDATA: /var/lib/postgresql/data/pg18
-
+    
     volumes:
       - /data/workspace/install-postgres/data:/var/lib/postgresql/data
       - /data/workspace/install-postgres/archive:/var/lib/postgresql/archive
       - /data/workspace/install-postgres/scripts/init-primary.sh:/docker-entrypoint-initdb.d/init-primary.sh
       - /data/workspace/install-postgres/config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
-
+    
     command: >
       postgres
       -c max_connections=5000
@@ -133,7 +133,7 @@ services:
       -c log_connections=on
       -c log_disconnections=on
       -c track_commit_timestamp=on
-
+    
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 10s
@@ -189,31 +189,31 @@ services:
     image: 10.14.0.37/postgres/postgres-18:V1
     container_name: pg-standby
     restart: unless-stopped
-
+    
     ports:
       - "5432:5432"
-
+    
     environment:
       POSTGRES_PASSWORD: 'postgres@!QAZxsw2'
       TZ: Asia/Shanghai
       PGDATA: /var/lib/postgresql/data/pg18
-
+    
     volumes:
       - /data/workspace/install-postgres/data:/var/lib/postgresql/data
-
+    
     command: |
       bash -euc '
         DATA=/var/lib/postgresql/data/pg18
-
+        
         # 等待主库就绪 (指向主库IP 10.14.0.31)
         echo ">>> 等待主库 10.14.0.31..."
         until pg_isready -h 10.14.0.31 -p 5432 -U replicator; do sleep 2; done
-
+        
         # 如果数据目录为空，执行全量备份
         if [ -z "$$(ls -A $$DATA 2>/dev/null)" ]; then
           echo ">>> 开始从主库备份..."
           export PGPASSWORD=replicator_password
-
+          
           # 必须使用 -R (--write-recovery-conf) 自动生成 standby.signal
           pg_basebackup \
             -h 10.14.0.31 \
@@ -222,12 +222,12 @@ services:
             -D "$$DATA" \
             -Fp -Xs -P -v -R \
             --slot=replication_slot_standby_1
-
+            
           echo ">>> 备份完成，修复权限..."
           chown -R postgres:postgres "$$DATA"
           chmod 700 "$$DATA"
         fi
-
+        
         echo ">>> 启动数据库..."
         # 启动从库
         exec docker-entrypoint.sh postgres \
@@ -237,7 +237,7 @@ services:
           -c hot_standby_feedback=on \
           -c max_standby_streaming_delay=30s
       '
-
+    
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -269,10 +269,10 @@ docker logs -f postgres-standby
 # 在主库执行
 # 检查复制状态（关键验证）
 docker exec -it pg-primary psql -U postgres -c "
-SELECT
-    client_addr,
-    usename,
-    state,
+SELECT 
+    client_addr, 
+    usename, 
+    state, 
     sync_state,
     pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), replay_lsn)) as lag
 FROM pg_stat_replication;

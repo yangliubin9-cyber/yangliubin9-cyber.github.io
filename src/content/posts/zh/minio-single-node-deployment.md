@@ -5,7 +5,7 @@ pathSlug: minio-single-node-deployment
 title: "Minio单节点部署"
 summary: "文件中所有内容要根据自己的情况修改，列主机名、 image、/data地址、端口号、networks、硬件资源等；需要提前准备好自己的镜像仓库，或镜像在本地。"
 publishedAt: 2026-04-13
-updatedAt: 2026-04-13
+updatedAt: 2026-04-15
 readingMinutes: 2
 series: services
 seriesOrder: 2
@@ -21,17 +21,7 @@ tags: []
 
 ### 部署环境
 
-系统
-
-节点
-
-IP
-
-Ubuntu24.04
-
-Minio
-
-10.14.0.38
+<div class="feishu-table-wrap"><table><thead><tr><th><strong>系统</strong></th><th><strong>节点</strong></th><th><strong>IP</strong></th></tr></thead><tbody><tr><td><strong>Ubuntu24.04</strong></td><td><strong>Minio</strong></td><td><strong>10.14.0.38</strong></td></tr></tbody></table></div>
 
 ## 前提准备
 
@@ -58,24 +48,24 @@ services:
     image: 10.14.0.37/minio/minio4:v1
     container_name: minio
     restart: unless-stopped
-
+    
     # 关键：启动命令要正确
     command: server /data --console-address ":9001"
-
+    
     ports:
       - "9000:9000"    # API 端口
       - "19001:9001"   # 控制台端口
-
+    
     environment:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: minio@!QAZxsw2
-
+    
     volumes:
       - /data/workspace/install-minio/data:/data
-
+    
     networks:
       - custom
-
+    
     # 添加健康检查
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -87,7 +77,7 @@ networks:
   custom:
     external: true
     driver: bridge
-
+    
 # 启动服务
 docker compose up -d
 

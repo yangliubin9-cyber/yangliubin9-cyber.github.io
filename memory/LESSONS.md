@@ -1,6 +1,12 @@
 # Lessons
 
-- 2026-04-14: When the translation half of the pipeline works but Feishu write permissions do not, keep the repo automation alive by separating "translate English back into git" from "publish English to Feishu". Gate English Feishu publishing behind an explicit env flag so the content pipeline can keep shipping while external folder permissions are unresolved.
+- 2026-04-15: Once the blog moves to a zh-only Feishu source plus derived English files in git, remove every English Feishu publish hook together: npm scripts, nightly workflow env, manifest commits, and README examples. Leaving one old `publish-en` entry behind is enough to confuse future sync runs and operators.
+
+- 2026-04-15: Feishu Docx folder sync cannot preserve document tables by falling back to `raw_content`; both `raw_content` and the old generic block fallback flatten table cells. The reliable fix is to render `table` and `table_cell` blocks explicitly from the Docx block tree, then style the emitted table markup in the article prose CSS.
+
+- 2026-04-15: In the Feishu folder-sync path, frontmatter round-trips must parse inline JSON-like values such as `tags: []` as real arrays, including the accidentally quoted form `"[]"`. Otherwise a later sync will rewrite arrays as strings and break Astro content schema validation during `npm run check` and `npm run build`.
+
+- 2026-04-14: When the translation half of the pipeline works but Feishu write permissions do not, keep the repo automation alive by separating "translate English back into git" from any external English publishing target. The repo can keep shipping from generated `src/content/posts/en` files even when downstream English sync is disabled.
 
 - 2026-04-14: For relay-backed machine translation, large technical posts can time out if you send title, summary, and the full markdown body in one request. Split the markdown into chunk-sized fragments, translate each chunk separately, and retry transient 429/502/503/504 responses instead of treating the whole article as one shot.
 
@@ -16,7 +22,7 @@
 
 - 2026-04-14: Feishu automation that reads folders or Docx blocks must paginate both collection endpoints and child-block endpoints. A one-page implementation can look fine in dry runs with a small dataset, then silently miss older docs or leave stale tail content behind once the folder or document grows.
 
-- 2026-04-14: When resuming Feishu blog-sync work, validate the pipeline in layers instead of jumping straight to the full nightly job. First run `node ./scripts/feishu-sync.mjs --help` or `npm run sync:feishu -- --dry-run --locale zh` to verify Feishu auth and folder parsing, then run `node ./scripts/feishu-publish-en.mjs --dry-run` to verify English doc publishing, and only after that run `ASTRO_TELEMETRY_DISABLED=1 npm run check` plus `npm run build` to confirm the synced content still builds cleanly.
+- 2026-04-14: When resuming Feishu blog-sync work, validate the pipeline in layers instead of jumping straight to the full nightly job. First run `node ./scripts/feishu-sync.mjs --help` or `npm run sync:feishu -- --dry-run --locale zh` to verify Feishu auth and folder parsing, then run the zh-to-en translation command you actually ship (`npm run sync:feishu:zh-en` or `node ./scripts/translate-posts.mjs changed`), and only after that run `ASTRO_TELEMETRY_DISABLED=1 npm run check` plus `npm run build` to confirm the synced content still builds cleanly.
 
 - 2026-04-13: Feishu Drive folder children under `drive/explorer/v2/folder/.../children` may come back in `data.children` keyed by token rather than a flat `items` array. Folder sync code needs to normalize both response shapes before deciding the folder is empty.
 

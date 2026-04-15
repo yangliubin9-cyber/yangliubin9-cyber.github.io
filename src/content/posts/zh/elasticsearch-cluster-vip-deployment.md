@@ -5,8 +5,8 @@ pathSlug: elasticsearch-cluster-vip-deployment
 title: "ES集群+VIP搭建"
 summary: "文件中所有内容要根据自己的情况修改，列主机名、 image、/data地址、端口号、networks、硬件资源等；"
 publishedAt: 2026-04-13
-updatedAt: 2026-04-13
-readingMinutes: 6
+updatedAt: 2026-04-15
+readingMinutes: 7
 series: services
 seriesOrder: 3
 featured: false
@@ -23,33 +23,7 @@ tags: []
 
 ### 部署环境
 
-系统
-
-节点
-
-IP
-
-Ubuntu24.04
-
-es-node-01
-
-10.14.0.33
-
-                VIP
-
-          10.14.0.42
-
-Ubuntu24.04
-
-es-node-02
-
-10.14.0.34
-
-Ubuntu24.04
-
-es-node-03
-
-10.14.0.34
+<div class="feishu-table-wrap"><table><thead><tr><th><strong>系统</strong></th><th><strong>节点</strong></th><th><strong>IP</strong></th></tr></thead><tbody><tr><td><strong>Ubuntu24.04</strong></td><td><strong>es-node-01</strong></td><td><strong>10.14.0.33</strong><br /><strong>                VIP</strong><br /><strong>          10.14.0.42</strong></td></tr><tr><td><strong>Ubuntu24.04</strong></td><td><strong>es-node-02</strong></td><td><strong>10.14.0.34</strong></td></tr><tr><td><strong>Ubuntu24.04</strong></td><td><strong>es-node-03</strong></td><td><strong>10.14.0.34</strong></td></tr></tbody></table></div>
 
 ---
 
@@ -83,7 +57,7 @@ swapoff -a
 
 ### 安装keepalived
 
-es-node-01安装服务及配置文件
+**es-node-01安装服务及配置文件**
 
 ```
 # apt安装服务
@@ -100,7 +74,7 @@ global_defs {
 }
 
 vrrp_script chk_es {
-    script "/usr/bin/curl -s -f http://localhost:9200 > /dev/null"
+    script "/usr/bin/curl -s -f http://localhost:9200 > /dev/null"  
     interval 2
     weight -50
 }
@@ -112,7 +86,7 @@ vrrp_instance VI_29 {
     priority 100         #优先级
     advert_int 1
     authentication {
-        auth_type PASS
+        auth_type PASS  
         auth_pass 1111  #集群密码要一致
     }
     virtual_ipaddress {
@@ -125,7 +99,7 @@ vrrp_instance VI_29 {
 EOF
 ```
 
-es-node-02安装服务及配置文件
+**es-node-02安装服务及配置文件**
 
 ```
 # apt安装服务
@@ -142,7 +116,7 @@ global_defs {
 }
 
 vrrp_script chk_es {
-    script "/usr/bin/curl -s -f http://localhost:9200 > /dev/null"
+    script "/usr/bin/curl -s -f http://localhost:9200 > /dev/null"  
     interval 2
     weight -50
 }
@@ -154,7 +128,7 @@ vrrp_instance VI_29 {
     priority 90         #优先级
     advert_int 1
     authentication {
-        auth_type PASS
+        auth_type PASS  
         auth_pass 1111  #集群密码要一致
     }
     virtual_ipaddress {
@@ -167,7 +141,7 @@ vrrp_instance VI_29 {
 EOF
 ```
 
-es-node-03安装服务及配置文件
+**es-node-03安装服务及配置文件**
 
 ```
 # apt安装服务
@@ -184,7 +158,7 @@ global_defs {
 }
 
 vrrp_script chk_es {
-    script "/usr/bin/curl -s -f http://localhost:9200 > /dev/null"
+    script "/usr/bin/curl -s -f http://localhost:9200 > /dev/null"  
     interval 2
     weight -50
 }
@@ -196,7 +170,7 @@ vrrp_instance VI_29 {
     priority 80         #优先级
     advert_int 1
     authentication {
-        auth_type PASS
+        auth_type PASS  
         auth_pass 1111  #集群密码要一致
     }
     virtual_ipaddress {
@@ -209,7 +183,7 @@ vrrp_instance VI_29 {
 EOF
 ```
 
-### 启动keepalived服务验证
+### 启动**keepalived服务验证**
 
 ```
 # es-node-01
@@ -262,13 +236,13 @@ chown -R 1000:1000 /data/workspace/install-elastic
 
 ### es-node-01 配置文件
 
-'# 需要根据自己配置进行调整以下参数
+**'# 需要根据自己配置进行调整以下参数 **
 
-'# discovery.seed_hosts
-'# ELASTIC_PASSWORD
-'# cluster.initial_master_nodes
-'# network.publish_host
-'# ES_JAVA_OPTS=-Xms2g -Xmx2g
+**'# discovery.seed_hosts**
+**'# ELASTIC_PASSWORD**
+**'# cluster.initial_master_nodes**
+**'# network.publish_host**
+**'# ES_JAVA_OPTS=-Xms2g -Xmx2g**
 
 ```
 version: '3.8'
@@ -312,13 +286,13 @@ services:
 
 ### es-node-02 配置文件
 
-'# 需要根据自己配置进行调整以下参数
+**'# 需要根据自己配置进行调整以下参数 **
 
-'# discovery.seed_hosts
-'# ELASTIC_PASSWORD
-'# cluster.initial_master_nodes
-'# network.publish_host
-'# ES_JAVA_OPTS=-Xms2g -Xmx2g
+**'# discovery.seed_hosts**
+**'# ELASTIC_PASSWORD**
+**'# cluster.initial_master_nodes**
+**'# network.publish_host**
+**'# ES_JAVA_OPTS=-Xms2g -Xmx2g**
 
 ```
 version: '3.8'
@@ -361,13 +335,13 @@ services:
 
 ### es-node-03 配置文件
 
-'# 需要根据自己配置进行调整以下参数
+**'# 需要根据自己配置进行调整以下参数 **
 
-'# discovery.seed_hosts
-'# ELASTIC_PASSWORD
-'# cluster.initial_master_nodes
-'# network.publish_host
-'# ES_JAVA_OPTS=-Xms2g -Xmx2g
+**'# discovery.seed_hosts**
+**'# ELASTIC_PASSWORD**
+**'# cluster.initial_master_nodes**
+**'# network.publish_host**
+**'# ES_JAVA_OPTS=-Xms2g -Xmx2g**
 
 ```
 version: '3.8'

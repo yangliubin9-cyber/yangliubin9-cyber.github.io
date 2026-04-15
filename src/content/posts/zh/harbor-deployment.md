@@ -5,7 +5,7 @@ pathSlug: harbor-deployment
 title: "Harbor部署"
 summary: "文件中所有内容要根据自己的情况修改，比如说 image、/data地址、端口号、networks、硬件资源等；"
 publishedAt: 2026-04-13
-updatedAt: 2026-04-13
+updatedAt: 2026-04-15
 readingMinutes: 4
 series: services
 seriesOrder: 4
@@ -64,7 +64,7 @@ services:
     # 端口映射：主机 3759 -> 容器 6379
     ports:
       - "3759:6379"
-
+    
     # 环境变量 (仅用于客户端工具的自动认证，不是 Redis 服务端配置)
     environment:
       - REDISCLI_AUTH=redis@!QAZxsw2
@@ -80,7 +80,7 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-
+    
     # 容器内的内核参数优化
     sysctls:
       # 增加容器内的连接队列长度
@@ -91,20 +91,20 @@ services:
       - "redis-server"
       # 1. 基础认证
       - "--requirepass redis@!QAZxsw2"
-
+      
       # 2. 数据持久化策略 (AOF + RDB 混合模式)
       - "--appendonly yes"                # 开启 AOF (数据更安全)
       - "--appendfsync everysec"          # 每秒刷盘一次，平衡性能与安全
       - "--save 900 1"                    # 15分钟内有1个key变动则生成RDB快照
       - "--save 300 10"                   # 5分钟内有10个key变动则生成RDB快照
-
+      
       # 3. 内存管理 (非常重要)
       # 限制最大内存，防止把服务器内存撑爆。建议设置为物理内存的 75% 左右
       # 这里写了 2gb 作为示例，请根据你机器实际情况修改，如 4gb, 8gb
       - "--maxmemory 2gb"
       # 内存满了之后的策略：移除最近最少使用的 Key (LRU)
       - "--maxmemory-policy allkeys-lru"
-
+      
       # 4. 连接与超时
       - "--timeout 300"                   # 客户端闲置 300秒(5分钟) 后断开连接
       - "--tcp-keepalive 300"             # TCP 保活探测
@@ -114,7 +114,7 @@ services:
       # 5. 性能优化
       # 开启多线程 IO (Redis 6.0+ 特性)，加速网络读写
       # 建议设置为 CPU 核心数 - 1，例如 4核机器设为 2 或 3。设为 1 表示禁用。
-      # - "--io-threads 1"
+      # - "--io-threads 1" 
       # - "--io-threads-do-reads yes"
 
     # 健康检查 (必须带上密码)

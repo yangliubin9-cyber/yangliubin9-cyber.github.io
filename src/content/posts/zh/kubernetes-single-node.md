@@ -3,9 +3,9 @@ locale: zh
 translationKey: kubernetes-single-node
 pathSlug: kubernetes-single-node
 title: "Kubernetes 单节点"
-summary: "‘# 选择最新的找到自己的操作系统的containerd下载并上传至服务器"
+summary: "<div class=\"feishu-table-wrap\"><table><thead><tr><th><strong>IP</strong></th><th><strong>主机名</strong></th><th><strong>节点</strong></th><th..."
 publishedAt: 2026-04-13
-updatedAt: 2026-04-13
+updatedAt: 2026-04-15
 readingMinutes: 13
 series: k8s
 seriesOrder: 4
@@ -17,37 +17,7 @@ tags: []
 
 ### 初始环境配置
 
-IP
-
-主机名
-
-节点
-
-系统
-
-10.211.55.11
-
-ubuntu-1
-
-k8s-master-01
-
-Ubuntu-24.04-server
-
-10.211.55.12
-
-ubuntu-2
-
-k8s-worker-01
-
-Ubuntu-24.04-server
-
-10.211.55.13
-
-ubuntu-3
-
-k8s-worker-02
-
-Ubuntu-24.04-server
+<div class="feishu-table-wrap"><table><thead><tr><th><strong>IP</strong></th><th><strong>主机名</strong></th><th><strong>节点</strong></th><th><strong>系统</strong></th></tr></thead><tbody><tr><td><strong>10.211.55.11</strong></td><td><strong>ubuntu-1</strong></td><td><strong>k8s-master-01</strong></td><td><strong>Ubuntu-24.04-server</strong></td></tr><tr><td><strong>10.211.55.12</strong></td><td><strong>ubuntu-2</strong></td><td><strong>k8s-worker-01</strong></td><td><strong>Ubuntu-24.04-server</strong></td></tr><tr><td><strong>10.211.55.13</strong></td><td><strong>ubuntu-3</strong></td><td><strong>k8s-worker-02</strong></td><td><strong>Ubuntu-24.04-server</strong></td></tr></tbody></table></div>
 
 ### 全部节点进行部署前配置
 
@@ -197,21 +167,21 @@ cat /etc/fstab
 free -m
 ```
 
-#### 安装Containerd
+#### **安装Containerd**
 
-‘# 在GitHub上搜索Containerd
+**‘# 在GitHub上搜索Containerd**
 
 > [Image omitted from Feishu sync: Image from Feishu (NYdmbpRB9oFnsQxkWkEcLuVWnCg)]
 
-‘# 选择第一个官方的Containerd进入
+**‘# 选择第一个官方的Containerd进入**
 
 > [Image omitted from Feishu sync: Image from Feishu (LdngbGoh6oCitLx0E0ZcxpGxnff)]
 
-‘# 进入以后选择Releasses进入
+**‘# 进入以后选择Releasses进入**
 
 > [Image omitted from Feishu sync: Image from Feishu (Xs1EbRbm8oE7mGxyfgGczbxjn5U)]
 
-‘# 选择最新的找到自己的操作系统的containerd下载并上传至服务器
+**‘# 选择最新的找到自己的操作系统的containerd下载并上传至服务器**
 
 > [Image omitted from Feishu sync: Image from Feishu (AjuSbj6fXoUBJMxkp1fcLJ8bnYg)]
 
@@ -261,19 +231,19 @@ systemctl enable --now containerd
 systemctl status containerd
 ```
 
-#### 安装 libseccomp
+#### **安装 libseccomp**
 
 > [Image omitted from Feishu sync: Image from Feishu (UIKvb3GwdoCCxox9It0cQ7KUnuk)]
 
-‘# 选择第一个官方的runc进入
+**‘# 选择第一个官方的runc进入**
 
 > [Image omitted from Feishu sync: Image from Feishu (Up0JbWmObohmD6x5RYwcKaWYndg)]
 
-‘# 选择Releases进入
+**‘# 选择Releases进入**
 
 > [Image omitted from Feishu sync: Image from Feishu (Lfplbf5kBohMk1xt9k5caie1nrc)]
 
-‘# 找到适合自己系统的libseccomp并上传到服务器上
+**‘# 找到适合自己系统的libseccomp并上传到服务器上**
 
 > [Image omitted from Feishu sync: Image from Feishu (BKH5bLfPQoMp0ZxPd8vc0QUxnVg)]
 
@@ -297,19 +267,19 @@ chmod +x configure
 make && make install
 ```
 
-#### 安装runc
+#### **安装runc**
 
 > [Image omitted from Feishu sync: Image from Feishu (BfezbzeIMonMNhxG32qcXsTpnYe)]
 
-‘# 选择第一个官方的runc进入
+**‘# 选择第一个官方的runc进入**
 
 > [Image omitted from Feishu sync: Image from Feishu (PsyAbaG2eoof80xlrSMcJaIGnwf)]
 
-‘# 选择Releases进入
+**‘# 选择Releases进入**
 
 > [Image omitted from Feishu sync: Image from Feishu (EwGmbIzCZoMFrhxZwDPc688fnBg)]
 
-‘# 找到适合自己系统的runc并上传到服务器上
+**‘# 找到适合自己系统的runc并上传到服务器上**
 
 > [Image omitted from Feishu sync: Image from Feishu (KRUWbKJjeoeYZgxkn7UcOkx9ngf)]
 
@@ -406,7 +376,7 @@ kubeadm token create --print-join-command
 # ⬇️⬇️⬇️ 示例命令 ⬇️⬇️⬇️
 kubeadm join k8s-master-01:6443 --token tj4bwu.te0lcsbhpazw3dvc \
       --discovery-token-ca-cert-hash sha256:31dd5ab19185d190896ed6426bff41691fe1f8115fea87fba0f45631b6d07926
-
+      
 # 查看nodes状态 (只在Master上执行)
 kubectl get nodes
 
