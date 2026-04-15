@@ -1,8 +1,8 @@
 ---
 import AboutPage from '../../components/AboutPage.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { localePath } from '../../lib/routing';
 import { siteMeta } from '../../data/site';
+import { localePath } from '../../lib/routing';
 
 const aboutStructuredData = {
   '@context': 'https://schema.org',
@@ -21,9 +21,8 @@ const aboutStructuredData = {
 const aboutContent = {
   kicker: '关于',
   title: '在 AI、平台与运维交界处写工程博客',
-  lede:
-    '我是杨刘彬，网名 MUZI。这个页面我想尽量写得简单一点，像一个真实的人在介绍自己，而不是像一段网站说明。',
-  aboutEyebrow: '了解我',
+  lede: '',
+  aboutEyebrow: '你好，我是MUZI',
   aboutTitle: '我更愿意把自己看成一个长期在做工程实践记录的人',
   aboutParagraphs: [
     {
@@ -37,7 +36,7 @@ const aboutContent = {
     }
   ],
   contactEyebrow: '联系我',
-  contactTitle: '如果你想交流技术、博客内容或合作，可以直接联系我',
+  contactTitle: '',
   contactSummary: '我更偏好直接、明确的沟通方式。邮件适合正式联系，GitHub 适合讨论文章、代码和项目本身。',
   contactItems: [
     {

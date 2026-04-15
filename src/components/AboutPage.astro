@@ -13,12 +13,12 @@ type ContactItem = {
 interface AboutContent {
   kicker: string;
   title: string;
-  lede: string;
+  lede?: string;
   aboutEyebrow: string;
   aboutTitle: string;
   aboutParagraphs: AboutParagraph[];
   contactEyebrow: string;
-  contactTitle: string;
+  contactTitle?: string;
   contactSummary: string;
   contactItems: ContactItem[];
 }
@@ -34,7 +34,7 @@ const { content } = Astro.props;
   <div class="about-page-intro">
     <span class="kicker">{content.kicker}</span>
     <h1 class="title page-title about-page-title">{content.title}</h1>
-    <p class="lede about-page-lede">{content.lede}</p>
+    {content.lede ? <p class="lede about-page-lede">{content.lede}</p> : null}
   </div>
 </section>
 
@@ -52,7 +52,7 @@ const { content } = Astro.props;
 
   <aside class="about-page-contact-card">
     <span class="eyebrow">{content.contactEyebrow}</span>
-    <h2>{content.contactTitle}</h2>
+    {content.contactTitle ? <h2>{content.contactTitle}</h2> : null}
     <p class="about-page-contact-summary">{content.contactSummary}</p>
 
     <div class="about-page-contact-list">
