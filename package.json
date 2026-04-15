@@ -10,6 +10,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "sync:feishu": "node ./scripts/feishu-sync.mjs",
+    "sync:feishu:zh-en": "node ./scripts/feishu-sync.mjs --locale zh --translate-en",
     "sync:feishu:publish-en": "node ./scripts/feishu-publish-en.mjs",
     "sync:feishu:nightly": "node ./scripts/feishu-nightly-sync.mjs",
     "translate:one": "node ./scripts/translate-posts.mjs one",

@@ -25,9 +25,13 @@ function run(command, args, env = process.env) {
 async function main() {
   const node = process.execPath;
 
-  await run(node, ['./scripts/feishu-sync.mjs', '--locale', 'zh']);
-  await run(node, ['./scripts/translate-posts.mjs', 'changed']);
-  await run(node, ['./scripts/feishu-publish-en.mjs']);
+  await run(node, ['./scripts/feishu-sync.mjs', '--locale', 'zh', '--translate-en']);
+
+  if (process.env.FEISHU_PUBLISH_EN_ENABLED === 'true') {
+    await run(node, ['./scripts/feishu-publish-en.mjs']);
+  } else {
+    console.log('skip english Feishu publish: FEISHU_PUBLISH_EN_ENABLED is not true');
+  }
 }
 
 main().catch((error) => {

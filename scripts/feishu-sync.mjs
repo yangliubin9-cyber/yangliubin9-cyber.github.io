@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { spawn } from 'node:child_process';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
@@ -119,7 +120,7 @@ async function loadDotenvFile(filePath) {
 function printHelp() {
   console.log(`
 Usage:
-  npm run sync:feishu -- [--dry-run] [--slug your-slug] [--locale zh,en]
+  npm run sync:feishu -- [--dry-run] [--slug your-slug] [--locale zh,en] [--translate-en]
 
 Required env:
   FEISHU_APP_ID
@@ -141,6 +142,7 @@ Notes:
   - Bitable mode syncs metadata plus body.
   - Folder mode keeps local frontmatter as metadata and only refreshes Markdown body.
   - The script updates files under src/content/posts/<locale>/.
+  - Use --translate-en to generate/update English Markdown right after zh sync.
   - Existing Markdown remains the fallback when you do not run sync.
 `.trim());
 }
@@ -175,8 +177,45 @@ function parseArguments(argv) {
     dryRun: Boolean(flags.get('dry-run')),
     help: Boolean(flags.get('help')),
     locale: flags.get('locale'),
-    slug: flags.get('slug')
+    slug: flags.get('slug'),
+    translateEn: Boolean(flags.get('translate-en'))
   };
+}
+
+function run(command, args, env = process.env) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: 'inherit',
+      shell: false,
+      env
+    });
+
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve();
+        return;
+      }
+
+      reject(new Error(`${command} ${args.join(' ')} failed with exit code ${code}`));
+    });
+
+    child.on('error', reject);
+  });
+}
+
+async function runEnglishTranslationSync(args) {
+  if (!process.env.OPENAI_API_KEY?.trim()) {
+    throw new Error(
+      'Missing OPENAI_API_KEY. --translate-en requires translation credentials so English Markdown can be generated right after zh sync.'
+    );
+  }
+
+  const node = process.execPath;
+  const translateArgs = args.slug
+    ? ['./scripts/translate-posts.mjs', 'one', '--key', args.slug]
+    : ['./scripts/translate-posts.mjs', 'changed'];
+
+  await run(node, translateArgs);
 }
 
 function normalizeLineEndings(value) {
@@ -1299,6 +1338,8 @@ async function main() {
     );
   }
 
+  const shouldTranslateEn = args.translateEn && locales.includes('zh') && !args.dryRun;
+
   if (folderModeEnabled) {
     let writeCount = 0;
 
@@ -1321,6 +1362,11 @@ async function main() {
         ? `Dry run complete: ${writeCount} file(s) would be updated from Feishu folders.`
         : `Feishu folder sync complete: ${writeCount} file(s) updated.`
     );
+
+    if (shouldTranslateEn) {
+      await runEnglishTranslationSync(args);
+    }
+
     return;
   }
 
@@ -1369,6 +1415,10 @@ async function main() {
   }
 
   console.log(args.dryRun ? `Dry run complete: ${writeCount} file(s) would be updated.` : `Feishu sync complete: ${writeCount} file(s) updated.`);
+
+  if (shouldTranslateEn) {
+    await runEnglishTranslationSync(args);
+  }
 }
 
 main().catch((error) => {

@@ -1,5 +1,7 @@
 # Lessons
 
+- 2026-04-14: When the translation half of the pipeline works but Feishu write permissions do not, keep the repo automation alive by separating "translate English back into git" from "publish English to Feishu". Gate English Feishu publishing behind an explicit env flag so the content pipeline can keep shipping while external folder permissions are unresolved.
+
 - 2026-04-14: For relay-backed machine translation, large technical posts can time out if you send title, summary, and the full markdown body in one request. Split the markdown into chunk-sized fragments, translate each chunk separately, and retry transient 429/502/503/504 responses instead of treating the whole article as one shot.
 
 - 2026-04-14: If local markdown uses inline empty arrays like `tags: []`, custom frontmatter parsers and serializers must preserve them as real arrays on both read and write. Turning `[]` into `"[]"` or `tags:` will break Astro collection validation on generated English files.
@@ -59,3 +61,10 @@
 - 2026-04-10: 前端筛选里如果用 `hidden` 隐藏结果，一定要检查 `getComputedStyle(...).display`，不要只看元素有没有挂上 `hidden` 属性。这个项目里 `.card { display: grid; }` 会把浏览器默认的 `[hidden]` 隐藏效果覆盖掉，导致“脚本判断已隐藏，但页面视觉上还在”。兜底规则要直接加 `[hidden] { display: none !important; }`。
 - 2026-04-10: 如果用户明确说“模板不要动，只删掉某几句文案”，优先把文案放回 `ui` 数据层处理；确实需要兼容空文案时，用最小样式如 `.lede:empty { display: none; }` 吃掉空占位，不要顺手再改系列页或搜索页模板结构。
 - 2026-04-10: 共享 `.hero-editorial` 的页面如果只想调整系列页、搜索页这类内页标题对齐，不要直接改公共 hero 布局。给目标页面单独加一个类，比如 `.hero-page`，再覆盖成单列和左对齐，这样不会把首页带图片的 hero 一起改坏。
+- 2026-04-15: For a zh-first Feishu blog pipeline, treat "publish generated English back to Feishu" as optional and never let it block committing generated `src/content/posts/en` files. The site only needs the English Markdown pair to enable language switching; Feishu write-back is a separate downstream sync.
+
+- 2026-04-15: If the English auto-translation workflow is meant to backfill missing pairs after a pipeline fix, do not trigger it only on `src/content/posts/zh/**`. Also trigger it when `scripts/translate-posts.mjs` or `.github/workflows/auto-translate-en.yml` changes, otherwise the fix lands on `main` but no translation job reruns until someone edits Chinese content or manually dispatches the workflow.
+
+- 2026-04-15: For manual Feishu publishing on a zh-first bilingual blog, do not rely on operators remembering two separate steps like "sync zh" and then "translate en". Put the follow-up translation behind the same sync entry with an explicit flag such as `--translate-en`, and expose one stable npm command for it. That keeps the source-of-truth sync and the derived-English sync in one predictable path without reintroducing a hard dependency on Feishu English docs.
+
+- 2026-04-15: When backfilling missing English Markdown for a zh-first blog, treat “the translation API is temporarily unavailable or misconfigured” as a delivery blocker for automation, not for the content itself. If the source Chinese Markdown is already in the repo, you can still restore language switching by creating the missing `src/content/posts/en/*.md` files manually, then set `translationSourceHash`, `translationStatus`, and `translationModel` so `translate-posts check` returns to green and later automation does not keep flagging the pair as stale.

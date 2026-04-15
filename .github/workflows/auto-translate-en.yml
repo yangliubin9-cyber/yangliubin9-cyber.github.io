@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'src/content/posts/zh/**'
+      - 'scripts/translate-posts.mjs'
+      - '.github/workflows/auto-translate-en.yml'
   workflow_dispatch:
 
 permissions:
@@ -40,14 +42,6 @@ jobs:
           OPENAI_TRANSLATION_MODEL: ${{ secrets.OPENAI_TRANSLATION_MODEL }}
         run: node ./scripts/translate-posts.mjs changed
 
-      - name: Publish changed English posts to Feishu
-        env:
-          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
-          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
-          FEISHU_DRIVE_EN_FOLDER_TOKEN: ${{ secrets.FEISHU_DRIVE_EN_FOLDER_TOKEN }}
-          FEISHU_SYNC_TIMEOUT_MS: ${{ secrets.FEISHU_SYNC_TIMEOUT_MS }}
-        run: node ./scripts/feishu-publish-en.mjs
-
       - name: Validate content and build
         env:
           ASTRO_TELEMETRY_DISABLED: '1'
@@ -59,7 +53,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/content/posts/en memory/feishu-en-doc-manifest.json
+          git add src/content/posts/en
           if git diff --cached --quiet; then
             echo "No generated English changes to commit"
             exit 0
