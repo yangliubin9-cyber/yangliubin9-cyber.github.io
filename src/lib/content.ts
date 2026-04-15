@@ -209,3 +209,30 @@ export function formatPublishDate(locale: Locale, value: Date) {
 export function getReadingLabel(locale: Locale, minutes: number) {
   return locale === 'zh' ? `${minutes} 分钟阅读` : `${minutes} min read`;
 }
+export function getDisplaySummary(summary: string, fallbackTitle: string) {
+  const raw = summary.trim();
+
+  if (!raw) {
+    return fallbackTitle;
+  }
+
+  if (
+    raw.startsWith('<') ||
+    raw.startsWith('**') ||
+    raw.startsWith('__') ||
+    raw.startsWith('```') ||
+    raw.startsWith('>') ||
+    raw.startsWith('#') ||
+    raw.includes('feishu-table-wrap')
+  ) {
+    return fallbackTitle;
+  }
+
+  const compact = raw
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[*_`]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return compact || fallbackTitle;
+}

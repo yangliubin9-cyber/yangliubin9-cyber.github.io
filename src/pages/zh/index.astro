@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getSeriesTracks } from '../../lib/content';
+import { getDisplaySummary, getSeriesTracks } from '../../lib/content';
 import { localePath } from '../../lib/routing';
 import { getSeriesDescription, getSeriesName, isHomeFeaturedSeries, siteMeta } from '../../data/site';
 import { getUiText } from '../../data/ui';
@@ -74,14 +74,14 @@ const homeStructuredData = {
 
             <div class="track-copy">
               <h3>{featuredPost.data.title}</h3>
-              <p class="muted">{featuredPost.data.summary}</p>
+              <p class="muted">{getDisplaySummary(featuredPost.data.summary, featuredPost.data.title)}</p>
               <p class="track-description">{getSeriesDescription('zh', seriesItem)}</p>
             </div>
 
             <a class="track-link" href={localePath('zh', latestPost.data.pathSlug)}>
               <span class="track-label">{trackLatestLabel}</span>
               <strong>{latestPost.data.title}</strong>
-              <p>{latestPost.data.summary}</p>
+              <p>{getDisplaySummary(latestPost.data.summary, latestPost.data.title)}</p>
             </a>
 
             <div class="track-actions">

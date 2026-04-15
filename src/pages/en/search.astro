@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getPosts, getReadingLabel } from '../../lib/content';
+import { getDisplaySummary, getPosts, getReadingLabel } from '../../lib/content';
 import { localePath } from '../../lib/routing';
 import { getSeriesBySlug, getSeriesName, series, siteMeta } from '../../data/site';
 import { getUiText } from '../../data/ui';
@@ -77,13 +77,14 @@ const seriesOptions = series.map((item) => ({
     <div class="grid search-grid" data-search-results>
       {posts.map((post) => {
         const seriesItem = getSeriesBySlug(post.data.series);
+        const displaySummary = getDisplaySummary(post.data.summary, post.data.title);
         return (
           <a
             class="card card-post"
             href={localePath('en', post.data.pathSlug)}
             data-search-item
             data-search-series={post.data.series}
-            data-search-text={`${post.data.title} ${post.data.summary} ${post.data.tags.join(' ')} ${
+            data-search-text={`${post.data.title} ${displaySummary} ${post.data.tags.join(' ')} ${
               seriesItem ? getSeriesName('en', seriesItem) : ''
             }`.toLowerCase()}
           >
@@ -93,7 +94,7 @@ const seriesOptions = series.map((item) => ({
               </span>
             )}
             <h3>{post.data.title}</h3>
-            <p class="muted">{post.data.summary}</p>
+            <p class="muted">{displaySummary}</p>
             <strong>{getReadingLabel('en', post.data.readingMinutes)}</strong>
           </a>
         );

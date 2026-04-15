@@ -866,7 +866,11 @@ function inferSeriesFromTrail(document) {
 }
 
 function extractSummary(markdown, fallbackTitle) {
-  const paragraphs = normalizeLineEndings(markdown)
+  const cleaned = normalizeLineEndings(markdown)
+    .replace(/```[\s\S]*?```/g, '\n')
+    .replace(/<div class="feishu-table-wrap">[\s\S]*?<\/div>/g, '\n');
+
+  const paragraphs = cleaned
     .split(/\n\s*\n/g)
     .map((item) => item.trim())
     .filter(Boolean);
@@ -877,8 +881,11 @@ function extractSummary(markdown, fallbackTitle) {
       paragraph.startsWith('>') ||
       paragraph.startsWith('- ') ||
       paragraph.startsWith('* ') ||
+      paragraph.startsWith('**') ||
+      paragraph.startsWith('__') ||
       paragraph.startsWith('```') ||
-      paragraph.startsWith('![')
+      paragraph.startsWith('![') ||
+      paragraph.startsWith('<')
     ) {
       continue;
     }

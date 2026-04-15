@@ -1,5 +1,9 @@
 # Lessons
 
+- 2026-04-15: When a Feishu subfolder like `服务搭建 / Redis` shows up in the folder tree but `drive/explorer/v2/folder/<token>/children` returns `children: {}` with `code: 0`, treat it as a source-content gap first, not a sync parser bug. The blog cannot publish a missing article if the upstream folder is effectively empty to the integration.
+
+- 2026-04-15: Blog list surfaces such as home, search, and series pages should not render synced `summary` fields raw. Add a display-level sanitizer and fall back to the post title when a summary starts with HTML, fenced content, or markdown emphasis markers, otherwise one malformed synced summary leaks directly into multiple public pages.
+
 - 2026-04-15: Once the blog moves to a zh-only Feishu source plus derived English files in git, remove every English Feishu publish hook together: npm scripts, nightly workflow env, manifest commits, and README examples. Leaving one old `publish-en` entry behind is enough to confuse future sync runs and operators.
 
 - 2026-04-15: Feishu Docx folder sync cannot preserve document tables by falling back to `raw_content`; both `raw_content` and the old generic block fallback flatten table cells. The reliable fix is to render `table` and `table_cell` blocks explicitly from the Docx block tree, then style the emitted table markup in the article prose CSS.

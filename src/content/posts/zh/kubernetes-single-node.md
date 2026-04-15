@@ -3,7 +3,7 @@ locale: zh
 translationKey: kubernetes-single-node
 pathSlug: kubernetes-single-node
 title: "Kubernetes 单节点"
-summary: "<div class=\"feishu-table-wrap\"><table><thead><tr><th><strong>IP</strong></th><th><strong>主机名</strong></th><th><strong>节点</strong></th><th..."
+summary: "Kubernetes 单节点"
 publishedAt: 2026-04-13
 updatedAt: 2026-04-15
 readingMinutes: 13

@@ -2,6 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import {
   formatPublishDate,
+  getDisplaySummary,
   getPostsBySeries,
   getReadingLabel,
   type PostEntry
@@ -89,7 +90,7 @@ const stepLabel =
         <article class="card card-entry">
           <span class="track-label">{startLabel}</span>
           <h3>{startPost.data.title}</h3>
-          <p class="muted">{startPost.data.summary}</p>
+          <p class="muted">{getDisplaySummary(startPost.data.summary, startPost.data.title)}</p>
           <div class="entry-meta">
             <span>{publishedLabel} · {formatPublishDate('en', startPost.data.publishedAt)}</span>
             <span>{readingTimeLabel} · {getReadingLabel('en', startPost.data.readingMinutes)}</span>
@@ -106,7 +107,7 @@ const stepLabel =
         <article class="card card-entry">
           <span class="track-label">{latestLabel}</span>
           <h3>{latestPost.data.title}</h3>
-          <p class="muted">{latestPost.data.summary}</p>
+          <p class="muted">{getDisplaySummary(latestPost.data.summary, latestPost.data.title)}</p>
           <div class="entry-meta">
             <span>{publishedLabel} · {formatPublishDate('en', latestPost.data.publishedAt)}</span>
             <span>{readingTimeLabel} · {getReadingLabel('en', latestPost.data.readingMinutes)}</span>
@@ -145,7 +146,7 @@ const stepLabel =
                 <span>{getReadingLabel('en', post.data.readingMinutes)}</span>
               </div>
             </div>
-            <p class="muted">{post.data.summary}</p>
+            <p class="muted">{getDisplaySummary(post.data.summary, post.data.title)}</p>
             <div class="track-actions">
               <a class="button-link" href={localePath('en', post.data.pathSlug)}>{readAction}</a>
             </div>
