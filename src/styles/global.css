@@ -774,7 +774,13 @@ html[data-theme='dark'] .hero-avatar-frame {
 }
 
 .card-track {
+  display: flex;
+  flex-direction: column;
   background: var(--surface-highlight);
+}
+
+.card-track .track-link {
+  margin-top: auto;
 }
 
 .card-track-series {
