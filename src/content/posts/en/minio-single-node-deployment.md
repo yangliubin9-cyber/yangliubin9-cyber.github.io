@@ -3,69 +3,74 @@ locale: en
 translationKey: minio-single-node-deployment
 pathSlug: minio-single-node-deployment
 title: "MinIO Single-Node Deployment"
-summary: "Prepare the image, working directory, ports, and health checks first, then bring up a single-node MinIO instance with Docker Compose."
+summary: "Customize all values in the file based on your environment: hostname, image, `/data` path, ports, networks, and hardware resources. Prepare your own image registry or ensure images are available locally beforehand."
 publishedAt: 2026-04-13
-updatedAt: 2026-04-13
+updatedAt: 2026-04-15
 readingMinutes: 2
 series: services
 seriesOrder: 2
 featured: false
 tags: []
-translationSourceHash: 3abbb29e06cd082d08661de5c2d0c457502aae3794a304e929507a69ca3c547b
-translationStatus: reviewed
-translationModel: manual
-translationUpdatedAt: 2026-04-15
+translationSourceHash: 71be231350845bfef6db49a2c2c192dcf4b10d9fbcf83ae498bb1053562d3895
+translationStatus: ai-generated
+translationModel: kimi-k2.5
+translationUpdatedAt: 2026-04-17
 ---
 
-## Deploy with Docker Compose
+## Deploying with Docker Compose
 
-### Deployment notes
+### ⚠️ Pre-deployment Notes ⚠️
 
-Adjust all values to your own environment before you run the service, including the hostname, image address, storage path, ports, networks, and credentials. Prepare the image in your registry or on the host in advance.
+All content in the file must be modified according to your specific situation, including hostname, image, /data path, port numbers, networks, hardware resources, etc. You need to prepare your own image repository in advance, or ensure the image is available locally.
 
-### Deployment environment
+### Deployment Environment
 
-- OS: Ubuntu 24.04
-- Node: MinIO
-- IP: `10.14.0.38`
+<div class="feishu-table-wrap"><table><thead><tr><th><strong>OS</strong></th><th><strong>Node</strong></th><th><strong>IP</strong></th></tr></thead><tbody><tr><td><strong>Ubuntu 24.04</strong></td><td><strong>Minio</strong></td><td><strong>10.14.0.38</strong></td></tr></tbody></table></div>
 
-## Preparation
+## Prerequisites
 
-```bash
-# install Docker and Docker Compose first
+```
+# Prepare Docker and Docker Compose services
+Install manually
 
-# set the hostname
+# Modify hostname
 hostnamectl set-hostname Minio
 
-# prepare the image tag
-minio/minio4:v1
+# Prepare MinIO image version
+minio/minio4:v1  // Here I used an April 2025 image, tagged it, and uploaded to Harbor for use
 
-# create the working directory
+# Create service directory
 mkdir -p /data/workspace/install-minio && cd /data/workspace/install-minio
 
-# create the required directories
+# Create directories required by MinIO
 mkdir data config
 
-# create the external network
-docker network create custom
-
-# prepare docker-compose.yaml
+# Prepare docker-compose.yaml file
+Create network docker network create custom
 services:
   minio:
     image: 10.14.0.37/minio/minio4:v1
     container_name: minio
     restart: unless-stopped
+    
+    # Critical: ensure the startup command is correct
     command: server /data --console-address ":9001"
+    
     ports:
-      - "9000:9000"
-      - "19001:9001"
+      - "9000:9000"    # API port
+      - "19001:9001"   # Console port
+    
     environment:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: minio@!QAZxsw2
+    
     volumes:
       - /data/workspace/install-minio/data:/data
+    
     networks:
       - custom
+    
+    # Add health check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -76,14 +81,12 @@ networks:
   custom:
     external: true
     driver: bridge
-
-# start the service
+    
+# Start services
 docker compose up -d
 
-# verify the service
+# Verify services
 docker compose ps
 NAME      IMAGE                        COMMAND                  SERVICE   CREATED      STATUS                PORTS
 minio     10.14.0.37/minio/minio4:v1   "/usr/bin/docker-ent…"   minio     2 days ago   Up 2 days (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp, 0.0.0.0:19001->9001/tcp, [::]:19001->9001/tcp
 ```
-
-The two values worth checking first are the startup command and the console port. If either of those is wrong, the MinIO container may start but the web console or API will not behave as expected.

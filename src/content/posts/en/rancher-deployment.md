@@ -3,53 +3,50 @@ locale: en
 translationKey: rancher-deployment
 pathSlug: rancher-deployment
 title: "Rancher Deployment"
-summary: "Adjust hostnames, image addresses, data paths, ports, networks, and bootstrap credentials to match your own environment before deploying Rancher."
+summary: "Customize all values in the file according to your environment—hostnames, images, /data paths, ports, networks, and hardware resources. Ensure your images are available in a private registry or locally before proceeding."
 publishedAt: 2026-04-13
-updatedAt: 2026-04-13
+updatedAt: 2026-04-15
 readingMinutes: 2
 series: services
 seriesOrder: 1
 featured: false
 tags: []
-translationSourceHash: 58bc8bc09dab2548cb3e8d735de57c06ebf30f7e7908f83bd09c5a68d74f9ca7
-translationStatus: reviewed
-translationModel: manual
-translationUpdatedAt: 2026-04-15
+translationSourceHash: 73270ae59e159d65e5c677a9d145ffca7955ec65dbd03df513791c34611c5c44
+translationStatus: ai-generated
+translationModel: kimi-k2.5
+translationUpdatedAt: 2026-04-17
 ---
 
-## Deploy with Docker Compose
+## Deploying with Docker Compose
 
-### Deployment notes
+### ⚠️ Pre-deployment Notes ⚠️
 
-Every value in the example below should be adjusted to your own environment, especially the hostname, image registry address, data path, ports, network name, and resource sizing. Prepare the required image in advance, either in your private registry or on the target host.
+Modify all content in the file according to your specific environment, including hostname, image, /data paths, port numbers, networks, hardware resources, etc. You need to prepare your own image registry in advance, or ensure images are available locally.
 
-### Deployment environment
+### Deployment Environment
 
-- OS: Ubuntu 24.04
-- Node: Rancher
-- IP: `10.14.0.38`
+<div class="feishu-table-wrap"><table><thead><tr><th><strong>OS</strong></th><th><strong>Node</strong></th><th><strong>IP</strong></th></tr></thead><tbody><tr><td><strong>Ubuntu 24.04</strong></td><td><strong>Redis</strong></td><td><strong>10.14.0.38</strong></td></tr></tbody></table></div>
 
-### Preparation
+### Prerequisites
 
-```bash
-# install Docker and Docker Compose first
+```
+# Prepare Docker and Docker Compose services
+Install manually
 
-# set the hostname
-hostnamectl set-hostname Rancher
+# Change hostname
+hostnamectl set-hostname Redis
 
-# prepare the image tag
-rancher/rancher-2.8.2:v1
+# Prepare MinIO image version
+rancher/rancher-2.8.2:v1  // I am using the 2.8.2 image here, tagged and uploaded to Harbor for my own use
 
-# create the working directory
-mkdir -p /data/workspace/install-rancher && cd /data/workspace/install-rancher
+# Create service directory
+mkdir -p /data/workspace/install-redis && cd /data/workspace/install-redis
 
-# create the directories and files used by Rancher
+# Create directories required for MinIO
 mkdir data resolved.conf
 
-# create the external network
-docker network create bigdata
-
-# prepare docker-compose.yaml
+# Prepare docker-compose.yaml file
+Create network: docker network create bigdata
 services:
   rancher:
     restart: always
@@ -62,6 +59,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - CATTLE_BOOTSTRAP_PASSWORD=rancher@!QAZxsw2
+      # Critical: Add server URL to resolve redirect issues
       - CATTLE_SERVER_URL=https://10.14.0.38:1443
     ports:
       - "8080:80"
@@ -69,17 +67,16 @@ services:
     networks:
       - bigdata
 
+# Connect to external network
 networks:
   bigdata:
     external: true
 
-# start the service
+# Start service
 docker compose up -d
 
-# verify the service
+# Verify service
 docker compose ps
 NAME      IMAGE                                 COMMAND           SERVICE   CREATED      STATUS      PORTS
 rancher   10.14.0.37/rancher/rancher-2.8.2:v1   "entrypoint.sh"   rancher   2 days ago   Up 2 days   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp, 0.0.0.0:1443->443/tcp, [::]:1443->443/tcp
 ```
-
-The critical setting here is `CATTLE_SERVER_URL`. If it does not match the URL users actually open, Rancher can redirect incorrectly after login or bootstrap.

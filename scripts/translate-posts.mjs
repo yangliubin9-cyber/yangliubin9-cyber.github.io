@@ -40,12 +40,30 @@ const frontmatterOrder = [
 ];
 function resolveOpenAIEndpoint() {
   const configuredBaseUrl = process.env.OPENAI_BASE_URL?.trim();
+  const preferChatCompletions =
+    process.env.OPENAI_USE_CHAT_COMPLETIONS === 'true' ||
+    (configuredBaseUrl &&
+      (/moonshot\.cn/i.test(configuredBaseUrl) || /kimi/i.test(configuredBaseUrl)));
 
   if (!configuredBaseUrl) {
-    return 'https://api.openai.com/v1/responses';
+    return preferChatCompletions
+      ? 'https://api.openai.com/v1/chat/completions'
+      : 'https://api.openai.com/v1/responses';
   }
 
   const normalizedBaseUrl = configuredBaseUrl.replace(/\/+$/, '');
+
+  if (preferChatCompletions) {
+    if (normalizedBaseUrl.endsWith('/chat/completions')) {
+      return normalizedBaseUrl;
+    }
+
+    if (normalizedBaseUrl.endsWith('/v1')) {
+      return `${normalizedBaseUrl}/chat/completions`;
+    }
+
+    return `${normalizedBaseUrl}/v1/chat/completions`;
+  }
 
   if (normalizedBaseUrl.endsWith('/responses')) {
     return normalizedBaseUrl;
@@ -357,6 +375,12 @@ function extractOutputText(responseJson) {
     return responseJson.output_text;
   }
 
+  const choiceText = responseJson.choices?.[0]?.message?.content;
+
+  if (typeof choiceText === 'string' && choiceText.trim()) {
+    return choiceText;
+  }
+
   const outputParts = [];
 
   for (const item of responseJson.output ?? []) {
@@ -458,39 +482,63 @@ async function requestOpenAI({
 }) {
   let lastError = null;
 
+  const isChatCompletions = openaiEndpoint.endsWith('/chat/completions');
+
   for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const body = isChatCompletions
+      ? {
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          ...(schema
+            ? {
+                response_format: {
+                  type: 'json_schema',
+                  json_schema: {
+                    name: 'translation_result',
+                    schema,
+                    strict: true
+                  }
+                }
+              }
+            : {})
+        }
+      : {
+          model,
+          temperature: 0.2,
+          input: [
+            {
+              role: 'system',
+              content: [{ type: 'input_text', text: systemPrompt }]
+            },
+            {
+              role: 'user',
+              content: [{ type: 'input_text', text: userPrompt }]
+            }
+          ],
+          ...(schema
+            ? {
+                text: {
+                  format: {
+                    type: 'json_schema',
+                    name: 'translation_result',
+                    schema,
+                    strict: true
+                  }
+                }
+              }
+            : {})
+        };
+
     const response = await fetch(openaiEndpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model,
-        temperature: 0.2,
-        input: [
-          {
-            role: 'system',
-            content: [{ type: 'input_text', text: systemPrompt }]
-          },
-          {
-            role: 'user',
-            content: [{ type: 'input_text', text: userPrompt }]
-          }
-        ],
-        ...(schema
-          ? {
-              text: {
-                format: {
-                  type: 'json_schema',
-                  name: 'translation_result',
-                  schema,
-                  strict: true
-                }
-              }
-            }
-          : {})
-      })
+      body: JSON.stringify(body)
     });
 
     if (response.ok) {
