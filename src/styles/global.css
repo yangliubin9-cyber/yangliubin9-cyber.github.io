@@ -769,13 +769,17 @@ html[data-theme='dark'] .hero-avatar-frame {
 
 .card-track,
 .card-entry {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   align-content: start;
 }
 
+.card-entry .track-actions {
+  margin-top: auto;
+}
+
 .card-track {
-  display: flex;
-  flex-direction: column;
   background: var(--surface-highlight);
 }
 
