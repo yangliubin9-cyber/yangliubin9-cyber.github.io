@@ -783,7 +783,8 @@ html[data-theme='dark'] .hero-avatar-frame {
   background: var(--surface-highlight);
 }
 
-.card-track .track-link {
+.card-track .track-link,
+.card-track .track-actions {
   margin-top: auto;
 }
 
