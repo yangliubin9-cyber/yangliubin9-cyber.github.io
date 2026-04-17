@@ -102,7 +102,7 @@ Environment variables for translation:
 
 - `OPENAI_API_KEY`: required for translation requests
 - `OPENAI_BASE_URL`: optional, defaults to `https://api.openai.com/v1`; set this when you use an OpenAI-compatible relay such as `https://ai.yunfei.best/v1`
-- `OPENAI_TRANSLATION_MODEL`: optional, defaults to `gpt-5.4-mini`
+- `OPENAI_TRANSLATION_MODEL`: optional, defaults to `kimi-k2.5`
 
 Useful translation commands:
 

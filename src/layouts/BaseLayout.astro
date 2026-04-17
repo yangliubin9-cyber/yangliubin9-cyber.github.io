@@ -104,6 +104,8 @@ const structuredDataItems = [
     {alternateUrl && (
       <link rel="alternate" hreflang={locale === 'zh' ? 'en' : 'zh'} href={alternateUrl} />
     )}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     <meta property="og:site_name" content={`${siteMeta.brand} | ${siteMeta.title}`} />
     <meta property="og:title" content={title} />

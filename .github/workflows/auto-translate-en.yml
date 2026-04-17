@@ -42,6 +42,11 @@ jobs:
           OPENAI_TRANSLATION_MODEL: ${{ secrets.OPENAI_TRANSLATION_MODEL }}
         run: node ./scripts/translate-posts.mjs changed
 
+      - name: Check translation freshness
+        env:
+          ASTRO_TELEMETRY_DISABLED: '1'
+        run: npm run translate:check
+
       - name: Validate content and build
         env:
           ASTRO_TELEMETRY_DISABLED: '1'
