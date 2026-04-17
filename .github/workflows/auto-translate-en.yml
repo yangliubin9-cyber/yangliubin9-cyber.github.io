@@ -58,5 +58,5 @@ jobs:
             echo "No generated English changes to commit"
             exit 0
           fi
-          git commit -m "chore: auto sync english translations"
+          git commit -m "chore: auto sync english translations [skip ci]"
           git push

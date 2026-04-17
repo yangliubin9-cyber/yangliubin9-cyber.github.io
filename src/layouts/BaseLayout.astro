@@ -341,7 +341,19 @@ const structuredDataItems = [
       </main>
 
       <footer class="site-footer">
-        <p>{siteMeta.brand} · {siteMeta.title}</p>
+        <div class="footer-panel">
+          <div class="footer-copy">
+            <p class="footer-brand">{siteMeta.brand} · {siteMeta.title}</p>
+            <p class="footer-tagline">{siteMeta.description[locale]}</p>
+            <p class="footer-copyright">© {new Date().getFullYear()} {siteMeta.author.name}</p>
+          </div>
+          <div class="footer-links">
+            <a class="footer-link" href={siteMeta.author.github} target="_blank" rel="noreferrer">GitHub</a>
+            <a class="footer-link" href={siteMeta.repositories.site} target="_blank" rel="noreferrer">
+              {locale === 'zh' ? '本站源码' : 'Source'}
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   </body>

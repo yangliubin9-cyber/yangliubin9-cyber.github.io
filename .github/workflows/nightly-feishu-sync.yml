@@ -43,21 +43,21 @@ jobs:
           FEISHU_SYNC_USE_RAW_CONTENT: ${{ secrets.FEISHU_SYNC_USE_RAW_CONTENT }}
         run: node ./scripts/feishu-sync.mjs --locale zh --translate-en
 
-      - name: Validate content and build
-        env:
-          ASTRO_TELEMETRY_DISABLED: '1'
-        run: |
-          npm run check
-          npm run build
-
-      - name: Commit and push changes
+      - name: Commit synced content first
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/content/posts/zh src/content/posts/en
           if git diff --cached --quiet; then
             echo "No content changes to commit"
-            exit 0
+          else
+            git commit -m "chore: nightly feishu sync [skip ci]"
+            git push
           fi
-          git commit -m "chore: nightly feishu sync"
-          git push
+
+      - name: Validate content and build
+        env:
+          ASTRO_TELEMETRY_DISABLED: '1'
+        run: |
+          npm run check
+          npm run build

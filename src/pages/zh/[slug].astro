@@ -67,7 +67,7 @@ const articleStructuredData = {
   headline: post.data.title,
   description: post.data.summary,
   datePublished: post.data.publishedAt.toISOString(),
-  dateModified: post.data.publishedAt.toISOString(),
+  dateModified: post.data.updatedAt?.toISOString() ?? post.data.publishedAt.toISOString(),
   inLanguage: 'zh-CN',
   mainEntityOfPage: new URL(localePath('zh', post.data.pathSlug), siteMeta.url).toString(),
   author: {

@@ -10,7 +10,7 @@ const projectRoot = path.resolve(__dirname, '..');
 const postsRoot = path.join(projectRoot, 'src', 'content', 'posts');
 const zhRoot = path.join(postsRoot, 'zh');
 const enRoot = path.join(postsRoot, 'en');
-const defaultModel = process.env.OPENAI_TRANSLATION_MODEL || 'gpt-5.4-mini';
+const defaultModel = process.env.OPENAI_TRANSLATION_MODEL || 'kimi-k2.5';
 const maxTranslationChunkChars = Number.parseInt(
   process.env.OPENAI_TRANSLATION_MAX_CHARS || '4000',
   10

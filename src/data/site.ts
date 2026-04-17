@@ -3,6 +3,7 @@ export const siteMeta = {
   brand: 'MUZI',
   url: 'https://yangliubin9-cyber.github.io',
   socialImage: '/social-card.svg',
+  avatar: '/Blog.png',
   author: {
     name: 'Yang Liubin',
     github: 'https://github.com/yangliubin9-cyber'

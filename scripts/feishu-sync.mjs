@@ -450,8 +450,11 @@ function normalizeDate(value, fallback) {
 }
 
 function estimateReadingMinutes(markdown) {
-  const cjkCharacters = (markdown.match(/\p{Script=Han}/gu) || []).length;
-  const latinWords = (markdown.match(/[A-Za-z0-9_./:-]+/g) || []).length;
+  const prose = normalizeLineEndings(markdown)
+    .replace(/```[\s\S]*?```/g, '\n')
+    .replace(/~~~[\s\S]*?~~~/g, '\n');
+  const cjkCharacters = (prose.match(/\p{Script=Han}/gu) || []).length;
+  const latinWords = (prose.match(/[A-Za-z0-9_./:-]+/g) || []).length;
   const weightedTokens = cjkCharacters + latinWords;
   return Math.max(1, Math.ceil(weightedTokens / 220));
 }
@@ -895,15 +898,15 @@ function extractSummary(markdown, fallbackTitle) {
     const latinTokenCount = (compact.match(/[A-Za-z0-9_./:-]+/g) || []).length;
     const hasSentencePunctuation = /[。！？；;,.]/.test(compact);
 
-    if (compact.length < 16) {
+    if (compact.length < 10) {
       continue;
     }
 
-    if (cjkCount < 8 && latinTokenCount < 6) {
+    if (cjkCount < 5 && latinTokenCount < 4) {
       continue;
     }
 
-    if (!hasSentencePunctuation && cjkCount < 12) {
+    if (!hasSentencePunctuation && cjkCount < 8) {
       continue;
     }
 
